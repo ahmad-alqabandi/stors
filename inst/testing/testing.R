@@ -14,6 +14,10 @@ h_prime_norm <- function(x) {
   -x
 }
 
+devtools::load_all()
+stors::grid_obtimizer("snorm")
+.Call(C_print_cached_grids)
+
 
 set_grid(lb = -Inf, rb = Inf, mode = modes, f = f_norm, h = h_norm, h_prime = h_prime_norm, dist_name = "normal", to = "set" )
 
@@ -21,7 +25,7 @@ grids_list_print()
 
 grid = stors::read_grid(dist_name = "normal")
 
-snorm = stors::stors("normal")
+snorm2 = stors::stors("normal")
 
 x =  grid$grid_data$x
 lower = grid$grid_data$s_upper_lower
@@ -33,13 +37,14 @@ upper = grid$grid_data$s_upper
 lt = grid$lt_properties
 rt = grid$rt_properties
 
+object.size(snorm)
+object.size(snorm2) # we need to make sure this does not happened 
 
-n=1000
+n=1
 
 microbenchmark::microbenchmark(
-  snorm(n),
-  stors::stors2(n,grid, f_norm),
-  stors::stors3(n, x, lower, pa, steps, pro, unis, upper, lt, rt, f_norm),
+  stors::snorm(n),
+  zrnormR(n),
   rnorm(n),
-  times = 10000
+  times = 100
 )

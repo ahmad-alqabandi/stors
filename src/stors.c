@@ -1,21 +1,6 @@
-#include <Rinternals.h>
-#include <R_ext/Random.h>
 
-// ---------- Structures ----------
-
-
-
-SEXP stors(SEXP s_size, SEXP Rx, SEXP Rs_upper_lower, SEXP Rp_a, SEXP Rm,
-           SEXP Rnormalized_areas, SEXP Runif_s, SEXP Rs_upper, SEXP Rlts, SEXP Rrts, SEXP Rf, SEXP Renv);
-
-static const R_CallMethodDef callMethods[]  = {
-  {"c_stors", (DL_FUNC) &stors, -1},
-  {NULL, NULL, 0}
-};
-
-void R_init_myLib(DllInfo *info) {
-  R_registerRoutines(info, NULL, callMethods, NULL, NULL);
-}
+#include "R_stors.h"
+#include "stors.h"
 
 // return pdf value for the target dist
 double f(double x, SEXP Rf, SEXP Renv)
@@ -36,20 +21,21 @@ double f(double x, SEXP Rf, SEXP Renv)
     return (res);
 }
 
-/*
-SEXP print_size( SEXP Robj ){
 
-  double *obj = REAL(Robj);
-  size_t size = 0;
+SEXP print_cached_grids(void){
   
-  size = __builtin_dynamic_object_size(obj,1);
+   Rprintf(" ========== \n");
+   Rprintf(" x\n");
+   for( int j=0; j < grids.incache; j++){
+    for( int i = 0; i < (grids.grid[j].steps_number + 1) ; i++){
+      Rprintf(" %f \n",grids.grid[j].x[i]);
+    }
+   }
+   Rprintf(" ========== \n");
   
-  Rprintf("\n\n size = %d \n\n",size );
-  
-  return (R_NilValue);
+  R_RETURN_NULL
 }
-
-
+/*
 SEXP pre_fetch( SEXP Rgrid , SEXP Rsize){
   
   double *obj = REAL(Rgrid);
