@@ -1,11 +1,16 @@
 #include "R_stors.h"
 #include "snorm.h"
 
-SEXP snorm(SEXP s_size, SEXP R_Cnum)
+SEXP snorm(SEXP s_size)
 {
-  int j, sample_size = asInteger(s_size), Cnum = asInteger(R_Cnum);
+  int j, sample_size = asInteger(s_size);
   
-  struct grid g = grids.grid[Cnum];
+   if(grids.grid[0].x == NULL){
+     REprintf("you need to optimize your dist first");
+     R_RETURN_NULL
+   }
+  
+  struct grid g = grids.grid[0];
   
   double h_upper, u, u1, sample, f_sample;
   

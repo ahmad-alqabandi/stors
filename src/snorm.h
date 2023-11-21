@@ -6,6 +6,6 @@
 #include <R.h>
 #include <Rinternals.h>
 
-SEXP snorm(SEXP s_size, SEXP Cnum);
+SEXP snorm(SEXP s_size);
   
 #endif

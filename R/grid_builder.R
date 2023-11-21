@@ -21,14 +21,15 @@ pbgrids <- list(
 
 #' Title
 #'
-#' @param density_name 
+#' @param density_name
 #'
 #' @return
 #' @export
-#'
 #' @examples
 grid_obtimizer <- function(density_name = c("snorm")) {
   density_name <- match.arg(density_name)
+
+  stopifnot(" Grid already optimized for this distrubution" = !grids_env$grids_config[[density_name]]$opt)
 
   dendata <- pbgrids[[density_name]]
 
@@ -39,19 +40,44 @@ grid_obtimizer <- function(density_name = c("snorm")) {
 
     if ((object.size(opt_grid) / 1024) > 128) break
   }
-  
+
   opt_grid <- grid_builder(a = 0.00035, th = 0.6, mode = dendata$modes, f = dendata$f, h = dendata$h, h_prime = dendata$h_prime)
-  
-  
-  cash_grid( dendata$Cnum ,opt_grid)
-  
+
+
+
+  cash_grid_c(dendata$Cnum, opt_grid)
+
+  save_grid_r(dendata$Cnum, opt_grid)
+
+  grids_env$grids_config[[density_name]]$opt <- TRUE
 }
 
-cash_grid = function(C_num, grid){
-  
-  .Call(C_cache_grid, C_num, grid$grid_data$x,  grid$grid_data$s_upper, grid$grid_data$p_a, grid$grid_data$s_upper_lower, grid$areas, grid$steps_number, grid$sampling_probabilities, grid$unif_scaler, grid$lt_properties, grid$rt_properties)
-  
+
+cash_grid_c <- function(Cnum, grid) {
+  .Call(C_cache_grid, Cnum, grid$grid_data$x, grid$grid_data$s_upper, grid$grid_data$p_a, grid$grid_data$s_upper_lower, grid$areas, grid$steps_number, grid$sampling_probabilities, grid$unif_scaler, grid$lt_properties, grid$rt_properties)
 }
+
+
+cash_grid_r <- function(Cnum, opt_grid, f = NULL) {
+  if (!is.null(f)) {
+    # parse function
+  }
+
+  grids_cache_path <- file.path(grids_env$grids_config$cache_dir, paste0(Cnum, ".rds"))
+
+  saveRDS(opt_grid, grids_cache_path)
+}
+
+save_grid_r <- function(Cnum, opt_grid, f = NULL) {
+  if (!is.null(f)) {
+    # parse function
+  }
+
+  grids_data_path <- file.path(grids_env$grids_config$data_dir, paste0(Cnum, ".rds"))
+  
+  saveRDS(opt_grid, grids_data_path)
+}
+
 
 #' Grid builder
 #'
@@ -62,25 +88,11 @@ cash_grid = function(C_num, grid){
 #' @param h log transform of the density function
 #' @param h_prime first derivative of h
 #' @return message
+#' @import digest digest
 #' @export
-set_grid <- function(lb = -Inf, rb = Inf, mode, f = f_norm, h = h_norm, h_prime = h_prime_norm, to = c("set"), dist_name = "") {
-  to <- match.arg(to)
+set_grid <- function(lb = -Inf, rb = Inf, mode, f = f_norm, h = h_norm, h_prime = h_prime_norm) {
 
-  data_dir <- tools::R_user_dir("stors", "data")
 
-  if (!dir.exists(data_dir)) dir.create(data_dir, recursive = TRUE)
-
-  grids_list_path <- file.path(data_dir, "grids_list.rds")
-
-  if (!file.exists(grids_list_path)) {
-    grids_list <- data.frame(distrubution_name = character(), number_of_steps = double(), sampling_efficiency = double())
-  } else {
-    grids_list <- readRDS(grids_list_path)
-
-    stopifnot("Error: dist_name is already exist" = !(dist_name %in% grids_list$distrubution_name))
-  }
-
-  if (to == "set") {
     A <- seq(from = 0.005, to = 0.0002, length.out = 100)
 
     for (a in A) {
@@ -93,18 +105,12 @@ set_grid <- function(lb = -Inf, rb = Inf, mode, f = f_norm, h = h_norm, h_prime 
     func_to_text <- deparse(f)
 
     opt_grid$dens_func <- func_to_text
+    
+    grids_env$grids_config$creatd_Id  = append(grids_env$grids_config$creatd_Id , digest(opt_grid))
+    
 
-    new_grid_path <- file.path(data_dir, paste0(dist_name, ".rds"))
-
-    saveRDS(opt_grid, file = new_grid_path)
-
-    # grids_list = grids_list[nrow(grids_list) + 1,]=c(dist_name, opt_grid$steps_number, 1 / sum(opt_grid$areas) )
-    grids_list <- rbind(grids_list, data.frame(distrubution_name = dist_name, number_of_steps = opt_grid$steps_number, sampling_efficiency = 1 / sum(opt_grid$areas)))
-
-    print(grids_list)
-
-    saveRDS(grids_list, grids_list_path)
-  }
+    return(opt_grid)
+  
 }
 
 

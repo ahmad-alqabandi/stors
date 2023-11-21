@@ -5,38 +5,30 @@
 #' @param f target density
 #' @return sample of size n
 #' @export
-#'
-stors <- function(dist_name) {
-  force(dist_name)
-
-  data_dir <- tools::R_user_dir("stors", "data")
-
-  stopifnot(`there are no grids in user_data directory` = dir.exists(data_dir))
-
-  grid_dir <- file.path(data_dir, paste0(dist_name, ".rds"))
-
-  stopifnot(`there is no grid for 'dist_name' density` = file.exists(grid_dir))
-
-  grid <- readRDS(grid_dir)
-
+#' @import digest digest
+stors <- function(grid) {
+  force(grid)
+  
+  stopifnot(" This grid is not optmized using set_grid() " = digest(grid) %in% grids_env$grids_config$creatd_Id )
+  
+  n = nrow(grids_env$grids_config$grids)+1
+  
+  grids_env$grids_config$grids[n,]$Id = digest(grid)
+  
+  Cnum = grids_env$grids_config$grids[n,]$Cnum = grids_env$grids_config$builtin_num + n - 1
+  
   grid$dens_func <- eval(parse(text = grid$dens_func))
 
   rfunc_env <- new.env()
+  
+  cash_grid_c(Cnum, grid)
 
   # MAKE SURE TO RM() ALL DATA AFTER IS GET CACHED IN C
   function(n) {
     .Call(
       C_stors,
       n,
-      grid$grid_data$x,
-      grid$grid_data$s_upper_lower,
-      grid$grid_data$p_a,
-      grid$steps_number,
-      grid$sampling_probabilities,
-      grid$unif_scaler,
-      grid$grid_data$s_upper,
-      grid$lt_properties,
-      grid$rt_properties,
+      eval(expression(Cnum)),
       grid$dens_func,
       rfunc_env
     )
@@ -53,5 +45,6 @@ stors <- function(dist_name) {
 #' @export
 #'
 snorm <- function(n, mean = 0, sd = 1) {
-  .Call(C_snorm, n, 0)
+  # stopifnot("you need to optimize the grid first" = grids_env$grids_config$snorm$opt)
+  .Call(C_snorm, n)
 }

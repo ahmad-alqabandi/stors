@@ -1,50 +1,60 @@
-modes <- 0
+detach_package <- function(pkg, character.only = FALSE)
+{
+  if(!character.only)
+  {
+    pkg <- deparse(substitute(pkg))
+  }
+  search_item <- paste("package", pkg, sep = ":")
+  while(search_item %in% search())
+  {
+    detach(search_item, unload = TRUE, character.only = TRUE)
+  }
+}
 
-f_norm <- function(x) {
-  0.3989423 * exp(-0.5 * x * x)
+detach_package(stors)
+
+modes_multi = c(0,4)
+
+
+p <- 0.5
+
+q <- 0.5
+
+f_multi <- function(x) {
+  p * (sqrt(2 * pi))^(-1) * exp(-(x^2)/2) + q * ( sqrt(2 * pi))^(-1) * exp(-((x - 4)^2)/2)
+}
+
+h_multi <- function(x) {
+  log(  p * (sqrt(2 * pi))^(-1) * exp(-(x^2)/2) + q * (sqrt(2 * pi))^(-1) * exp(-((x - 4)^2)/2))
 }
 
 
-h_norm <- function(x) {
-  log(0.3989423) - (x * x) * (1 / 2)
+h_prime_multi <- function(x) {
+  (-(exp(-1/2 * (-4 + x)^2) * q * (-4 + x))/sqrt(2 * pi) - (exp(-x^2/2) * p * x)/sqrt(2 * pi))/((exp(-x^2/2) * p)/sqrt(2 * pi) + (exp(-1/2 * (-4 + x)^2) * q)/sqrt(2 * pi))
 }
 
+multi_grid = set_grid(lb = -Inf, rb = Inf, mode = modes_multi, f = f_multi, h = h_multi, h_prime = h_prime_multi)
 
-h_prime_norm <- function(x) {
-  -x
-}
+multi_sampler = stors(multi_grid)
 
 devtools::load_all()
+
+# save_grid, load_grid
+
 stors::grid_obtimizer("snorm")
+
+hist(snorm(10000))
+
+
 .Call(C_print_cached_grids)
 
+multi_sampler = stors(multi_grid)
 
-set_grid(lb = -Inf, rb = Inf, mode = modes, f = f_norm, h = h_norm, h_prime = h_prime_norm, dist_name = "normal", to = "set" )
-
-grids_list_print()
-
-grid = stors::read_grid(dist_name = "normal")
-
-snorm2 = stors::stors("normal")
-
-x =  grid$grid_data$x
-lower = grid$grid_data$s_upper_lower
-pa = grid$grid_data$p_a
-steps = grid$steps_number
-pro = grid$sampling_probabilities
-unis= grid$unif_scaler
-upper = grid$grid_data$s_upper
-lt = grid$lt_properties
-rt = grid$rt_properties
-
-object.size(snorm)
-object.size(snorm2) # we need to make sure this does not happened 
 
 n=1
-
 microbenchmark::microbenchmark(
-  stors::snorm(n),
+  snorm(n),
   zrnormR(n),
   rnorm(n),
-  times = 100
+  times = 1000
 )

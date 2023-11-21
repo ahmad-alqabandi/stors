@@ -4,12 +4,12 @@
 \alias{stors}
 \title{stros for sampling}
 \usage{
-stors(dist_name)
+stors(grid)
 }
 \arguments{
-\item{n}{sample size}
-
 \item{grid}{proposal grid}
+
+\item{n}{sample size}
 
 \item{f}{target density}
 }

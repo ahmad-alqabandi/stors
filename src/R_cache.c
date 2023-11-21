@@ -2,7 +2,7 @@
 #include "R_cache.h"
 
 
-struct grids grids = {.incache = 0};
+struct grids grids = {{0}};
 
 
 
@@ -13,14 +13,14 @@ SEXP cache_grid(SEXP R_Cnum, SEXP R_x, SEXP R_s_upper, SEXP R_p_a, SEXP R_s_uppe
   double *x = REAL(R_x), *S_upper = REAL(R_s_upper), *p_a = REAL(R_p_a), *s_upper_lower = REAL(R_s_upper_lower),
     *areas = REAL(R_areas), *sampling_probabilities = REAL(R_sampling_probabilities), *lt_properties = REAL(R_lt_properties), *rt_properties = REAL(R_rt_properties);
   
-  grids.grid[j].x = (double*) malloc( (m + 1) * sizeof(double) );
-  grids.grid[j].p_a = (double*) malloc( (m + 1) * sizeof(double) );
-  grids.grid[j].s_upper = (double*) malloc( (m + 1) * sizeof(double) );
-  grids.grid[j].s_upper_lower = (double*) malloc( (m + 1) * sizeof(double) );
+  grids.grid[j].x =  calloc( (m + 1) , sizeof(double) );
+  grids.grid[j].p_a = calloc( (m + 1) , sizeof(double) );
+  grids.grid[j].s_upper = calloc( (m + 1) , sizeof(double) );
+  grids.grid[j].s_upper_lower = calloc( (m + 1) ,  sizeof(double) );
   
   grids.grid[j].steps_number = m;
   grids.grid[j].unif_scaler = unif_scaler;
-  
+
   for( size_t i = 0; i < (m + 1); i++){
     grids.grid[j].x[i] = x[i];
     grids.grid[j].p_a[i] = p_a[i];
@@ -66,6 +66,8 @@ SEXP free_cache(void){
   }
   
   grids.incache=0;
+  
+  Rprintf("\n === C Cache freed successfully === \n");
   
   R_RETURN_NULL
 }

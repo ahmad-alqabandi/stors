@@ -7,6 +7,6 @@
 #include <Rinternals.h>
 
 SEXP print_cached_grids(void);
-SEXP stors(SEXP s_size, SEXP Rx, SEXP Rs_upper_lower, SEXP Rp_a, SEXP Rm, SEXP Rnormalized_areas, SEXP Runif_s, SEXP Rs_upper, SEXP Rlts, SEXP Rrts, SEXP Rf, SEXP Renv);
-
+SEXP stors(SEXP s_size, SEXP R_Cnum, SEXP Rf, SEXP Renv);
+  
 #endif

@@ -10,9 +10,7 @@ set_grid(
   mode,
   f = f_norm,
   h = h_norm,
-  h_prime = h_prime_norm,
-  to = c("set"),
-  dist_name = ""
+  h_prime = h_prime_norm
 )
 }
 \arguments{
