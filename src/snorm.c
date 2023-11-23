@@ -1,12 +1,12 @@
 #include "R_stors.h"
 #include "snorm.h"
 
-SEXP snorm(SEXP s_size)
+SEXP srnorm(SEXP s_size)
 {
   int j, sample_size = asInteger(s_size);
   
    if(grids.grid[0].x == NULL){
-     REprintf("you need to optimize your dist first");
+     REprintf("you need to optimize your destribution grid first");
      R_RETURN_NULL
    }
   

@@ -4,7 +4,7 @@
 \alias{grid_obtimizer}
 \title{Title}
 \usage{
-grid_obtimizer(density_name = c("snorm"))
+grid_obtimizer(density_name = c("srnorm"))
 }
 \arguments{
 \item{density_name}{}

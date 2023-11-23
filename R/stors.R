@@ -4,32 +4,42 @@
 #' @param grid proposal grid
 #' @param f target density
 #' @return sample of size n
-#' @export
 #' @import digest digest
+#' @export
 stors <- function(grid) {
+  
   force(grid)
   
-  stopifnot(" This grid is not optmized using set_grid() " = digest(grid) %in% grids_env$grids_config$creatd_Id )
+  is_valid_grid(grid)
   
-  n = nrow(grids_env$grids_config$grids)+1
+  if(digest(grid) %in% stors_env$user_cached_grids$Id ){
+    
+        Cnum = subset(stors_env$user_cached_grids, Id == digest(grid))$Cnum
+    
+  } else{
+    
+    n = nrow(stors_env$user_cached_grids) + 1
+    
+    stors_env$user_cached_grids[n,]$Id = digest(grid)
+    
+    Cnum = stors_env$user_cached_grids[n,]$Cnum = stors_env$grids$biultin$builtin_num + n - 1
+    
+    cash_grid_c(Cnum, grid)
+    
+  }
   
-  grids_env$grids_config$grids[n,]$Id = digest(grid)
+  dens_func <- eval(parse(text = grid$dens_func))
   
-  Cnum = grids_env$grids_config$grids[n,]$Cnum = grids_env$grids_config$builtin_num + n - 1
-  
-  grid$dens_func <- eval(parse(text = grid$dens_func))
-
   rfunc_env <- new.env()
   
-  cash_grid_c(Cnum, grid)
-
-  # MAKE SURE TO RM() ALL DATA AFTER IS GET CACHED IN C
+  rm(grid)
+  
   function(n) {
     .Call(
       C_stors,
       n,
       eval(expression(Cnum)),
-      grid$dens_func,
+      dens_func,
       rfunc_env
     )
   }
@@ -44,7 +54,7 @@ stors <- function(grid) {
 #' @return sample of size n
 #' @export
 #'
-snorm <- function(n, mean = 0, sd = 1) {
-  # stopifnot("you need to optimize the grid first" = grids_env$grids_config$snorm$opt)
-  .Call(C_snorm, n)
+srnorm <- function(n, mean = 0, sd = 1) {
+  # stopifnot("you need to optimize the grid first" = stors_env$grids_config$snorm$opt)
+  .Call(C_srnorm, n)
 }

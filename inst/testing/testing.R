@@ -21,7 +21,7 @@ p <- 0.5
 q <- 0.5
 
 f_multi <- function(x) {
-  p * (sqrt(2 * pi))^(-1) * exp(-(x^2)/2) + q * ( sqrt(2 * pi))^(-1) * exp(-((x - 4)^2)/2)
+  0.5 * (sqrt(2 * pi))^(-1) * exp(-(x^2)/2) + 0.5 * ( sqrt(2 * pi))^(-1) * exp(-((x - 4)^2)/2)
 }
 
 h_multi <- function(x) {
@@ -33,17 +33,31 @@ h_prime_multi <- function(x) {
   (-(exp(-1/2 * (-4 + x)^2) * q * (-4 + x))/sqrt(2 * pi) - (exp(-x^2/2) * p * x)/sqrt(2 * pi))/((exp(-x^2/2) * p)/sqrt(2 * pi) + (exp(-1/2 * (-4 + x)^2) * q)/sqrt(2 * pi))
 }
 
-multi_grid = set_grid(lb = -Inf, rb = Inf, mode = modes_multi, f = f_multi, h = h_multi, h_prime = h_prime_multi)
+multi_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_multi, f = f_multi, h = h_multi, h_prime = h_prime_multi)
 
 multi_sampler = stors(multi_grid)
+
+hist(multi_sampler(1000000))
+
+save_grid(grid = multi_grid, file_name = "multi_sampler_1")
+
+multi_grid = load_grid("multi_sampler_1")
+
+multi_sampler = stors(multi_grid)
+
+hist(multi_sampler(1000000))
+
+
+stors::grid_obtimizer("srnorm")
+
+hist(srnorm(n))
 
 devtools::load_all()
 
 # save_grid, load_grid
 
-stors::grid_obtimizer("snorm")
 
-hist(snorm(10000))
+hist(srnorm(100000))
 
 
 .Call(C_print_cached_grids)
@@ -51,10 +65,11 @@ hist(snorm(10000))
 multi_sampler = stors(multi_grid)
 
 
-n=1
+n=1000
 microbenchmark::microbenchmark(
-  snorm(n),
+  srnorm(n),
+  multi_sampler(n),
   zrnormR(n),
   rnorm(n),
-  times = 1000
+  times = 100
 )

@@ -1,7 +1,7 @@
 # pbgrids : 1 Normal
 
 pbgrids <- list(
-  snorm = c(
+  srnorm = c(
     Cnum = 0,
     f = function(x) {
       0.3989423 * exp(-0.5 * x * x)
@@ -19,6 +19,17 @@ pbgrids <- list(
 )
 
 
+#' check grid validity
+#'
+#' @return boolian
+#' @import digest digest
+is_valid_grid = function(grid){
+  
+  stopifnot(" This grid is not optmized using build_grid() " = digest(grid) %in% stors_env$created_girds_Id )
+  
+}
+
+
 #' Title
 #'
 #' @param density_name
@@ -26,11 +37,13 @@ pbgrids <- list(
 #' @return
 #' @export
 #' @examples
-grid_obtimizer <- function(density_name = c("snorm")) {
+grid_obtimizer <- function(density_name = c("srnorm")) {
+  
   density_name <- match.arg(density_name)
 
-  stopifnot(" Grid already optimized for this distrubution" = !grids_env$grids_config[[density_name]]$opt)
+  stopifnot(" Grid already optimized for this distrubution" = !stors_env$grids$biultin[[density_name]]$opt)
 
+  
   dendata <- pbgrids[[density_name]]
 
   A <- seq(from = 0.005, to = 0.0002, length.out = 100)
@@ -43,13 +56,12 @@ grid_obtimizer <- function(density_name = c("snorm")) {
 
   opt_grid <- grid_builder(a = 0.00035, th = 0.6, mode = dendata$modes, f = dendata$f, h = dendata$h, h_prime = dendata$h_prime)
 
-
-
   cash_grid_c(dendata$Cnum, opt_grid)
 
-  save_grid_r(dendata$Cnum, opt_grid)
+  save_builtin_grid(dendata$Cnum, opt_grid)
 
-  grids_env$grids_config[[density_name]]$opt <- TRUE
+  stors_env$grids$biultin[[density_name]]$opt <- TRUE
+  
 }
 
 
@@ -58,28 +70,61 @@ cash_grid_c <- function(Cnum, grid) {
 }
 
 
-cash_grid_r <- function(Cnum, opt_grid, f = NULL) {
-  if (!is.null(f)) {
-    # parse function
-  }
-
-  grids_cache_path <- file.path(grids_env$grids_config$cache_dir, paste0(Cnum, ".rds"))
-
-  saveRDS(opt_grid, grids_cache_path)
-}
-
-save_grid_r <- function(Cnum, opt_grid, f = NULL) {
-  if (!is.null(f)) {
-    # parse function
-  }
-
-  grids_data_path <- file.path(grids_env$grids_config$data_dir, paste0(Cnum, ".rds"))
+save_builtin_grid <- function(Cnum, grid) {
   
-  saveRDS(opt_grid, grids_data_path)
+  grids_file_path <- file.path(stors_env$user_dirs$builtin_dir, paste0(Cnum, ".rds"))
+  
+  saveRDS(grid, grids_file_path)
 }
 
 
-#' Grid builder
+#' function to save grids that created by the user
+#'
+#' @param grid an optimize grid generated using build_grid() function
+#' @param file_name the name of the file that is holding the grid in the used data directory
+#'
+#' @return
+#' @export
+#' @import digest digest
+#' @examples
+save_grid <- function(grid, file_name) {
+  
+  is_valid_grid(grid)
+  
+  grids_file_path <- file.path(stors_env$user_dirs$data_dir, paste0(file_name, ".rds"))
+  
+  saveRDS(grid, grids_file_path)
+  
+  efficiency <- (1/sum(grid$areas))
+  
+  stors_env$grids$user[ nrow(stors_env$grids$user) + 1 ,] = list( file_name, efficiency)
+}
+
+
+
+#' Title
+#'
+#' @param grid_name the name of the stored grid that has been stored using save_grid()
+#'
+#' @return return a saved grid from user data directory
+#' @export
+#'
+#' @examples
+load_grid <- function(grid_name) {
+  
+  stopifnot("this grid is not exist"= grid_name %in% stors_env$grids$user$name)
+  
+  grids_file_path <- file.path(stors_env$user_dirs$data_dir, paste0(grid_name, ".rds"))
+  
+  grid <- readRDS(grids_file_path)
+  
+  stors_env$created_girds_Id  = append(stors_env$created_girds_Id , digest(grid))
+  
+  return(grid)
+  
+}
+
+#' build grid
 #'
 #' @param lb scaler density lower bound
 #' @param rb scaler density upper bound
@@ -90,25 +135,24 @@ save_grid_r <- function(Cnum, opt_grid, f = NULL) {
 #' @return message
 #' @import digest digest
 #' @export
-set_grid <- function(lb = -Inf, rb = Inf, mode, f = f_norm, h = h_norm, h_prime = h_prime_norm) {
-
+build_grid <- function(lb = -Inf, rb = Inf, mode, f = f_norm, h = h_norm, h_prime = h_prime_norm) {
 
     A <- seq(from = 0.005, to = 0.0002, length.out = 100)
 
     for (a in A) {
+      
       opt_grid <- grid_builder(lb, rb, a, th = 0.6, mode, f, h, h_prime)
 
       if ((object.size(opt_grid) / 1024) > 128) break
     }
 
-
     func_to_text <- deparse(f)
 
     opt_grid$dens_func <- func_to_text
     
-    grids_env$grids_config$creatd_Id  = append(grids_env$grids_config$creatd_Id , digest(opt_grid))
+    if(!(digest(opt_grid) %in% stors_env$created_girds_Id))
+    stors_env$created_girds_Id  = append(stors_env$created_girds_Id , digest(opt_grid))
     
-
     return(opt_grid)
   
 }
