@@ -1,9 +1,13 @@
-#' stros for sampling
+#' Sampling Function for Users' Grid
 #'
-#' @param n sample size
-#' @param grid proposal grid
-#' @param f target density
-#' @return sample of size n
+#' @description
+#' This function generates a sampling function based on a grid created and optimized by the user using the `build_grid()` function. The resulting sampling function can then be used to produce samples.
+#'
+#' @param grid The sampling grid created by the user.
+#'
+#' @return 
+#' Returns a sampling function that can be used to generate samples from the input `grid`.
+#' 
 #' @import digest digest
 #' @export
 stors <- function(grid) {
@@ -46,15 +50,12 @@ stors <- function(grid) {
 }
 
 
-#' stros for sampling
+#' Sampling from Normal distrubution
 #'
 #' @param n sample size
-#' @param grid proposal grid
-#' @param f target density
 #' @return sample of size n
 #' @export
 #'
-srnorm <- function(n, mean = 0, sd = 1) {
-  # stopifnot("you need to optimize the grid first" = stors_env$grids_config$snorm$opt)
+srnorm <- function(n) {
   .Call(C_srnorm, n)
 }

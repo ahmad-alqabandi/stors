@@ -2,20 +2,16 @@
 % Please edit documentation in R/stors.R
 \name{stors}
 \alias{stors}
-\title{stros for sampling}
+\title{Sampling Function for Users' Grid}
 \usage{
 stors(grid)
 }
 \arguments{
-\item{grid}{proposal grid}
-
-\item{n}{sample size}
-
-\item{f}{target density}
+\item{grid}{The sampling grid created by the user.}
 }
 \value{
-sample of size n
+Returns a sampling function that can be used to generate samples from the input `grid`.
 }
 \description{
-stros for sampling
+This function generates a sampling function based on a grid created and optimized by the user using the `build_grid()` function. The resulting sampling function can then be used to produce samples.
 }

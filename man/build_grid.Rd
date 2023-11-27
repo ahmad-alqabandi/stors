@@ -2,7 +2,7 @@
 % Please edit documentation in R/grid_builder.R
 \name{build_grid}
 \alias{build_grid}
-\title{Grid builder}
+\title{Build User Grid}
 \usage{
 build_grid(
   lb = -Inf,
@@ -14,21 +14,39 @@ build_grid(
 )
 }
 \arguments{
-\item{lb}{scaler density lower bound}
+\item{lb}{Scalar representing the lower bound of the density.}
 
-\item{rb}{scaler density upper bound}
+\item{rb}{Scalar representing the upper bound of the density.}
 
-\item{mode}{vector density modes}
+\item{mode}{Scalar/vector representing the modes of the density.}
 
-\item{f}{density function}
+\item{f}{The target density function.}
 
-\item{h}{log transform of the density function}
+\item{h}{Log transform of the target density function.}
 
-\item{h_prime}{first derivative of h}
+\item{h_prime}{The first derivative of the log-transformed target density.}
 }
 \value{
-message
+Returns a list containing all details of the proposal or sampling grid.
 }
 \description{
-Grid builder
+This function is used to create an optimized grid representing the proposal distribution for a target density, especially when sampling from certain density functions not prebuilt in STROS, such as `srnorm` and `srgamma`.
+}
+\examples{
+# The following example demonstrates how to build a grid for sampling from a bimodal distribution, which is a combination of two normal distributions \( f(x) = 0.5 \cdot w_1(x) + 0.5 \cdot w_2(x) \), where \( w_1(x) \sim \mathcal{N}(0, 1) \) and \( w_2(x) \sim \mathcal{N}(4, 1) \).
+ 
+ modes_bi = c(0,4)
+ 
+ f_bi <- function(x) {
+   0.5 * (sqrt(2 * pi))^(-1) * exp(-(x^2)/2) + 0.5 * ( sqrt(2 * pi))^(-1) * exp(-((x - 4)^2)/2)
+   }
+   
+ h_bi <- function(x) log(f_bi(x))
+   
+ h_prime_bi <- function(x) {
+     (-(exp(-1/2 * (-4 + x)^2) * 0.5 * (-4 + x))/sqrt(2 * pi) - (exp(-x^2/2) * 0.5 * x)/sqrt(2 * pi))/((exp(-x^2/2) * 0.5)/sqrt(2 * pi) + (exp(-1/2 * (-4 + x)^2) * 0.5)/sqrt(2 * pi))
+     }
+ 
+ bi_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_bi, f = f_bi, h = h_bi, h_prime = h_prime_bi)
+ 
 }

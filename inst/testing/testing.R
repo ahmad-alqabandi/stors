@@ -39,9 +39,9 @@ multi_sampler = stors(multi_grid)
 
 hist(multi_sampler(1000000))
 
-save_grid(grid = multi_grid, file_name = "multi_sampler_1")
+save_grid(grid = multi_grid, grid_name = "bimodal_3")
 
-multi_grid = load_grid("multi_sampler_1")
+multi_grid = load_grid("multi_grid")
 
 multi_sampler = stors(multi_grid)
 

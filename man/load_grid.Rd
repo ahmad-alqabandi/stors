@@ -2,16 +2,16 @@
 % Please edit documentation in R/grid_builder.R
 \name{load_grid}
 \alias{load_grid}
-\title{Title}
+\title{Load Stored Grid}
 \usage{
 load_grid(grid_name)
 }
 \arguments{
-\item{grid_name}{the name of the stored grid that has been stored using save_grid()}
+\item{grid_name}{A string specifying the name of the grid to be loaded.}
 }
 \value{
-return a saved grid from user data directory
+Returns a list of the grid stored under `grid_name` in R's internal data directory. If the specified grid name does not exist, it shows an error.
 }
 \description{
-Title
+This function loads a grid into memory that was previously saved using the `save_grid()` function.
 }

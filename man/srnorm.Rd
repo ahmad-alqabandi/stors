@@ -2,20 +2,16 @@
 % Please edit documentation in R/stors.R
 \name{srnorm}
 \alias{srnorm}
-\title{stros for sampling}
+\title{Sampling from Normal distrubution}
 \usage{
-srnorm(n, mean = 0, sd = 1)
+srnorm(n)
 }
 \arguments{
 \item{n}{sample size}
-
-\item{grid}{proposal grid}
-
-\item{f}{target density}
 }
 \value{
 sample of size n
 }
 \description{
-stros for sampling
+Sampling from Normal distrubution
 }
