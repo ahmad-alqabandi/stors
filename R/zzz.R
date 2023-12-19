@@ -21,16 +21,16 @@ stors_env <- new.env(parent = emptyenv())
     for (name in grids$biultin$names) {
       
       if (grids$biultin[[name]]$opt) {
-        opt_grid <- readRDS(file.path(stors_grids_path, paste0(grids$biultin[[name]]$Cnum, ".rds")))
+        opt_grid <- readRDS(file.path(builtin_dir, paste0(grids$biultin[[name]]$Cnum, ".rds")))
         cash_grid_c(grids$biultin[[name]]$Cnum, opt_grid)
       }
       
     }
     
   } else{
-    grids <- list(biultin = list(names = c("srnorm", "sgamma"),
+    grids <- list(biultin = list(names = c("srnorm", "slaplace"),
                           srnorm = list(opt = FALSE, Cnum = 0),
-                          sgamma = list(opt = FALSE, Cnum = 1),
+                          slaplace = list(opt = FALSE, Cnum = 1),
                           builtin_num = 2),
                   user = data.frame( name = character(), efficiency = double()) )
   } 

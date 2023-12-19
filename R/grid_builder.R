@@ -1,22 +1,3 @@
-# pbgrids : 1 Normal
-
-pbgrids <- list(
-  srnorm = c(
-    Cnum = 0,
-    f = function(x) {
-      0.3989423 * exp(-0.5 * x * x)
-    },
-    h = function(x) {
-      log(0.3989423) - (x * x) * (1 / 2)
-    },
-    h_prime = function(x) {
-      -x
-    },
-    modes = 0,
-    lb = -Inf,
-    rb = Inf
-  )
-)
 
 
 #' check grid validity
@@ -28,56 +9,6 @@ is_valid_grid = function(grid){
   stopifnot(" This grid is not optmized using build_grid() " = digest(grid) %in% stors_env$created_girds_Id )
   
 }
-
-#' Optimize Built-in Grid
-#'
-#' @description
-#' This function optimizes and stores the sampling grid for STROS built-in distributions.
-#'
-#' @param density_name string specifying the name of the distribution.
-#'
-#' @details
-#' Before users can sample from a built-in distribution in the STROS package, they must first optimize the sampling grid using this function.
-#'
-#' @seealso [srnorm]
-#'
-#' @examples
-#' # optimize grid to sample 10 values from normal distribution N(0,1) 
-#' library(stors)
-#' grid_optimizer("srnorm")
-#' srnorm(10)
-#'
-#' @return
-#' This function generates and stores an optimized grid for the specified built-in distribution in R's internal data directory.
-#' 
-#' @export
-grid_optimizer <- function(density_name = c("srnorm")) {
-  
-  density_name <- match.arg(density_name)
-
-  stopifnot(" Grid already optimized for this distrubution" = !stors_env$grids$biultin[[density_name]]$opt)
-
-  
-  dendata <- pbgrids[[density_name]]
-
-  A <- seq(from = 0.005, to = 0.0002, length.out = 100)
-
-  for (a in A) {
-    opt_grid <- grid_builder(a = a, th = 0.6, mode = dendata$modes, f = dendata$f, h = dendata$h, h_prime = dendata$h_prime)
-
-    if ((object.size(opt_grid) / 1024) > 128) break
-  }
-
-  opt_grid <- grid_builder(a = 0.00035, th = 0.6, mode = dendata$modes, f = dendata$f, h = dendata$h, h_prime = dendata$h_prime)
-
-  cash_grid_c(dendata$Cnum, opt_grid)
-
-  save_builtin_grid(dendata$Cnum, opt_grid)
-
-  stors_env$grids$biultin[[density_name]]$opt <- TRUE
-  
-}
-
 
 cash_grid_c <- function(Cnum, grid) {
   .Call(C_cache_grid, Cnum, grid$grid_data$x, grid$grid_data$s_upper, grid$grid_data$p_a, grid$grid_data$s_upper_lower, grid$areas, grid$steps_number, grid$sampling_probabilities, grid$unif_scaler, grid$lt_properties, grid$rt_properties)
@@ -91,67 +22,6 @@ save_builtin_grid <- function(Cnum, grid) {
   saveRDS(grid, grids_file_path)
 }
 
-
-
-#' @method print grid
-#' @export
-print.grid <-function(grid, ...){
-  
-   cat("The grid has ", grid$steps_number ," steps, in the domain range [", grid$grid_data$x[1] ,",", grid$grid_data$x[grid$steps_number+1],"].\n")
-   cat(sprintf("With a sampling efficiency of %.2f%%", 1/sum(grid$areas) * 100))
-   
-}
-
-
-
-#' @method plot grid
-#' @export
-plot.grid <- function(grid, ...){
-  
-  n = nrow(grid$grid_data)
-  
-  lf  <- function(x) exp( grid$lt_properties[5] * (x - grid$grid_data$x[1]) + grid$lt_properties[3] )
-
-  rf  <- function(x) exp( grid$rt_properties[5] * (x - grid$grid_data$x[n]) + grid$rt_properties[6] )
-  
-
-  f <- eval(parse(text = grid$dens_func))
-  
-  
-  xx <- seq(from = grid$grid_data$x[1]-1, to = grid$grid_data$x[n]+1, by = 0.01)
-  
-  xl <- seq( from = grid$grid_data$x[1]-1 , to= grid$grid_data$x[1], by = 0.01)
-  
-  xr <- seq( from = grid$grid_data$x[n] , to= grid$grid_data$x[n]+1, by = 0.01)
-  
-  yy <- f(xx)
-  
-  yl <- lf(xl)
-  
-  yr <- rf(xr)
-  
-  grid$grid_data$s_upper[n] = yr[1]
-  
-  grid$grid_data = rbind( c(grid$grid_data$x[1],yl[length(yl)],NA,NA), grid$grid_data)
-  
-  n <- n+1
-  
-  if (requireNamespace("ggplot2")) {
-    
-    ggplot2::ggplot() +
-      ggplot2::geom_step(ggplot2::aes(grid$grid_data[1:(n),]$x, grid$grid_data[1:(n),]$s_upper)) +
-      ggplot2::geom_line(ggplot2::aes(x = xx, y = yy, colour = "red"))  +
-      ggplot2::geom_line(ggplot2::aes(x = xl, y = yl, colour = "black")) +
-      ggplot2::geom_line(ggplot2::aes(x = xr, y = yr, colour = "black")) +
-      coord_cartesian(ylim=c(0, max(yy)))
-      # ggplot2::scale_y_continuous(limits = c(0, max(yy)))
-    
-  } else{
-    plot(grid,...)
-  }
-  
-  
-}
 
 #' Save User Grid
 #'
@@ -176,33 +46,6 @@ save_grid <- function(grid, grid_name) {
   efficiency <- (1/sum(grid$areas))
   
   stors_env$grids$user[ nrow(stors_env$grids$user) + 1 ,] = list( grid_name, efficiency)
-}
-
-
-#' Print All Grids
-#'
-#' @description
-#' Prints details of all grids stored by the user, including grid name, size, efficiency, etc.
-#'
-#' @export
-#'
-#' @examples
-#' # To print details of all stored grids
-#' print_grids()
-print_grids <- function( ){
-  
-  stopifnot(" there are no grids stored by the user " = nrow(stors_env$grids$user) != 0)
-  
-  grids <- list.files(path = stors_env$user_dirs$data_dir, full.names = TRUE)
-  
-  grids_details <- file.info(grids)
-  
-  grids_sizes <- grids_details[grids_details$isdir == FALSE,]$size
-  
-  print(stors_env$grids$user)
-  
-  cat("\n grids_size : ", sum(as.double(grids_sizes))/1028," KB")
-  
 }
 
 
@@ -262,20 +105,50 @@ load_grid <- function(grid_name) {
 #' Build User Grid
 #'
 #' @description
-#' This function is used to create an optimized grid representing the proposal distribution for a target density, especially when sampling from certain density functions not prebuilt in STROS, such as `srnorm` and `srgamma`.
+#' This function is used to create an optimized grid representing the proposal distribution for a target density, especially when sampling from certain density functions not prebuilt in stors, such as `srnorm` and `srgamma`.
 #'
-#' @param lb Scalar representing the lower bound of the density.
-#' @param rb Scalar representing the upper bound of the density.
-#' @param mode Scalar/vector representing the modes of the density.
-#' @param f The target density function.
-#' @param h Log transform of the target density function.
-#' @param h_prime The first derivative of the log-transformed target density.
+#' @param lb Scalar target density lower bound.
+#' @param rb Scalar target density upper bound.
+#' @param mode Vector representing the modes of the density.
+#' @param f Function accepting one argument which returns the probability density of the target.
+#' @param h Function accepting one argument which returns the Log-transform of the target.
+#' @param h_prime Function accepting one argument which returns the first derivative of the log-transformed target density.
 #'
+#' @details
+#' The grid building is conducted through constant area rectangles starting from the target distribution modes. For each mode, steps are constructed around as rectangles with a width of \(x_i - x_{i-1}\) and a height determined by \(\max(f(x_{i-1}), f(x_i))\), effectively covering the target distribution in a step pattern. The function grid_builder() constructs these steps and computes values that contribute to the sampling process. These values are later cached when the resulting grid is passed to the stors() function. This approach enhances the computational efficiency of stors.
+#' 
+#' 
 #' @return
-#' Returns a list containing all details of the proposal or sampling grid.
-#'
+#' Returns a list that contains the following data that is related to the proposal distribution:
+#' \itemize{
+#' \item{"grid_data"} {Data frame that includes the created steps information, such as x (the beginning of each step on the x-axis), s_upper (the step height on the y-axis), p_a (pre-acceptance probability for each step), and s_upper_lower (a vector used to re-scale the uniform random number when the sample is accepted).}
+#' \item{"areas"} {Vector that contains the area under the left tail bound, the steps in the middle, and the right tail bound.}
+#' \item{"steps_number"} {Scalar representing the number of steps in the proposal.}
+#' \item{"sampling_probabilities"} {Vector that contains the area under the left tail, and the area under the left tail and middle steps.}
+#' \item{"unif_scaler"} {Scalar representing the inverse probability of sampling from the step part of the proposal, \eqn{\frac{1}{p(lb < x < rb)}}. This value, similar to s_upper_lower in the grid_data data frame, is used to scale the uniform random value under the condition that we are going to sample from the steps part of the proposal.}
+#' \item{"lt_properties"} {Vector that includes 5 values used when sampling under the proposal's left tail using the ARS method.}
+#' \item{"rt_properties"} {Vector that includes 6 values used when sampling under the proposal's right tail using the ARS method.}
+#' }
+#' @seealso [func()]
+#' #\deqn{}
 #' @examples
-#' # The following example demonstrates how to build a grid for sampling from a bimodal distribution, which is a combination of two normal distributions \( f(x) = 0.5 \cdot w_1(x) + 0.5 \cdot w_2(x) \), where \( w_1(x) \sim \mathcal{N}(0, 1) \) and \( w_2(x) \sim \mathcal{N}(4, 1) \).
+#' 
+#' library(stors)
+#' 
+#' #EXAMPLE:1 The following example shows the grid building steps for a basic standard normal distribution f(x) \sim N(0,1)
+#' 
+#'  modes_norm = 0
+#' 
+#'   f_norm  <- function(x)  1/sqrt(2 * pi) * exp(-0.5 *x^2)
+#'    
+#'    h_norm <- function(x) log(f_norm(x))
+#'    
+#'    h_norm <- function(x) -x
+#' 
+#'  norm_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_norm, f = f_norm, h = h_norm, h_prime = h_norm)
+#' 
+#' 
+#' #EXAMPLE:2  The following example demonstrates how to build a grid for sampling from a bimodal distribution, which is a combination of two normal distributions \( f(x) = 0.5 \cdot w_1(x) + 0.5 \cdot w_2(x) \), where \( w_1(x) \sim \mathcal{N}(0, 1) \) and \( w_2(x) \sim \mathcal{N}(4, 1) \).
 #'  
 #'  modes_bi = c(0,4)
 #'  
@@ -293,20 +166,27 @@ load_grid <- function(grid_name) {
 #'  
 #' @import digest digest
 #' @export
-build_grid <- function(lb = -Inf, rb = Inf, mode, f = f_norm, h = h_norm, h_prime = h_prime_norm) {
+build_grid <- function(lb = -Inf, rb = Inf, mode, f, h = NULL, h_prime = NULL, a = 0.01,th = 0.9) {
 
-    A <- seq(from = 0.005, to = 0.0002, length.out = 100)
-
-    for (a in A) {
-      
-      opt_grid <- grid_builder(lb, rb, a, th = 0.6, mode, f, h, h_prime)
-
-      if ((object.size(opt_grid) / 1024) > 128) break
-    }
+    # A <- seq(from = 0.005, to = 0.0002, length.out = 100)
+    # 
+    # for (a in A) {
+    #   
+    #   opt_grid <- grid_builder(lb, rb, a, th = 0.6, mode, f, h, h_prime)
+    # 
+    #   if ((object.size(opt_grid) / 1024) > 128) break
+    # }
+    # 
+  if(is.null(h)){
+    h <- function(x){log(f(x))}
+  }
+  
+  if(is.null(h_prime)){
+    h_prime <- stors_prime(mode[1], h)
+  }
+  
+     opt_grid <- grid_builder(lb, rb,a, th, mode, f, h, h_prime)
     
-    # opt_grid <- grid_builder(lb, rb, 0.1, th = 0.8, mode, f, h, h_prime)
-    
-
     func_to_text <- deparse(f)
 
     opt_grid$dens_func <- func_to_text
@@ -324,7 +204,7 @@ build_grid <- function(lb = -Inf, rb = Inf, mode, f = f_norm, h = h_norm, h_prim
 }
 
 
-#' Grid init
+#' Grid Builder
 #'
 #' @param lb scaler density lower bound
 #' @param rb scaler density upper bound
@@ -343,6 +223,7 @@ grid_builder <- function(lb = -Inf, rb = Inf, a, th, mode, f, h, h_prime) {
     x = c(), s_upper = c(), s_lower = c(), p_a = c(),
     s_upper_lower = c()
   )
+  
   grids <- list()
   area <- c(0, 0, 0)
   g_len <- c()
@@ -350,10 +231,6 @@ grid_builder <- function(lb = -Inf, rb = Inf, a, th, mode, f, h, h_prime) {
   for (mode_i in (1:mode_n)) {
     grids[[mode_i]] <- find_steps(lb = -Inf, rb = Inf, a, th, mode[mode_i], mode_i, mode_n, f, h_prime, h)
   }
-
-
-  area[1] <- grids[[1]]$l_tail_area
-
 
 
   if (mode_n > 1) {
@@ -418,7 +295,14 @@ grid_builder <- function(lb = -Inf, rb = Inf, a, th, mode, f, h, h_prime) {
     g_len[length(g_len) + 1] <- grids[[1]]$m
   }
 
-  area[3] <- grids[[mode_n]]$r_tail_area
+  
+  tails_area = tails_ars(final_grid, f, h, h_prime, lb, rb)
+  
+  area[1] <- tails_area$lta
+  
+  area[3] <- tails_area$rta
+  
+  
 
   normalizing_con <- sum(area)
 
@@ -430,14 +314,19 @@ grid_builder <- function(lb = -Inf, rb = Inf, a, th, mode, f, h, h_prime) {
 
   unif_scaler <- normalizing_con / area[2]
 
+  
+  
   x1 <- final_grid$x[1]
   xm <- final_grid$x[steps_number + 1]
-
+  
   lt_properties <- c(exp(h_upper(x1, lb, h_prime, h)), normalizing_con * h_prime(x1), h(x1), 1 / h_prime(x1), h_prime(x1))
   rt_properties <- c(normalizing_con, area_cum_sum[2], h_prime(xm) / f(xm), 1 / h_prime(xm), h_prime(xm), h(xm))
 
   invisible(list(grid_data = final_grid, areas = area, steps_number = steps_number, sampling_probabilities = sampling_probabilities, unif_scaler = unif_scaler, lt_properties = lt_properties, rt_properties = rt_properties))
 }
+
+
+
 
 #' Steps Builder
 #'
@@ -481,13 +370,6 @@ find_steps <- function(lb = -Inf, rb = Inf, a, th, mode, mode_i, mode_n, f, h_pr
 
       if (x_next > rb || (mode_i == mode_n && f(x_next) / f_x < th)) {
         x[i + r] <- x_c
-        if (rb == Inf) {
-          r_tail_area <- (1 / h_prime(x[i + r])) * -f(x[i + r])
-        } else {
-          r_tail_area <- (1 / h_prime(x[i + r])) * (exp(h_upper(x[i + r], rb, h_prime, h)) - f(x[i + r]))
-        }
-
-
         break
       }
 
@@ -527,19 +409,14 @@ find_steps <- function(lb = -Inf, rb = Inf, a, th, mode, mode_i, mode_n, f, h_pr
 
 
 
-      if (x_c < lb || (mode_i == 1 && f(x_c) / f_x_previous < th)) {
-        if (lb == Inf) {
-          l_tail_area <- (1 / h_prime(x[i - l])) * f(x[i - l])
-        } else {
-          l_tail_area <- (1 / h_prime(x[i - l])) * (f(x[i - l]) - exp(h_upper(x[i - l], lb, h_prime, h)))
-        }
+      if (x_c < lb || (mode_i == 1 && f(x_c) / f_x_previous  < th)) {
         break
       }
 
       f_x <- f(x_c)
 
       if (f(x_c) > f_x_previous) {
-        l_tail_area <- 0
+        # l_tail_area <- 0
         break
       }
 
@@ -566,13 +443,64 @@ find_steps <- function(lb = -Inf, rb = Inf, a, th, mode, mode_i, mode_n, f, h_pr
 
   d <- subset(d, rowSums(is.na(d)) != ncol(d))
 
-  return(list(d = d, m = m, l_tail_area = l_tail_area, r_tail_area = r_tail_area))
+  return(list(d = d, m = m))
 }
-
-
 
 
 
 h_upper <- function(grid_point, val, h_prime, h) {
   h_prime(grid_point) * (val - grid_point) + h(grid_point)
+}
+
+# h_prime_lb <- function(x, h){
+#   x0 = x
+#   x00 = x0 + 0.0000001
+#   (h(x00) - h(x0))/(x00 -x0)
+# }
+# 
+# 
+# h_prime_rb <- function(x, h){
+#   xm = x
+#   xmm = xm - 0.0000001
+#   (h(xmm) - h(xm))/(xmm -xm)
+# }
+# 
+# 
+# h_prime <- function(x){
+#   
+#   return(x^2)
+# }
+
+
+tails_ars <- function(grid, f, h, h_prime, lb, rb){
+  m = length(grid$x)
+  # left tail
+  if (lb == Inf) {
+    l_tail_area <- (1 / h_prime(grid$x[1])) * f(grid$x[1])
+  } else {
+    l_tail_area <- (1 / h_prime(grid$x[1])) * (f(grid$x[1]) - exp(h_upper(grid$x[1], lb, h_prime, h)))
+  }
+  
+  #right tails
+  if (rb == Inf) {
+    r_tail_area <- (1 / h_prime(grid$x[m+1])) * -f(grid$x[m+1])
+  } else {
+    r_tail_area <- (1 / h_prime(grid$x[m+1])) * (exp(h_upper(grid$x[m+1], rb, h_prime, h)) - f(grid$x[m+1]))
+  }
+  
+  return(list(lta = l_tail_area, rta = r_tail_area))
+  
+}
+
+stors_prime <-function(mode, h){
+
+    function(x){
+      if(x < mode){
+        x0 = x + 0.0000001
+      }else{
+        x0 = x - 0.0000001
+      }
+      (h(x0) - h(x))/(x0 -x)
+    }
+
 }

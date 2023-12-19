@@ -2,7 +2,7 @@
 % Please edit documentation in R/grid_builder.R
 \name{grid_builder}
 \alias{grid_builder}
-\title{Grid init}
+\title{Grid Builder}
 \usage{
 grid_builder(lb = -Inf, rb = Inf, a, th, mode, f, h, h_prime)
 }
@@ -27,5 +27,5 @@ grid_builder(lb = -Inf, rb = Inf, a, th, mode, f, h, h_prime)
 list including proposal distribution properties
 }
 \description{
-Grid init
+Grid Builder
 }

@@ -50,17 +50,17 @@ for( name in stors:::stors_env$grids$biultin$names){
 
 For distributions not covered by the built-in functions, users can generate their own grid using the `grid_build()` function. This function accepts arguments such as `modes` (a scalar for uni-modal distributions or a vector for multimodal ones), `f` (the target density function of the sampling distribution), `h` (the log transform of the target distribution), `h_prime` (the first derivative of `h`), `lb` (the lower bound), and `rb` (the upper bound of the target distribution).
 
-The following example demonstrates the process of sampling from a bimodal normal distribution. Let's assume that the user wants to sample from a bimodal distribution, which is a combination of two normal distributions $f(x) = 0.5 w_1(x) + 0.5 w_2(x)$, where $w_1(x) \sim \mathcal{N}(0, 1)$ and $w_2(x) \sim \mathcal{N}(4, 1)$:
+The following example demonstrates the process of sampling from a bimodal normal distribution. Let's assume that the user wants to sample from a bimodal distribution, which is a combination of two normal distributions $f(x) = 0.5 w_1(x) + 0.5 w_2(x)$, where $w_1(x) \sim N(0, 1)$ and $w_2(x) \sim N(4, 1)$:
 
 $$
-f(x) =  0.5 \frac{1}{\sqrt{2 \pi}}  \exp(-\frac{x^2}{2}) + 0.5  \frac{1}{\sqrt{2 \pi}} \exp(-\frac{(x - 4)^2}{2})
+f(x) =  0.5 \frac{1}{\sqrt{2 \pi}}  \exp\left(-\frac{x^2}{2}\right) + 0.5  \frac{1}{\sqrt{2 \pi}} \exp\left(-\frac{(x - 4)^2}{2}\right)
 $$
 
 To sample from the tails of $f(x)$ using ARS, we need the log transformation of $f(x)$, $h(x) = log(f(x))$ and it's first derivative $h_\text{prime}(x) = \frac{d}{dx} h(x)$. Also, the modes of $f(x)$ are required to build the steps part of the proposal distribution, which in this case are 0 and 4.
 
 ```{r , echo = TRUE}
 
-modes_bi = c(0,4)
+modes_bi = c(0.00134865,3.99865)
 
 f_bi <- function(x) {
   0.5 * (sqrt(2 * pi))^(-1) * exp(-(x^2)/2) + 0.5 * ( sqrt(2 * pi))^(-1) * exp(-((x - 4)^2)/2)

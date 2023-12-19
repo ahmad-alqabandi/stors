@@ -57,6 +57,11 @@ SEXP stors(SEXP s_size, SEXP R_Cnum, SEXP Rf, SEXP Renv)
   
   struct grid g = grids.grid[Cnum];
   
+  if(g.exist == 0){
+    REprintf("you need to optimize your destribution grid first");
+    R_RETURN_NULL
+  }
+  
   double h_upper, u, u1, sample, f_sample;
   
   SEXP Rresults = PROTECT((allocVector(REALSXP, sample_size)));

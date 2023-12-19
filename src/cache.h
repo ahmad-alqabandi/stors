@@ -19,6 +19,15 @@ struct grids {
   int incache;
 };
 
+// Vose Code
+struct vose {
+  double *small, *large, *prob, *alias, *data;
+};
+
 extern struct grids grids;
+
+extern struct vose vose;
+
+
 
 #endif

@@ -50,12 +50,74 @@ stors <- function(grid) {
 }
 
 
-#' Sampling from Normal distrubution
-#'
+#' Sampling from Normal distribution
+#' @rdname snorm
+#' @order 1
+#' 
+#' @description
+#' Sampling from Normal distribution using stors.
+#' 
+#' @details
+#' The function srnorm() is used to sample from a standard Normal distribution with a mean equal to zero and a standard deviation equal to 1. In contrast, srsnorm() is used to sample from any Normal distribution by accepting the mean and standard deviation as inputs. The reason for having these two separate functions is to improve performance. The Stors algorithm is so fast that even simple operations like multiplication and addition could impact its speed.
+#' 
 #' @param n sample size
+#' 
 #' @return sample of size n
-#' @export
+#' 
+#' 
+#' @example
+#' # the following example shows how to generate 10 samples from standard normal distribution using stors
+#' 
+#' grid_optimizer("srnorm")
+#' 
+#' srnorm(10)
+#' 
+#' # the following example shows how to generate 10 samples from normal distribution with mean equal 4 and standard deviation equal to 2
 #'
+#' srsnorm(10,4,2)
+#' 
+#' @export
 srnorm <- function(n) {
   .Call(C_srnorm, n)
+}
+
+
+
+#' @rdname snorm
+#' @order 2
+#' 
+#' @param n Integer sample size
+#' @param mu Scalar mean
+#' @param sd Scalar standard deviations
+#'
+#' @export
+srsnorm <- function(n, mu =0, sd = 1) {
+  .Call(C_srnorm, n) * sd + mu
+}
+
+
+
+#' Sampling from Laplace distribution
+#'
+#' @param n 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+srlaplace <- function(n) {
+  .Call(C_slaplace, n)
+}
+
+
+#' Sampling from Laplace distribution
+#'
+#' @param n 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+rlaplace_c <- function(n) {
+  .Call(C_rLaplace_c, n)
 }

@@ -4,7 +4,7 @@
 \alias{grid_optimizer}
 \title{Optimize Built-in Grid}
 \usage{
-grid_optimizer(density_name = c("srnorm"))
+grid_optimizer(density_name = c("srnorm", "slaplace"))
 }
 \arguments{
 \item{density_name}{string specifying the name of the distribution.}
@@ -26,5 +26,5 @@ srnorm(10)
 
 }
 \seealso{
-[srnorm]
+[grid_optimizer()] is used to optimize and cache grid to sample from multible distrubution such as [srnorm()] and [srgamma()]
 }

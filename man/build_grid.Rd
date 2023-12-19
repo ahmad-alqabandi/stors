@@ -8,32 +8,62 @@ build_grid(
   lb = -Inf,
   rb = Inf,
   mode,
-  f = f_norm,
-  h = h_norm,
-  h_prime = h_prime_norm
+  f,
+  h = NULL,
+  h_prime = NULL,
+  a = 0.01,
+  th = 0.9
 )
 }
 \arguments{
-\item{lb}{Scalar representing the lower bound of the density.}
+\item{lb}{Scalar target density lower bound.}
 
-\item{rb}{Scalar representing the upper bound of the density.}
+\item{rb}{Scalar target density upper bound.}
 
-\item{mode}{Scalar/vector representing the modes of the density.}
+\item{mode}{Vector representing the modes of the density.}
 
-\item{f}{The target density function.}
+\item{f}{Function accepting one argument which returns the probability density of the target.}
 
-\item{h}{Log transform of the target density function.}
+\item{h}{Function accepting one argument which returns the Log-transform of the target.}
 
-\item{h_prime}{The first derivative of the log-transformed target density.}
+\item{h_prime}{Function accepting one argument which returns the first derivative of the log-transformed target density.}
 }
 \value{
-Returns a list containing all details of the proposal or sampling grid.
+Returns a list that contains the following data that is related to the proposal distribution:
+\itemize{
+\item{"grid_data"} {Data frame that includes the created steps information, such as x (the beginning of each step on the x-axis), s_upper (the step height on the y-axis), p_a (pre-acceptance probability for each step), and s_upper_lower (a vector used to re-scale the uniform random number when the sample is accepted).}
+\item{"areas"} {Vector that contains the area under the left tail bound, the steps in the middle, and the right tail bound.}
+\item{"steps_number"} {Scalar representing the number of steps in the proposal.}
+\item{"sampling_probabilities"} {Vector that contains the area under the left tail, and the area under the left tail and middle steps.}
+\item{"unif_scaler"} {Scalar representing the inverse probability of sampling from the step part of the proposal, \eqn{\frac{1}{p(lb < x < rb)}}. This value, similar to s_upper_lower in the grid_data data frame, is used to scale the uniform random value under the condition that we are going to sample from the steps part of the proposal.}
+\item{"lt_properties"} {Vector that includes 5 values used when sampling under the proposal's left tail using the ARS method.}
+\item{"rt_properties"} {Vector that includes 6 values used when sampling under the proposal's right tail using the ARS method.}
+}
 }
 \description{
-This function is used to create an optimized grid representing the proposal distribution for a target density, especially when sampling from certain density functions not prebuilt in STROS, such as `srnorm` and `srgamma`.
+This function is used to create an optimized grid representing the proposal distribution for a target density, especially when sampling from certain density functions not prebuilt in stors, such as `srnorm` and `srgamma`.
+}
+\details{
+The grid building is conducted through constant area rectangles starting from the target distribution modes. For each mode, steps are constructed around as rectangles with a width of \(x_i - x_{i-1}\) and a height determined by \(\max(f(x_{i-1}), f(x_i))\), effectively covering the target distribution in a step pattern. The function grid_builder() constructs these steps and computes values that contribute to the sampling process. These values are later cached when the resulting grid is passed to the stors() function. This approach enhances the computational efficiency of stors.
 }
 \examples{
-# The following example demonstrates how to build a grid for sampling from a bimodal distribution, which is a combination of two normal distributions \( f(x) = 0.5 \cdot w_1(x) + 0.5 \cdot w_2(x) \), where \( w_1(x) \sim \mathcal{N}(0, 1) \) and \( w_2(x) \sim \mathcal{N}(4, 1) \).
+
+library(stors)
+
+#EXAMPLE:1 The following example shows the grid building steps for a basic standard normal distribution f(x) \sim N(0,1)
+
+ modes_norm = 0
+
+  f_norm  <- function(x)  1/sqrt(2 * pi) * exp(-0.5 *x^2)
+   
+   h_norm <- function(x) log(f_norm(x))
+   
+   h_norm <- function(x) -x
+
+ norm_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_norm, f = f_norm, h = h_norm, h_prime = h_norm)
+
+
+#EXAMPLE:2  The following example demonstrates how to build a grid for sampling from a bimodal distribution, which is a combination of two normal distributions \( f(x) = 0.5 \cdot w_1(x) + 0.5 \cdot w_2(x) \), where \( w_1(x) \sim \mathcal{N}(0, 1) \) and \( w_2(x) \sim \mathcal{N}(4, 1) \).
  
  modes_bi = c(0,4)
  
@@ -49,4 +79,8 @@ This function is used to create an optimized grid representing the proposal dist
  
  bi_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_bi, f = f_bi, h = h_bi, h_prime = h_prime_bi)
  
+}
+\seealso{
+[func()]
+#\deqn{}
 }

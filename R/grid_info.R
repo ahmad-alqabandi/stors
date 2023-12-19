@@ -1,0 +1,96 @@
+
+#' @method plot grid
+#' @export
+plot.grid <- function(grid, ...){
+  
+  n = nrow(grid$grid_data)
+  
+  lf  <- function(x) exp( grid$lt_properties[5] * (x - grid$grid_data$x[1]) + grid$lt_properties[3] )
+  
+  rf  <- function(x) exp( grid$rt_properties[5] * (x - grid$grid_data$x[n]) + grid$rt_properties[6] )
+  
+  f <- eval(parse(text = grid$dens_func))
+  
+  xx <- seq(from = grid$grid_data$x[1]-1, to = grid$grid_data$x[n]+1, by = 0.01)
+  
+  xl <- seq( from = grid$grid_data$x[1]-1 , to= grid$grid_data$x[1], by = 0.01)
+  
+  xr <- seq( from = grid$grid_data$x[n] , to= grid$grid_data$x[n]+1, by = 0.01)
+  
+  yy <- f(xx)
+  
+  yl <- lf(xl)
+  
+  yr <- rf(xr)
+  
+  grid$grid_data$s_upper[n] = yr[1]
+
+  grid$grid_data = rbind( c(grid$grid_data$x[1], yl[length(yl)], NA, NA), grid$grid_data)
+  
+  n <- n+1
+  
+  if (requireNamespace("ggplot2")) {
+    
+    ggplot2::ggplot() +
+      ggplot2::geom_step(ggplot2::aes(grid$grid_data[1:(n),]$x, grid$grid_data[1:(n),]$s_upper), color = "red") +
+      ggplot2::geom_step(ggplot2::aes(grid$grid_data[2:(n-1),]$x, grid$grid_data[2:(n-1),]$s_upper * grid$grid_data[2:(n-1),]$p_a), color = "green") +
+      ggplot2::geom_line(ggplot2::aes(x = xx, y = yy), color = "black")  +
+      ggplot2::geom_line(ggplot2::aes(x = xl, y = yl), color = "red") +
+      ggplot2::geom_line(ggplot2::aes(x = xr, y = yr), color = "red") +
+      ggplot2::coord_cartesian(ylim=c(0, max(yy))) +
+      ggplot2::geom_segment(ggplot2::aes(x=grid$grid_data$x[(n-1)], y=grid$grid_data$s_upper[(n-1)] * grid$grid_data$p_a[(n-1)], xend = grid$grid_data$x[(n)], yend = grid$grid_data$s_upper[(n-1)] * grid$grid_data$p_a[(n-1)]), color="green")+
+      ggplot2::xlab("x") +
+      ggplot2::ylab("Density")
+    # ggplot2::scale_y_continuous(limits = c(0, max(yy)))
+    
+    cat("last_y_prop = " , yr[length(yr)], "\n" )
+    cat("last_y_tail = " , yy[length(yy)] )
+    
+  } else{
+    plot(grid,...)
+  }
+  
+  
+}
+
+
+
+
+#' Print All Grids
+#'
+#' @description
+#' Prints details of all grids stored by the user, including grid name, size, efficiency, etc.
+#'
+#' @export
+#'
+#' @examples
+#' # To print details of all stored grids
+#' print_grids()
+print_grids <- function( ){
+  
+  stopifnot(" there are no grids stored by the user " = nrow(stors_env$grids$user) != 0)
+  
+  grids <- list.files(path = stors_env$user_dirs$data_dir, full.names = TRUE)
+  
+  grids_details <- file.info(grids)
+  
+  grids_sizes <- grids_details[grids_details$isdir == FALSE,]$size
+  
+  print(stors_env$grids$user)
+  
+  cat("\n grids_size : ", sum(as.double(grids_sizes))/1028," KB")
+  
+}
+
+
+
+
+#' @method print grid
+#' @export
+print.grid <-function(grid, ...){
+  
+  cat("The grid has ", grid$steps_number ," steps, in the domain range [", grid$grid_data$x[1] ,",", grid$grid_data$x[grid$steps_number+1],"].\n")
+  cat(sprintf("With a sampling efficiency of %.2f%%", 1/sum(grid$areas) * 100))
+  
+}
+
