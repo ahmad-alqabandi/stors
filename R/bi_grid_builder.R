@@ -1,41 +1,5 @@
-# pbgrids : 1 Normal
 
-pbgrids <- list(
-  srnorm = c(
-    Cnum = 0,
-    tails_method = "ARS",
-    f = function(x) {
-      0.3989423 * exp(-0.5 * x * x)
-    },
-    h = function(x) {
-      log(0.3989423) - (x * x) * (1 / 2)
-    },
-    h_prime = function(x) {
-      -x
-    },
-    modes = 0,
-    lb = -Inf,
-    rb = Inf
-  ),
-  slaplace = c(
-    Cnum = 1,
-    tails_method = "IT",
-    f = function(x) {
-      0.5 * exp(-abs(x))
-    },
-    cdf = function(x) {
-      if(x <= 0){
-        0.5 * exp(x)
-      } else {
-        1 - 0.5 * exp(-x)
-      }},
-    modes = 0,
-    lb = -Inf,
-    rb = Inf
-  )
-)
-
-
+#c("srnorm","slaplace","laplace")
 
 
 #' Optimize Built-in Grid
@@ -60,7 +24,7 @@ pbgrids <- list(
 #' This function generates and stores an optimized grid for the specified built-in distribution in R's internal data directory.
 #' 
 #' @export
-grid_optimizer <- function(density_name = c("srnorm","slaplace")) {
+grid_optimizer <- function(density_name = stors_env$grids$biultin$names) {
   
   density_name <- match.arg(density_name)
   
@@ -189,8 +153,8 @@ bi_grid_builder <- function(lb = -Inf, rb = Inf, a, th, mode, f, cdf) {
   
   unif_scaler <- normalizing_con / area[2]
   
-  lt_properties <- c(0, 0, 0, 0, 0)
-  rt_properties <- c(0, 0,0, 0,0, 0)
+  lt_properties <- rep(0,5)
+  rt_properties <- rep(0,6)
   
   invisible(list(grid_data = final_grid, areas = area, steps_number = steps_number, sampling_probabilities = sampling_probabilities, unif_scaler = unif_scaler, lt_properties = lt_properties, rt_properties = rt_properties))
 }

@@ -11,6 +11,7 @@ struct grid {
   double unif_scaler;
   double lt_properties[5];
   double rt_properties[6];
+  double alpha;
   int exist;
 };
 
@@ -19,14 +20,7 @@ struct grids {
   int incache;
 };
 
-// Vose Code
-struct vose {
-  double *small, *large, *prob, *alias, *data;
-};
-
 extern struct grids grids;
-
-extern struct vose vose;
 
 
 

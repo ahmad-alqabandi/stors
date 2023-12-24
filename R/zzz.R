@@ -1,5 +1,44 @@
 #' @useDynLib stors, .registration = TRUE, .fixes = "C_"
 
+# pbgrids : 1 Normal
+
+pbgrids <- list(
+  srnorm = c(
+    Cnum = 0,
+    tails_method = "ARS",
+    f = function(x) {
+      0.3989423 * exp(-0.5 * x * x)
+    },
+    h = function(x) {
+      log(0.3989423) - (x * x) * (1 / 2)
+    },
+    h_prime = function(x) {
+      -x
+    },
+    modes = 0,
+    lb = -Inf,
+    rb = Inf
+  ),
+  laplace = c(
+    Cnum = 1,
+    tails_method = "IT",
+    f = function(x) {
+      0.5 * exp(-abs(x))
+    },
+    cdf = function(x) {
+      if(x <= 0){
+        0.5 * exp(x)
+      } else {
+        1 - 0.5 * exp(-x)
+      }},
+    modes = 0,
+    lb = -Inf,
+    rb = Inf
+  )
+)
+
+
+
 stors_env <- new.env(parent = emptyenv())
 
 .onLoad <- function(lib, pkg) {
@@ -28,11 +67,14 @@ stors_env <- new.env(parent = emptyenv())
     }
     
   } else{
-    grids <- list(biultin = list(names = c("srnorm", "slaplace"),
-                          srnorm = list(opt = FALSE, Cnum = 0),
-                          slaplace = list(opt = FALSE, Cnum = 1),
-                          builtin_num = 2),
+    grids <- list(biultin = list(names = names(pbgrids),
+                          builtin_num = length(pbgrids)),
                   user = data.frame( name = character(), efficiency = double()) )
+    
+    for (name in names(pbgrids)){
+      grids$biultin[[name]] = list(opt = FALSE, Cnum = pbgrids[[name]]$Cnum)
+    }
+    
   } 
   
   user_cached_grids <- data.frame( Id = character(), Cnum = integer())
@@ -57,3 +99,4 @@ stors_env <- new.env(parent = emptyenv())
 
   .Call(C_free_cache)
 }
+

@@ -38,15 +38,11 @@ stors <- function(grid) {
   
   rm(grid)
   
-  function(n) {
-    .Call(
-      C_stors,
-      n,
-      eval(expression(Cnum)),
-      dens_func,
-      rfunc_env
-    )
-  }
+  function_string <- paste0("function(n) { .Call(C_stors,n,",paste0(Cnum),",dens_func,rfunc_env) }" )
+  function_expression <- parse(text = function_string)
+  sampling_function <- eval(function_expression)
+  
+  return(sampling_function)
 }
 
 
@@ -96,8 +92,7 @@ srsnorm <- function(n, mu =0, sd = 1) {
 }
 
 
-
-#' Sampling from Laplace distribution
+#' laplace
 #'
 #' @param n 
 #'
@@ -105,19 +100,7 @@ srsnorm <- function(n, mu =0, sd = 1) {
 #' @export
 #'
 #' @examples
-srlaplace <- function(n) {
-  .Call(C_slaplace, n)
+laplace <- function(n) {
+  .Call(C_laplace, n)
 }
 
-
-#' Sampling from Laplace distribution
-#'
-#' @param n 
-#'
-#' @return
-#' @export
-#'
-#' @examples
-rlaplace_c <- function(n) {
-  .Call(C_rLaplace_c, n)
-}

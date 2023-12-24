@@ -1,5 +1,4 @@
 
-#include "R_stors.h"
 #include "stors.h"
 
 // return pdf value for the target dist
@@ -53,6 +52,7 @@ SEXP pre_fetch( SEXP Rgrid , SEXP Rsize){
 
 SEXP stors(SEXP s_size, SEXP R_Cnum, SEXP Rf, SEXP Renv)
 {
+  
   int j, sample_size = asInteger(s_size), Cnum = asInteger(R_Cnum);
   
   struct grid g = grids.grid[Cnum];

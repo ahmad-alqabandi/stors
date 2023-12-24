@@ -1,6 +1,7 @@
 #include "stors.h"
 #include "R_cache.h"
 #include "snorm.h"
+#include "laplace.h"
 
 static const R_CallMethodDef callMethods[]  = {
   {"stors", (DL_FUNC) &stors, -1},
@@ -8,10 +9,9 @@ static const R_CallMethodDef callMethods[]  = {
   {"free_cache", (DL_FUNC) &free_cache, -1},
   {"print_cached_grids", (DL_FUNC) &print_cached_grids, -1},
   {"srnorm", (DL_FUNC) &srnorm, -1},
-  {"slaplace", (DL_FUNC) &slaplace, -1},
-  {"rLaplace_c", (DL_FUNC) &rLaplace_c, -1},
-  {"add", (DL_FUNC) &add, -1},
-  {"sub", (DL_FUNC) &sub, -1},
+  {"srnorm_trunc_nav", (DL_FUNC) &srnorm_trunc_nav, -1},
+  {"srnorm_trunc", (DL_FUNC) &srnorm_trunc, -1},
+  {"laplace", (DL_FUNC) &laplace, -1},
   {NULL, NULL, 0}
 };
 

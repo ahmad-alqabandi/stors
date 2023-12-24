@@ -1,12 +1,15 @@
+#ifndef LAPLACE_H
+#define LAPLACE_H
 
-#ifndef R_HEADERS
-#define R_HEADERS
-
-#include "cache.h"
 
 #include <R.h>
 #include <Rinternals.h>
 
+#include "cache.h"
+
 #define R_RETURN_NULL return(R_NilValue);
+
+
+SEXP laplace(SEXP s_size);
 
 #endif
