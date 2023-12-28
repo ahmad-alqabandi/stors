@@ -4,7 +4,20 @@
 \alias{grid_builder}
 \title{Grid Builder}
 \usage{
-grid_builder(lb = -Inf, rb = Inf, a, th, mode, f, h, h_prime)
+grid_builder(
+  lb = -Inf,
+  rb = Inf,
+  a,
+  th,
+  mode,
+  f,
+  h = NA,
+  h_prime = NA,
+  cdf = NA,
+  stps = NA,
+  lstpsp = NA,
+  rstpsp = NA
+)
 }
 \arguments{
 \item{lb}{scaler density lower bound}

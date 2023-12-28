@@ -61,7 +61,7 @@ stors_env <- new.env(parent = emptyenv())
       
       if (grids$biultin[[name]]$opt) {
         opt_grid <- readRDS(file.path(builtin_dir, paste0(grids$biultin[[name]]$Cnum, ".rds")))
-        cash_grid_c(grids$biultin[[name]]$Cnum, opt_grid)
+        cache_grid_c(grids$biultin[[name]]$Cnum, opt_grid)
       }
       
     }

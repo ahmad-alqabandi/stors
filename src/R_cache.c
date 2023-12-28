@@ -77,3 +77,23 @@ SEXP free_cache(void){
   
   R_RETURN_NULL
 }
+
+
+
+SEXP free_cache_cnum( SEXP Rcnum){
+  
+  int cnum = asInteger(Rcnum);
+  
+  free(grids.grid[cnum].x);
+  grids.grid[cnum].x = NULL;
+  free(grids.grid[cnum].p_a);
+  grids.grid[cnum].p_a = NULL;
+  free(grids.grid[cnum].s_upper);
+  grids.grid[cnum].s_upper = NULL;
+  free(grids.grid[cnum].s_upper_lower);
+  grids.grid[cnum].s_upper_lower = NULL;
+  
+  grids.incache-=1;
+  
+  R_RETURN_NULL
+}

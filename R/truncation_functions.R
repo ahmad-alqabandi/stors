@@ -1,11 +1,11 @@
-#' Title
+#' laplace
 #'
-#' @export
-truncsrnorm_inter = function(n ,l, r){
+trunclaplace_inter = function(n ,l, r){
   
-  .Call(C_srnorm_trunc, n, l, r)
+  .Call(C_laplace_trunc, n, l, r)
   
 }
+
 
 
 # I will stick with this function until I found a proper selution.
@@ -19,7 +19,7 @@ truncsrnorm_inter = function(n ,l, r){
 #' @export
 #'
 #' @examples
-truncsrnorm = function(xl, xr){
+trunclaplace = function(xl, xr){
   
   stopifnot(
     "xl must be smaller that xr" = xl < xr,
@@ -27,11 +27,11 @@ truncsrnorm = function(xl, xr){
     "xr must be smaller than the density upper bound" = xr < pbgrids$srnorm$rb
   )
   
-  Upper_cumsum = .Call(C_srnorm_trunc_nav, xl, xr)
+  Upper_cumsum = .Call(C_laplace_trunc_nav, xl, xr)
   
   return(
     function(n){
-      truncsrnorm_inter(n, Upper_cumsum[1], Upper_cumsum[2])
+      trunclaplace_inter(n, Upper_cumsum[1], Upper_cumsum[2])
     }
   )
   

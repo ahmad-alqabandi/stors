@@ -6,12 +6,16 @@
 #' @import digest digest
 is_valid_grid = function(grid){
   
-  stopifnot(" This grid is not optmized using  bvbuild_grid() " = digest(grid) %in% stors_env$created_girds_Id )
+  stopifnot(" This grid is not optmized using build_grid() " = digest(grid) %in% stors_env$created_girds_Id )
   
 }
 
-cash_grid_c <- function(Cnum, grid) {
+cache_grid_c <- function(Cnum, grid) {
   .Call(C_cache_grid, Cnum, grid$grid_data$x, grid$grid_data$s_upper, grid$grid_data$p_a, grid$grid_data$s_upper_lower, grid$areas, grid$steps_number, grid$sampling_probabilities, grid$unif_scaler, grid$lt_properties, grid$rt_properties, grid$alpha)
+}
+
+free_cache_cnum_c <- function(Cnum) {
+  .Call(C_free_cache_cnum, Cnum)
 }
 
 
@@ -218,7 +222,8 @@ build_grid <- function(lb = -Inf, rb = Inf, mode, f, h = NULL, h_prime = NULL, a
 #' @param h_prime first derivative of h
 #' @return list including proposal distribution properties
 #' @importFrom utils head
-grid_builder <- function(lb = -Inf, rb = Inf, a, th, mode, f, h, h_prime) {
+grid_builder <- function(lb = -Inf, rb = Inf, a, th, mode, f, h = NA, h_prime=NA, cdf =NA, stps =NA , lstpsp =NA , rstpsp= NA) {
+  
   mode_n <- length(mode)
 
   final_grid <- data.frame(
@@ -227,11 +232,42 @@ grid_builder <- function(lb = -Inf, rb = Inf, a, th, mode, f, h, h_prime) {
   )
   
   grids <- list()
+  # grids2 <- list()
+  lsts <- list()
+  rsts <- list()
+  
   area <- c(0, 0, 0)
   g_len <- c()
 
+  
+
+    for (mode_i in (1:mode_n)) {
+      
+      if(mode_i != 1 || is.na(lstpsp))
+      {lsts[[mode_i]] <- find_left_steps(lb, rb, a, th, mode[mode_i], mode_i, mode_n, f)
+      if(!is.na(lstpsp)) stps <- stps -  lsts[[mode_i]]$m}
+      
+      if(mode_i != mode_n || is.na(rstpsp))
+      {rsts[[mode_i]] <- find_right_steps(lb, rb, a, th, mode[mode_i], mode_i, mode_n, f)
+      if(!is.na(rstpsp)) stps <- stps -  rsts[[mode_i]]$m}
+      
+      # grids2[[mode_i]] <- find_steps(lb = -Inf, rb = Inf, a, th, mode[mode_i], mode_i, mode_n, f)
+      
+    }
+  
+  
+  if(!is.na(stps))
+  {
+    steps_lim_left = round(lstpsp * stps)
+    lsts[[1]] <- find_left_steps(lb, rb, a, th, mode[1], 1, mode_n, f,  steps_lim = steps_lim_left)
+    
+    steps_lim_right = stps - steps_lim_left
+    rsts[[mode_n]] <- find_right_steps(lb, rb, a, th, mode[mode_n], mode_n, mode_n, f, steps_lim = steps_lim_right)
+  }
+  
+    
   for (mode_i in (1:mode_n)) {
-    grids[[mode_i]] <- find_steps(lb = -Inf, rb = Inf, a, th, mode[mode_i], mode_i, mode_n, f, h_prime, h)
+    grids[[mode_i]] <- list(d = rbind(lsts[[mode_i]]$d,rsts[[mode_i]]$d), m = lsts[[mode_i]]$m + rsts[[mode_i]]$m)
   }
 
 
@@ -270,9 +306,6 @@ grid_builder <- function(lb = -Inf, rb = Inf, a, th, mode, f, h, h_prime) {
 
       m2 <- grids[[i + 1]]$m
 
-
-
-
       area[2] <- area[2] + m1 * a
 
       g_len[length(g_len) + 1] <- m1
@@ -297,14 +330,29 @@ grid_builder <- function(lb = -Inf, rb = Inf, a, th, mode, f, h, h_prime) {
     g_len[length(g_len) + 1] <- grids[[1]]$m
   }
 
-  tails_area = tails_ars(final_grid, f, h, h_prime, lb, rb)
   
-  area[1] <- tails_area$lta
   
-  area[3] <- tails_area$rta
+  steps_number <- sum(g_len) # m
   
-  print(tails_area$lta)
-  print(tails_area$rta)
+  x1 <- final_grid$x[1]
+  xm <- final_grid$x[steps_number + 1]
+  
+  
+  if(is.function(h)){
+
+    tails_area = tails_ars(final_grid, f, h, h_prime, lb, rb)
+    
+    area[1] <- tails_area$lta
+    
+    area[3] <- tails_area$rta
+    
+  } else{
+
+    area[1] <- cdf(x1)
+    
+    area[3] <- 1 - cdf(xm)
+  }
+  
   
 
   normalizing_con <- sum(area)
@@ -313,54 +361,204 @@ grid_builder <- function(lb = -Inf, rb = Inf, a, th, mode, f, h, h_prime) {
 
   sampling_probabilities <- (area_cum_sum / normalizing_con)[1:2]
 
-  steps_number <- sum(g_len) # m
-
   unif_scaler <- normalizing_con / area[2]
 
   
   
-  x1 <- final_grid$x[1]
-  xm <- final_grid$x[steps_number + 1]
+  if(is.function(h)){
+    lt_properties <- c(exp(h_upper(x1, lb, h_prime, h)), normalizing_con * h_prime(x1), h(x1), 1 / h_prime(x1), h_prime(x1)) #4
+    rt_properties <- c(normalizing_con, area_cum_sum[2], h_prime(xm) / f(xm), 1 / h_prime(xm), h_prime(xm), h(xm))
+  } else{
+    lt_properties <- rep(0,5)
+    rt_properties <- rep(0,6)
+  }
   
-  lt_properties <- c(exp(h_upper(x1, lb, h_prime, h)), normalizing_con * h_prime(x1), h(x1), 1 / h_prime(x1), h_prime(x1)) #4
-  rt_properties <- c(normalizing_con, area_cum_sum[2], h_prime(xm) / f(xm), 1 / h_prime(xm), h_prime(xm), h(xm))
-
+  
   invisible(list(grid_data = final_grid, areas = area, steps_number = steps_number, sampling_probabilities = sampling_probabilities, unif_scaler = unif_scaler, lt_properties = lt_properties, rt_properties = rt_properties, alpha = a))
 }
 
 
 
+# 
+# find_steps <- function(lb = -Inf, rb = Inf, a, th, mode, mode_i, mode_n, f) {
+#   memory_res <- (max(500, ceiling(1 / a)) + 500) / 2
+# 
+#   x <- rep(NA, memory_res * 2 + 1)
+#   s_upper <- rep(NA, memory_res * 2 + 1)
+#   s_lower <- rep(NA, memory_res * 2 + 1)
+#   p_a <- rep(NA, memory_res * 2 + 1)
+#   s_upper_lower <- rep(NA, memory_res * 2 + 1)
+# 
+# 
+#   r <- 0
+#   l <- 0
+# 
+#   i <- memory_res + 1
+# 
+# 
+#   if (mode != rb) {
+#     x_c <- mode
+# 
+#     f_x <- f(x_c)
+# 
+#     while (TRUE) {
+#       x_next <- x_c + a / f_x
+# 
+#       if (x_next > rb || (mode_i == mode_n && f(x_next) / f_x < th)) {
+#         x[i + r] <- x_c
+#         break
+#       }
+# 
+#       f_x_next <- f(x_next)
+# 
+#       if (f_x_next > f_x) {
+#         x[i + r] <- x_c
+#         s_upper[i + r] <- f_x
+#         r_tail_area <- 0
+#         break
+#       }
+# 
+# 
+#       x[i + r] <- x_c
+#       s_upper[i + r] <- f_x
+#       s_lower[i + r] <- f_x_next
+#       s_upper_lower[i + r] <- s_upper[i + r] / s_lower[i + r]
+#       p_a[i + r] <- s_lower[i + r] / s_upper[i + r]
+# 
+# 
+#       f_x <- f_x_next
+#       x_c <- x_next
+# 
+#       r <- r + 1
+#     }
+#   }
+# 
+# 
+# 
+#   if (mode != lb) {
+#     x_previous <- mode
+#     f_x_previous <- f(x_previous)
+# 
+# 
+#     while (TRUE) {
+#       x_c <- x_previous - a / f_x_previous
+# 
+# 
+# 
+#       if (x_c < lb || (mode_i == 1 && f(x_c) / f_x_previous  < th)) {
+#         break
+#       }
+# 
+#       f_x <- f(x_c)
+# 
+#       if (f(x_c) > f_x_previous) {
+#         break
+#       }
+# 
+#       l <- l + 1
+#       x[i - l] <- x_c
+#       s_upper[i - l] <- f_x_previous
+#       s_lower[i - l] <- f_x
+#       s_upper_lower[i - l] <- s_upper[i - l] / s_lower[i - l]
+#       p_a[i - l] <- f_x / f_x_previous
+# 
+# 
+#       f_x_previous <- f_x
+#       x_previous <- x_c
+#     }
+#   }
+# 
+#   m <- l + r
+# 
+#   d <- data.frame(
+#     x = x, s_upper = s_upper, p_a = p_a,
+#     s_upper_lower = s_upper_lower
+#   )
+# 
+#   d <- subset(d, rowSums(is.na(d)) != ncol(d))
+# 
+#   return(list(d = d, m = m))
+# }
 
-#' Steps Builder
-#'
-#' @param lb scaler density lower bound
-#' @param rb scaler density upper bound
-#' @param a scaler step area
-#' @param th scaler pre_acceptance threshold
-#' @param mode vector density modes
-#' @param mode_i mode index
-#' @param mode_n total number of modes
-#' @param f density function
-#' @param h log transform of the density function
-#' @param h_prime first derivative of h
-#'
-#' @return
-#'
-#' @examples
-find_steps <- function(lb = -Inf, rb = Inf, a, th, mode, mode_i, mode_n, f, h_prime, h) {
+
+
+
+find_left_steps <- function(lb = -Inf, rb = Inf, a, th, mode, mode_i, mode_n, f, steps_lim = Inf) {
+  
   memory_res <- (max(500, ceiling(1 / a)) + 500) / 2
-
-  x <- rep(NA, memory_res * 2 + 1)
-  s_upper <- rep(NA, memory_res * 2 + 1)
-  s_lower <- rep(NA, memory_res * 2 + 1)
-  p_a <- rep(NA, memory_res * 2 + 1)
-  s_upper_lower <- rep(NA, memory_res * 2 + 1)
-
-
-  r <- 0
+  
+  x <- rep(NA, memory_res)
+  s_upper <- rep(NA, memory_res )
+  s_lower <- rep(NA, memory_res )
+  p_a <- rep(NA, memory_res )
+  s_upper_lower <- rep(NA, memory_res)
+  
+  
   l <- 0
-
+  
   i <- memory_res + 1
+  
+  if (mode != lb) {
+    
+    x_previous <- mode
+    
+    f_x_previous <- f(x_previous)
+    
+    
+    while (TRUE) {
+      x_c <- x_previous - a / f_x_previous
+      
+      
+      if (l >= steps_lim || x_c < lb || (mode_i == 1 && f(x_c) / f_x_previous  <= th)) {
+        break
+      }
+      
+      f_x <- f(x_c)
+      
+      if (f(x_c) > f_x_previous) {
+        break
+      }
+      
+      l <- l + 1
+      x[i - l] <- x_c
+      s_upper[i - l] <- f_x_previous
+      s_lower[i - l] <- f_x
+      s_upper_lower[i - l] <- s_upper[i - l] / s_lower[i - l]
+      p_a[i - l] <- f_x / f_x_previous
+      
+      
+      f_x_previous <- f_x
+      x_previous <- x_c
+      
+    }
+    
+  }
+  
+  d <- data.frame(
+    x = x, s_upper = s_upper, p_a = p_a,
+    s_upper_lower = s_upper_lower
+  )
+  
+  d <- subset(d, rowSums(is.na(d)) != ncol(d))
+  
+  return(list(d = d, m = l))
+}
+
+
+
+
+find_right_steps <- function(lb = -Inf, rb = Inf, a, th, mode, mode_i, mode_n, f, steps_lim = Inf) {
+  
+  memory_res <- (max(500, ceiling(1 / a)) + 500) / 2
+  
+  x <- rep(NA, memory_res)
+  s_upper <- rep(NA, memory_res )
+  s_lower <- rep(NA, memory_res )
+  p_a <- rep(NA, memory_res )
+  s_upper_lower <- rep(NA, memory_res)
+  
+  
+  r <- 1
 
 
   if (mode != rb) {
@@ -371,26 +569,26 @@ find_steps <- function(lb = -Inf, rb = Inf, a, th, mode, mode_i, mode_n, f, h_pr
     while (TRUE) {
       x_next <- x_c + a / f_x
 
-      if (x_next > rb || (mode_i == mode_n && f(x_next) / f_x < th)) {
-        x[i + r] <- x_c
+      if (r > steps_lim || x_next > rb || (mode_i == mode_n && f(x_next) / f_x <= th)) {
+        x[r] <- x_c
         break
       }
 
       f_x_next <- f(x_next)
 
       if (f_x_next > f_x) {
-        x[i + r] <- x_c
-        s_upper[i + r] <- f_x
+        x[ r] <- x_c
+        s_upper[r] <- f_x
         r_tail_area <- 0
         break
       }
 
 
-      x[i + r] <- x_c
-      s_upper[i + r] <- f_x
-      s_lower[i + r] <- f_x_next
-      s_upper_lower[i + r] <- s_upper[i + r] / s_lower[i + r]
-      p_a[i + r] <- s_lower[i + r] / s_upper[i + r]
+      x[r] <- x_c
+      s_upper[ r] <- f_x
+      s_lower[r] <- f_x_next
+      s_upper_lower[ r] <- s_upper[ r] / s_lower[r]
+      p_a[r] <- s_lower[ r] / s_upper[ r]
 
 
       f_x <- f_x_next
@@ -400,79 +598,24 @@ find_steps <- function(lb = -Inf, rb = Inf, a, th, mode, mode_i, mode_n, f, h_pr
     }
   }
 
-
-
-  if (mode != lb) {
-    x_previous <- mode
-    f_x_previous <- f(x_previous)
-
-
-    while (TRUE) {
-      x_c <- x_previous - a / f_x_previous
-
-
-
-      if (x_c < lb || (mode_i == 1 && f(x_c) / f_x_previous  < th)) {
-        break
-      }
-
-      f_x <- f(x_c)
-
-      if (f(x_c) > f_x_previous) {
-        # l_tail_area <- 0
-        break
-      }
-
-      l <- l + 1
-      x[i - l] <- x_c
-      s_upper[i - l] <- f_x_previous
-      s_lower[i - l] <- f_x
-      s_upper_lower[i - l] <- s_upper[i - l] / s_lower[i - l]
-
-      p_a[i - l] <- f_x / f_x_previous
-
-
-      f_x_previous <- f_x
-      x_previous <- x_c
-    }
-  }
-
-  m <- l + r
-
+  
   d <- data.frame(
     x = x, s_upper = s_upper, p_a = p_a,
     s_upper_lower = s_upper_lower
   )
-
+  
   d <- subset(d, rowSums(is.na(d)) != ncol(d))
-
-  return(list(d = d, m = m))
+  
+  return(list(d = d, m = r-1))
 }
+
+
 
 
 
 h_upper <- function(grid_point, val, h_prime, h) {
   h_prime(grid_point) * (val - grid_point) + h(grid_point)
 }
-
-# h_prime_lb <- function(x, h){
-#   x0 = x
-#   x00 = x0 + 0.0000001
-#   (h(x00) - h(x0))/(x00 -x0)
-# }
-# 
-# 
-# h_prime_rb <- function(x, h){
-#   xm = x
-#   xmm = xm - 0.0000001
-#   (h(xmm) - h(xm))/(xmm -xm)
-# }
-# 
-# 
-# h_prime <- function(x){
-#   
-#   return(x^2)
-# }
 
 
 tails_ars <- function(grid, f, h, h_prime, lb, rb){

@@ -129,3 +129,30 @@ microbenchmark::microbenchmark(
   truncsrnorm_inter(n,0.02325644 ,0.99846791),
   times = 1000
 )
+
+# test truncation LAplace
+
+laplace = grid_optimizer("laplace")
+laplace
+hist(laplace(100000))
+
+trnc23laplace=trunclaplace(-2,3)
+
+hist(trnc23laplace(100000))
+
+hist(rtrunc(100000,"laplace",-2,3))
+
+library(LaplacesDemon)
+n=10000000
+ microbenchmark::microbenchmark(
+  rtrunc(n,"laplace",-2,3),
+  trnc23laplace(n),
+  times = 2
+)
+
+ 
+ 
+
+
+
+
