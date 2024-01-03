@@ -1,6 +1,9 @@
 
 #include "stors.h"
 
+#include "cache.h"
+
+
 // return pdf value for the target dist
 double f(double x, SEXP Rf, SEXP Renv)
 {

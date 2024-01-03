@@ -34,8 +34,23 @@ pbgrids <- list(
     modes = 0,
     lb = -Inf,
     rb = Inf
+  ),
+  srexp = c(
+    Cnum = 2,
+    tails_method = "IT",
+    f = function(x) {
+      exp(-x)
+    },
+    cdf = function(x) {
+      1-exp(-x)
+    },
+    modes = 0,
+    lb = 0,
+    rb = Inf
   )
+  
 )
+
 
 
 

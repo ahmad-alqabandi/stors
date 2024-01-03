@@ -1,5 +1,7 @@
 #include "snorm.h"
-#include "macrodef.h"
+#include "macro_var.h"
+
+#define NAME srnorm
 
 #define CNUM 0
 
@@ -15,9 +17,7 @@
 
 // =================================
 
-SEXP srnorm(SEXP s_size){
-#include "stors_body.h"
-}
+#include "stors_sample.c"
 
 // =================================
 
@@ -29,12 +29,7 @@ SEXP srnorm_trunc_nav(SEXP Rlx, SEXP Rrx){
 
 #define TRUNC
 
-SEXP srnorm_trunc(SEXP s_size, SEXP Rl, SEXP Rr)
-{
-
-#include "stors_body.h"
-
-}
+#include "stors_sample.c"
 
 #undef TRUNC
 

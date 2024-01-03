@@ -57,7 +57,7 @@ d_srnorm_upper = function(n ,l, r){
 }
 
 
-# I will stick with this function until I found a proper selution.
+# I will stick with this function until I found a proper solution.
 #' Title
 #'
 #' @param n 
@@ -77,7 +77,6 @@ truncsrnorm = function(xl, xr){
   )
   
   Upper_cumsum = .Call(C_srnorm_trunc_nav, xl, xr)
-  
   return(
     function(n){
       d_srnorm_upper(n, Upper_cumsum[1], Upper_cumsum[2])

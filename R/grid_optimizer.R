@@ -27,9 +27,15 @@ grid_optimizer <- function(density_name = stors_env$grids$biultin$names) {
   
   density_name <- match.arg(density_name)
   
-  stopifnot(" Grid already optimized for this distrubution" = !stors_env$grids$biultin[[density_name]]$opt)
+  # stopifnot(" Grid already optimized for this distrubution" = !stors_env$stors_env$grids$biultin[[density_name]]$optgrids$biultin[[density_name]]$opt)
   
   dendata <- pbgrids[[density_name]]
+  
+  if(stors_env$grids$biultin[[density_name]]$opt){
+    stors_env$grids$biultin[[density_name]]$opt = FALSE
+    free_cache_cnum_c(dendata$Cnum)
+    
+  }
   
   opt_prob = find_optimal_grid(dendata, density_name)
 
@@ -56,10 +62,10 @@ grid_optimizer <- function(density_name = stors_env$grids$biultin$names) {
 }
 
 
-# 
+
 # {
 # 
-# density_name <- "srnorm"
+# density_name <- "srexp"
 # 
 # dendata <- pbgrids[[density_name]]
 # 
@@ -124,12 +130,12 @@ find_optimal_grid <- function(dendata, density_name){
       density_fun <- get(density_name, mode = "function")
       
       gc = gc()
-      
+      grid$grid_data$x[1]=0.001
       cache_grid_c(dendata$Cnum, grid)
       
       cost <- microbenchmark::microbenchmark(
-        st = density_fun(1000),
-        times = 10000
+        st = density_fun(1000), #1000000
+        times = 100
       )
       
       free_cache_cnum_c(dendata$Cnum)

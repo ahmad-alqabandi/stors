@@ -1,13 +1,8 @@
+#include "R_stors.h"
+
+
 #ifndef SNORM_H
 #define SNORM_H
-
-
-#include <R.h>
-#include <Rinternals.h>
-
-#include "cache.h"
-
-#define R_RETURN_NULL return(R_NilValue);
 
 
 SEXP srnorm(SEXP s_size);

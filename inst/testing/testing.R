@@ -47,6 +47,7 @@ hist(multi_sampler(1000000))
 
 
 grid = stors::grid_optimizer("srnorm")
+
 plot(grid)
 # save_grid, load_grid
 
@@ -64,6 +65,9 @@ microbenchmark::microbenchmark(
   times = 100
 )
 
+-2.501206
+-2.489405
+
 
 microbenchmark::microbenchmark(
   zrnormR(1000),
@@ -72,3 +76,34 @@ microbenchmark::microbenchmark(
   zrnormR(1000000),
   times = 100
 )
+
+
+
+
+vec =  grid$grid_data[1:(n),]$x
+tail(vec, n = 3)
+head(vec, n = 3)
+length(vec)
+
+vec = grid$grid_data[1:(n),]$s_upper
+tail(vec, n = 3)
+head(vec, n = 3)
+
+length(vec)
+
+
+vec =  grid$grid_data[2:(n-1),]$x
+tail(vec, n = 3)
+head(vec, n = 3)
+
+length(vec)
+
+
+vec =  grid$grid_data[5:(n-1),]$s_upper * grid$grid_data[5:(n-1),]$p_a
+tail(vec, n = 3)
+head(vec, n = 3)
+
+length(vec)
+
+
+

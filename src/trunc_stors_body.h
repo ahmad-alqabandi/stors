@@ -1,3 +1,6 @@
+
+
+
 if(grids.grid[CNUM].x == NULL){
   REprintf("you need to optimize your destribution grid first");
   R_RETURN_NULL
@@ -34,7 +37,11 @@ for( int j = 0; j < 2; j++){
   
   if(xlr[j] > g.x[g.steps_number]){
     
-#if R_TAIL == ARS
+#ifndef R_TAIL
+    
+    results[j] = 1
+    
+#elif R_TAIL == ARS
     
     hu_x =  g.rt_properties[4] * (xlr[j] - g.x[g.steps_number]) + g.rt_properties[5];
     
@@ -43,21 +50,9 @@ for( int j = 0; j < 2; j++){
 #elif R_TAIL == IT
 
     
-    // val = PROTECT(allocVector(REALSXP, 2));
-    // 
-    // REAL(val)[0] = g.x[g.steps_number];
-    // REAL(val)[1] = xlr[j];
-    // 
-    // PROTECT(fcall = Rf_lang2(Rf, val));
-    // PROTECT(result = eval(fcall, Renv));
-    // PROTECT(foo = coerceVector(result, REALSXP));
-    // cdf[0] = REAL(foo)[0];
-    // cdf[1] = REAL(foo)[1];
-    // UNPROTECT(4);
-    
-    cdf = CDF(xlr[j]) - CDF(g.x[g.steps_number]);
+    cdf = R_ITF(xlr[j]) - R_ITF(g.x[g.steps_number]);
 
-results[j] =  ( g.areas[0] + g.areas[1] + cdf)/ total_area;
+    results[j] =  ( g.areas[0] + g.areas[1] + cdf)/ total_area;
     
 #endif
     
@@ -68,25 +63,19 @@ results[j] =  ( g.areas[0] + g.areas[1] + cdf)/ total_area;
         
         if(i == 0){
           
-#if R_TAIL == ARS
+#ifndef L_TAIL
+          
+          results[j] = 0;
+          
+#elif L_TAIL == ARS
 
           hu_x =  g.lt_properties[4] * (xlr[j] - g.x[0]) + g.lt_properties[2];
           
           results[j] = (g.lt_properties[3] * (exp(hu_x) - g.lt_properties[0])) / total_area;
           
-#elif R_TAIL == IT
+#elif L_TAIL == IT
           
           
-          // val = PROTECT(allocVector(REALSXP, 1));
-          // 
-          // REAL(val)[0] =  xlr[j];
-          // 
-          // PROTECT(fcall = Rf_lang2(Rf, val));
-          // PROTECT(result = eval(fcall, Renv));
-          // PROTECT(foo = coerceVector(result, REALSXP));
-          // cdf[0] = REAL(foo)[0];
-          // UNPROTECT(4);
-          // 
           cdf = CDF(xlr[j]);
           
           results[j] =  cdf / total_area;

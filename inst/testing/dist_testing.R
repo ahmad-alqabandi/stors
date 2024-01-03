@@ -22,7 +22,9 @@ Laplace_sampler = stors(Laplace_grid)
 
 hist(Laplace_sampler(100000) * 4, breaks = 100)
 
-grid_optimizer("slaplace")
+laplace_grid <- grid_optimizer("laplace")
+
+plot(laplace_grid)
 
 
 n = 1
@@ -36,7 +38,7 @@ microbenchmark::microbenchmark(
 )
 
 
-hist(srlaplace(10000), breaks = 100)
+hist(laplace(10000), breaks = 100)
 hist(stors::rlaplace_c(10000), breaks = 100)
 
 
@@ -132,15 +134,25 @@ microbenchmark::microbenchmark(
 
 # test truncation LAplace
 
-laplace = grid_optimizer("laplace")
-laplace
+laplace_grid = grid_optimizer("laplace")
+
+laplace_grid
+
 hist(laplace(100000))
 
-trnc23laplace=trunclaplace(-2,3)
+trnc23laplace=trunclaplace(-2.5,3.3)
 
-hist(trnc23laplace(100000))
+sam = trnc23laplace(10000000)
+hist(sam)
+max(sam)
+min(sam)
 
-hist(rtrunc(100000,"laplace",-2,3))
+sam = rtrunc(10000000,"laplace",-2,3)
+hist(sam)
+max(sam)
+min(sam)
+
+
 
 library(LaplacesDemon)
 n=10000000
@@ -151,8 +163,19 @@ n=10000000
 )
 
  
+ # test exp
+ 
+ srexp_grid = grid_optimizer("srexp")
+ 
+ srexp_grid
+ 
+ hist(srexp(100000))
  
 
 
-
+ microbenchmark::microbenchmark(
+   srexp(1000),
+   rexp(1000),
+   times = 10000
+ )
 

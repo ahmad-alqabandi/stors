@@ -5,11 +5,17 @@ plot.grid <- function(grid, ...){
   
   n = nrow(grid$grid_data)
   
-  lf  <- function(x) exp( grid$lt_properties[5] * (x - grid$grid_data$x[1]) + grid$lt_properties[3] )
-  
-  rf  <- function(x) exp( grid$rt_properties[5] * (x - grid$grid_data$x[n]) + grid$rt_properties[6] )
-  
   f <- eval(parse(text = grid$dens_func))
+  
+  if(grid$tails_method == "ARS"){
+    lf  <- function(x) exp( grid$lt_properties[5] * (x - grid$grid_data$x[1]) + grid$lt_properties[3] )
+    
+    rf  <- function(x) exp( grid$rt_properties[5] * (x - grid$grid_data$x[n]) + grid$rt_properties[6] )
+  } else {
+    
+    lf <- f
+    rf <- f
+  }
   
   xx <- seq(from = grid$grid_data$x[1]-1, to = grid$grid_data$x[n]+1, by = 0.01)
   
@@ -43,11 +49,13 @@ plot.grid <- function(grid, ...){
       ggplot2::ylab("Density")
     # ggplot2::scale_y_continuous(limits = c(0, max(yy)))
     
-    cat("last_y_prop = " , yr[length(yr)], "\n" )
-    cat("last_y_tail = " , yy[length(yy)] )
+    # cat("last_y_prop = " , yr[length(yr)], "\n" )
+    # cat("last_y_tail = " , yy[length(yy)] )
     
   } else{
-    plot(grid,...)
+    class(grid) <- "list"
+    plot(grid, ...)
+
   }
   
   

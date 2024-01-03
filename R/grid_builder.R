@@ -368,18 +368,20 @@ grid_builder <- function(lb = -Inf, rb = Inf, a, th, mode, f, h = NA, h_prime=NA
   if(is.function(h)){
     lt_properties <- c(exp(h_upper(x1, lb, h_prime, h)), normalizing_con * h_prime(x1), h(x1), 1 / h_prime(x1), h_prime(x1)) #4
     rt_properties <- c(normalizing_con, area_cum_sum[2], h_prime(xm) / f(xm), 1 / h_prime(xm), h_prime(xm), h(xm))
-  } else{
+    tails_method <- "ARS"
+    } else{
     lt_properties <- rep(0,5)
     rt_properties <- rep(0,6)
+    tails_method <- "IT"
   }
   
   
-  invisible(list(grid_data = final_grid, areas = area, steps_number = steps_number, sampling_probabilities = sampling_probabilities, unif_scaler = unif_scaler, lt_properties = lt_properties, rt_properties = rt_properties, alpha = a))
+  invisible(list(grid_data = final_grid, areas = area, steps_number = steps_number, sampling_probabilities = sampling_probabilities, unif_scaler = unif_scaler, lt_properties = lt_properties, rt_properties = rt_properties, alpha = a, tails_method = tails_method))
 }
 
 
 
-# 
+
 # find_steps <- function(lb = -Inf, rb = Inf, a, th, mode, mode_i, mode_n, f) {
 #   memory_res <- (max(500, ceiling(1 / a)) + 500) / 2
 # 
@@ -485,7 +487,7 @@ grid_builder <- function(lb = -Inf, rb = Inf, a, th, mode, f, h = NA, h_prime=NA
 
 find_left_steps <- function(lb = -Inf, rb = Inf, a, th, mode, mode_i, mode_n, f, steps_lim = Inf) {
   
-  memory_res <- (max(500, ceiling(1 / a)) + 500) / 2
+  memory_res <- (max(500, ceiling(1 / a)) + 500)
   
   x <- rep(NA, memory_res)
   s_upper <- rep(NA, memory_res )
@@ -496,7 +498,7 @@ find_left_steps <- function(lb = -Inf, rb = Inf, a, th, mode, mode_i, mode_n, f,
   
   l <- 0
   
-  i <- memory_res + 1
+  i <- memory_res 
   
   if (mode != lb) {
     
@@ -549,7 +551,7 @@ find_left_steps <- function(lb = -Inf, rb = Inf, a, th, mode, mode_i, mode_n, f,
 
 find_right_steps <- function(lb = -Inf, rb = Inf, a, th, mode, mode_i, mode_n, f, steps_lim = Inf) {
   
-  memory_res <- (max(500, ceiling(1 / a)) + 500) / 2
+  memory_res <- (max(500, ceiling(1 / a)) + 500) 
   
   x <- rep(NA, memory_res)
   s_upper <- rep(NA, memory_res )
@@ -571,15 +573,18 @@ find_right_steps <- function(lb = -Inf, rb = Inf, a, th, mode, mode_i, mode_n, f
 
       if (r > steps_lim || x_next > rb || (mode_i == mode_n && f(x_next) / f_x <= th)) {
         x[r] <- x_c
+        s_upper[r] <- s_lower[r] <- s_upper_lower[r] <- p_a[r] <- NA
         break
       }
 
       f_x_next <- f(x_next)
 
       if (f_x_next > f_x) {
-        x[ r] <- x_c
+        x[r] <- x_c
         s_upper[r] <- f_x
         r_tail_area <- 0
+        s_lower[r] <- s_upper_lower[r] <- p_a[r] <- NA
+        
         break
       }
 
@@ -597,7 +602,6 @@ find_right_steps <- function(lb = -Inf, rb = Inf, a, th, mode, mode_i, mode_n, f
       r <- r + 1
     }
   }
-
   
   d <- data.frame(
     x = x, s_upper = s_upper, p_a = p_a,

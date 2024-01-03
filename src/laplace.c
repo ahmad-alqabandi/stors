@@ -1,5 +1,7 @@
 #include "laplace.h"
-#include "macrodef.h"
+#include "macro_var.h"
+
+#define NAME laplace
 
 #define CNUM 1
 
@@ -15,9 +17,7 @@
 
 #define CDF(x) ( (x <= 0) ? (0.5 * exp(x)) : (1 - 0.5 * exp(-x)) )
 
-SEXP laplace(SEXP s_size){
-#include "stors_body.h"
-}
+#include "stors_sample.c"
 
 // =================================
 
@@ -29,12 +29,7 @@ SEXP laplace_trunc_nav(SEXP Rlx, SEXP Rrx){
 
 #define TRUNC
 
-SEXP laplace_trunc(SEXP s_size, SEXP Rl, SEXP Rr)
-{
-  
-#include "stors_body.h"
-  
-}
+#include "stors_sample.c"
 
 #undef TRUNC
 
