@@ -46,6 +46,7 @@ hist(multi_sampler(1000000))
 
 
 
+
 grid = stors::grid_optimizer("srnorm")
 
 plot(grid)
@@ -53,6 +54,25 @@ plot(grid)
 
 hist(srnorm(10000))
 
+min(srnorm(10000))
+
+tfunc = truncsrnorm( -1,3)
+
+sample = tfunc(110000)
+
+hist(sample)
+
+min(sample)
+
+max(sample)
+
+n = 100
+
+microbenchmark::microbenchmark(
+  rnorm(n),
+  srnorm = srnorm(n),
+  times = 10000
+)
 
 library(RcppZiggurat)
 
@@ -79,31 +99,28 @@ microbenchmark::microbenchmark(
 
 
 
+laplace_grid = grid_optimizer("laplace")
 
-vec =  grid$grid_data[1:(n),]$x
-tail(vec, n = 3)
-head(vec, n = 3)
-length(vec)
+laplace_grid
 
-vec = grid$grid_data[1:(n),]$s_upper
-tail(vec, n = 3)
-head(vec, n = 3)
+hist(laplace(100000))
 
-length(vec)
+trnc23laplace=trunclaplace(-2,3.3)
 
 
-vec =  grid$grid_data[2:(n-1),]$x
-tail(vec, n = 3)
-head(vec, n = 3)
-
-length(vec)
-
-
-vec =  grid$grid_data[5:(n-1),]$s_upper * grid$grid_data[5:(n-1),]$p_a
-tail(vec, n = 3)
-head(vec, n = 3)
-
-length(vec)
+hist(trnc23laplace(100000))
 
 
 
+srexp_grid = grid_optimizer("srexp")
+
+srexp_grid
+
+hist(srexp(100000))
+
+trnc12srexp=truncsrexp(0,2)
+
+sam = trnc12srexp(100000)
+
+hist(sam)
+min(sam)

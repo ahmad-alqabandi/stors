@@ -9,25 +9,10 @@
 
 #if defined(CNUM) && defined(NAME)
 
-
-#ifdef TRUNC
-
-SEXP DEN_TRUNC(NAME)(SEXP s_size, SEXP Rcsl, SEXP Rcsr){
-  
-#else
-
 SEXP DEN_SAMPLE(NAME)(SEXP s_size){
-    
-#endif
 
-  
   int j, sample_size = asInteger(s_size);
-  
-#ifdef TRUNC
-  double csl = asReal(Rcsl), csr = asReal(Rcsr);
-#endif
-  
-  
+
   if(grids.grid[CNUM].x == NULL){
     REprintf("you need to optimize your destribution grid first");
     R_RETURN_NULL
@@ -51,9 +36,6 @@ SEXP DEN_SAMPLE(NAME)(SEXP s_size){
   
   u1 = unif_rand();
   
-#ifdef TRUNC
-  u1 = csl + u1 * (csr-csl);
-#endif
   
   for (int i = 0; i < sample_size;)
   {
@@ -70,9 +52,6 @@ SEXP DEN_SAMPLE(NAME)(SEXP s_size){
       i++;
       u1 = unif_rand();
       
-#ifdef TRUNC
-      u1 = csl + u1 * (csr-csl);
-#endif
       
 #elif L_TAIL == ARS
       
@@ -86,9 +65,6 @@ SEXP DEN_SAMPLE(NAME)(SEXP s_size){
       }
       u1 = unif_rand();
       
-#ifdef TRUNC
-      u1 = csl + u1 * (csr-csl);
-#endif
       
 #endif
       
@@ -108,12 +84,7 @@ if(u1 > g.sampling_probabilities[1]){
       i++;
       u1 = unif_rand();
       
-#ifdef TRUNC
-      
-      u1 = csl + u1 * (csr-csl);
-      
-#endif
-      
+
 #elif R_TAIL == ARS
       
       sample = g.x[g.steps_number] + log1p((u1 * g.rt_properties[0] - g.rt_properties[1]) * g.rt_properties[2]) * g.rt_properties[3];
@@ -130,9 +101,6 @@ if(u1 > g.sampling_probabilities[1]){
       
       u1 = unif_rand();
       
-#ifdef TRUNC
-      u1 = csl + u1 * (csr-csl);
-#endif
       
 #endif
       
@@ -164,9 +132,6 @@ if(u1 > g.sampling_probabilities[1]){
         {
           u1 = unif_rand();
           
-#ifdef TRUNC
-          u1 = csl + u1 * (csr-csl);
-#endif
         }
       }
       else
@@ -189,9 +154,6 @@ if(u1 > g.sampling_probabilities[1]){
         
         u1 = unif_rand();
         
-#ifdef TRUNC
-        u1 = csl + u1 * (csr-csl);
-#endif
       }
       
     }

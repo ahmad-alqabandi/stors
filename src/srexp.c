@@ -17,17 +17,11 @@
 
 // =================================
 
-SEXP srexp_trunc_nav(SEXP Rlx, SEXP Rrx){
-#include "trunc_stors_body.h"
-}
+#include "stors_trunc_nav.c"
 
 // =================================
 
-#define TRUNC
-
-#include "stors_sample.c"
-
-#undef TRUNC
+#include "stors_sample_trunc.c"
 
 // =================================
 

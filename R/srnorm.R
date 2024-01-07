@@ -50,9 +50,9 @@ srsnorm <- function(n, mu =0, sd = 1) {
 #' Title
 #'
 #' @export
-d_srnorm_upper = function(n ,l, r){
+d_srnorm_upper = function(n ,xl, xr ,csl , csr, il, ir){
   
-  .Call(C_srnorm_trunc, n, l, r)
+  .Call(C_srnorm_trunc, n,xl, xr, csl, csr, il, ir)
   
 }
 
@@ -72,19 +72,17 @@ truncsrnorm = function(xl, xr){
   
   stopifnot(
     "xl must be smaller that xr" = xl < xr,
-    "xl must be greater than the density lower bound" = xl >  pbgrids$srnorm$lb,
-    "xr must be smaller than the density upper bound" = xr < pbgrids$srnorm$rb
+    "xl must be greater than the density lower bound" = xl >=  pbgrids$srnorm$lb,
+    "xr must be smaller than the density upper bound" = xr <= pbgrids$srnorm$rb
   )
   
   Upper_cumsum = .Call(C_srnorm_trunc_nav, xl, xr)
+  
+  print(Upper_cumsum)
   return(
     function(n){
-      d_srnorm_upper(n, Upper_cumsum[1], Upper_cumsum[2])
+      d_srnorm_upper(n, xl, xr, Upper_cumsum[1], Upper_cumsum[2], as.integer(Upper_cumsum[3]), as.integer(Upper_cumsum[4]))
     }
   )
   
 }
-
-
-
-

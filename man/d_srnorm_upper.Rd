@@ -4,7 +4,7 @@
 \alias{d_srnorm_upper}
 \title{Title}
 \usage{
-d_srnorm_upper(n, l, r)
+d_srnorm_upper(n, xl, xr, csl, csr, il, ir)
 }
 \description{
 Title

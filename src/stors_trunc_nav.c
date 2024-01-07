@@ -1,6 +1,16 @@
 
+#include "R_stors.h"
 
+#include "macro_func.h"
 
+#include "macro_var.h"
+
+#include "cache.h"
+
+#if defined(CNUM) && defined(NAME)
+
+SEXP DEN_TRUNC_NAV(NAME)(SEXP Rlx, SEXP Rrx){
+  
 if(grids.grid[CNUM].x == NULL){
   REprintf("you need to optimize your destribution grid first");
   R_RETURN_NULL
@@ -10,7 +20,7 @@ struct grid g = grids.grid[CNUM];
 
 int i=0;
 
-double xlr[2], total_area = g.areas[0]+ g.areas[1]+ g.areas[2];
+double xlr[2], total_area = g.areas[0]+ g.areas[1]+ g.areas[2], ixlr[2];
 
 
 #if R_TAIL == ARS
@@ -29,23 +39,25 @@ double cdf;
 xlr[0] = asReal(Rlx);
 xlr[1] = asReal(Rrx);
 
-SEXP Rresults = PROTECT((allocVector(REALSXP, 2)));
+SEXP Rresults = PROTECT((allocVector(REALSXP, 4)));
 
 double *results = REAL(Rresults);
 
-for( int j = 0; j < 2; j++){
+for( int j = 0; j < 2; j++){ 
+  
+  
+  
+#ifdef R_TAIL 
   
   if(xlr[j] > g.x[g.steps_number]){
     
-#ifndef R_TAIL
-    
-    results[j] = 1
-    
-#elif R_TAIL == ARS
+#if R_TAIL == ARS
     
     hu_x =  g.rt_properties[4] * (xlr[j] - g.x[g.steps_number]) + g.rt_properties[5];
     
     results[j] =( g.areas[0] + g.areas[1] + (g.rt_properties[3] * (exp(hu_x) - exp(g.rt_properties[5]))) )/ total_area;
+    
+    ixlr[j] = -1;
     
 #elif R_TAIL == IT
 
@@ -54,36 +66,52 @@ for( int j = 0; j < 2; j++){
 
     results[j] =  ( g.areas[0] + g.areas[1] + cdf)/ total_area;
     
+    ixlr[j] = -1;
+    
 #endif
     
-  }else{
+  }else
+    
+#endif
+
+    {
     while( i < g.steps_number + 1){
       
-      if(xlr[j] <= g.x[i]){
+      if(xlr[j] < g.x[i]){
         
-        if(i == 0){
-          
-#ifndef L_TAIL
-          
-          results[j] = 0;
-          
-#elif L_TAIL == ARS
+        
+#ifdef L_TAIL
+        
+    if(i == 0){
+
+#if L_TAIL == ARS
 
           hu_x =  g.lt_properties[4] * (xlr[j] - g.x[0]) + g.lt_properties[2];
           
           results[j] = (g.lt_properties[3] * (exp(hu_x) - g.lt_properties[0])) / total_area;
-          
+          ixlr[j] = -1;
 #elif L_TAIL == IT
           
           
           cdf = CDF(xlr[j]);
           
           results[j] =  cdf / total_area;
-          
+          ixlr[j] = -1;
 #endif
           
-        }else{
+        }else
+          
+#endif
+    
+          {
           results[j] =(g.areas[0] + g.alpha * (i - 1) + (xlr[j] - g.x[i-1]) * g.s_upper[i-1]) / total_area;
+          if( j == 0){
+            ixlr[j] = i-1;
+            
+          }else{
+            ixlr[j] = i;
+            
+          }
         }
         break;
       }
@@ -96,6 +124,13 @@ for( int j = 0; j < 2; j++){
   
 }
 
+results[2] = ixlr[0];
+results[3] = ixlr[1];
+
+
 UNPROTECT(1);
 
 return (Rresults);
+
+}
+#endif

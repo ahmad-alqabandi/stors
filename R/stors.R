@@ -47,15 +47,4 @@ stors <- function(grid) {
 
 
 
-#' laplace
-#'
-#' @param n 
-#'
-#' @return
-#' @export
-#'
-#' @examples
-laplace <- function(n) {
-  .Call(C_laplace, n)
-}
 

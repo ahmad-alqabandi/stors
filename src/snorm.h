@@ -7,7 +7,7 @@
 
 SEXP srnorm(SEXP s_size);
 SEXP srnorm_trunc_nav(SEXP Rlx, SEXP Rrx);
-SEXP srnorm_trunc(SEXP s_size, SEXP l, SEXP u);
+SEXP srnorm_trunc(SEXP s_size, SEXP Rxl, SEXP Rxr , SEXP Rcsl, SEXP Rcsr,  SEXP Ril, SEXP Rir);
   
 #endif
 
