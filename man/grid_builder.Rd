@@ -9,7 +9,7 @@ grid_builder(
   rb = Inf,
   a,
   th,
-  mode,
+  modes,
   f,
   h = NA,
   h_prime = NA,
@@ -28,13 +28,13 @@ grid_builder(
 
 \item{th}{scaler pre_acceptance threshold}
 
-\item{mode}{vector density modes}
-
 \item{f}{density function}
 
 \item{h}{log transform of the density function}
 
 \item{h_prime}{first derivative of h}
+
+\item{mode}{vector density modes}
 }
 \value{
 list including proposal distribution properties

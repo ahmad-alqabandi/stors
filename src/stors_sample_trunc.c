@@ -23,21 +23,22 @@ SEXP DEN_TRUNC(NAME)(SEXP s_size, SEXP Rxl, SEXP Rxr , SEXP Rcsl, SEXP Rcsr,  SE
         R_RETURN_NULL
       }
       
+      struct grid g = grids.grid[CNUM];
+      
 #ifdef L_TAIL 
       if(il != -1){
-        tmpxl = grids.grid[CNUM].x[il];
-        grids.grid[CNUM].x[il] = xl;
+        tmpxl = g.x[il];
+        g.x[il] = xl;
       }
 #endif      
 
 #ifdef R_TAIL 
       if(ir != -1){
-        tempxr = grids.grid[CNUM].x[ir];
-        grids.grid[CNUM].x[ir] = xr;
+        tempxr = g.x[ir];
+        g.x[ir] = xr;
       }
 #endif      
 
-      struct grid g = grids.grid[CNUM];
       
 #if L_TAIL == ARS || R_TAIL == ARS 
       
@@ -185,14 +186,14 @@ SEXP DEN_TRUNC(NAME)(SEXP s_size, SEXP Rxl, SEXP Rxr , SEXP Rcsl, SEXP Rcsr,  SE
       
 #ifdef L_TAIL 
       if(il != -1){
-        grids.grid[CNUM].x[il] = tmpxl;
+        g.x[il] = tmpxl;
       }
 #endif
 
       
 #ifdef R_TAIL 
       if(ir != -1){
-        grids.grid[CNUM].x[ir] = tempxr;
+        g.x[ir] = tempxr;
       }
 #endif
       

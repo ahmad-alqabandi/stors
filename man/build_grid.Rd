@@ -7,7 +7,7 @@
 build_grid(
   lb = -Inf,
   rb = Inf,
-  mode,
+  modes,
   f,
   h = NULL,
   h_prime = NULL,
@@ -20,13 +20,13 @@ build_grid(
 
 \item{rb}{Scalar target density upper bound.}
 
-\item{mode}{Vector representing the modes of the density.}
-
 \item{f}{Function accepting one argument which returns the probability density of the target.}
 
 \item{h}{Function accepting one argument which returns the Log-transform of the target.}
 
 \item{h_prime}{Function accepting one argument which returns the first derivative of the log-transformed target density.}
+
+\item{mode}{Vector representing the modes of the density.}
 }
 \value{
 Returns a list that contains the following data that is related to the proposal distribution:

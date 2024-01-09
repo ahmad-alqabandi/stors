@@ -73,7 +73,7 @@ truncsrnorm = function(xl, xr){
   stopifnot(
     "xl must be smaller that xr" = xl < xr,
     "xl must be greater than the density lower bound" = xl >=  pbgrids$srnorm$lb,
-    "xr must be smaller than the density upper bound" = xr <= pbgrids$srnorm$rb
+    "xr must be smaller than the density upper bound" = xr <=  pbgrids$srnorm$rb
   )
   
   Upper_cumsum = .Call(C_srnorm_trunc_nav, xl, xr)

@@ -3,7 +3,7 @@
 
 #define NAME srexp
 
-#define CNUM 2
+#define CNUM 3
 
 #define R_TAIL IT
 

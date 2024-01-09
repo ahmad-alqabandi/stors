@@ -6,6 +6,8 @@
 
 static const R_CallMethodDef callMethods[]  = {
   {"stors", (DL_FUNC) &stors, -1},
+  {"stors_trunc_nav", (DL_FUNC) &stors_trunc_nav, -1},
+  {"stors_trunc", (DL_FUNC) &stors_trunc, -1},
   {"cache_grid", (DL_FUNC) &cache_grid, -1},
   {"free_cache", (DL_FUNC) &free_cache, -1},
   {"free_cache_cnum", (DL_FUNC) &free_cache_cnum, -1},

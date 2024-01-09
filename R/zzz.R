@@ -4,7 +4,7 @@
 
 pbgrids <- list(
   srnorm = c(
-    Cnum = 0,
+    Cnum = 1,
     tails_method = "ARS",
     f = function(x) {
       0.3989423 * exp(-0.5 * x * x)
@@ -20,7 +20,7 @@ pbgrids <- list(
     rb = Inf
   ),
   laplace = c(
-    Cnum = 1,
+    Cnum = 2,
     tails_method = "IT",
     f = function(x) {
       0.5 * exp(-abs(x))
@@ -36,7 +36,7 @@ pbgrids <- list(
     rb = Inf
   ),
   srexp = c(
-    Cnum = 2,
+    Cnum = 3,
     tails_method = "IT",
     f = function(x) {
       exp(-x)

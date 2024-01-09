@@ -3,7 +3,7 @@
 
 #define NAME srnorm
 
-#define CNUM 0
+#define CNUM 1
 
 #define L_TAIL ARS
 

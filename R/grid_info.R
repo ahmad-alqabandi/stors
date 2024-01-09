@@ -17,11 +17,25 @@ plot.grid <- function(grid, ...){
     rf <- f
   }
   
-  xx <- seq(from = grid$grid_data$x[1]-1, to = grid$grid_data$x[n]+1, by = 0.01)
+  if(is.finite(grid$grid_bounds[1])){
+    l_limit = 0
+  }else{
+    l_limit = 1
+  }
   
-  xl <- seq( from = grid$grid_data$x[1]-1 , to= grid$grid_data$x[1], by = 0.01)
+  if(is.finite(grid$grid_bounds[2])){
+    r_limit = 0
+  }else{
+    r_limit = 1
+  }
+    
+
   
-  xr <- seq( from = grid$grid_data$x[n] , to= grid$grid_data$x[n]+1, by = 0.01)
+  xx <- seq(from = grid$grid_data$x[1]-l_limit, to = grid$grid_data$x[n]+r_limit, by = 0.01)
+  
+  xl <- seq( from = grid$grid_data$x[1]-l_limit , to= grid$grid_data$x[1], by = 0.01)
+  
+  xr <- seq( from = grid$grid_data$x[n] , to= grid$grid_data$x[n]+r_limit, by = 0.01)
   
   yy <- f(xx)
   

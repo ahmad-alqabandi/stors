@@ -172,7 +172,7 @@ load_grid <- function(grid_name) {
 #'  
 #' @import digest digest
 #' @export
-build_grid <- function(lb = -Inf, rb = Inf, mode, f, h = NULL, h_prime = NULL, a = 0.01,th = 0.9) {
+build_grid <- function(lb = -Inf, rb = Inf, modes, f, h = NULL, h_prime = NULL, a = 0.01,th = 0.9) {
 
     # A <- seq(from = 0.005, to = 0.0002, length.out = 100)
     # 
@@ -188,11 +188,16 @@ build_grid <- function(lb = -Inf, rb = Inf, mode, f, h = NULL, h_prime = NULL, a
   }
   
   if(is.null(h_prime)){
-    h_prime <- stors_prime(mode[1], h)
+    h_prime <- stors_prime(modes[1], h)
   }
   
-     opt_grid <- grid_builder(lb, rb,a, th, mode, f, h, h_prime)
+  opt_prob = find_optimal_grid(lb = lb, rb = rb, modes = modes, f = f, h =  h, h_prime = h_prime)
+  
+  
+  # opt_grid <- grid_builder(lb, rb,a, th, modes, f, h, h_prime)
     
+  opt_grid <- grid_builder(lb = lb, rb = rb ,a = opt_prob$area , th = 0, modes, f = f, h =  h, h_prime = h_prime , cdf = NA, stps =opt_prob$steps , lstpsp =opt_prob$lstpsp , rstpsp= opt_prob$rstpsp)
+  
     func_to_text <- deparse(f)
 
     opt_grid$dens_func <- func_to_text
@@ -222,10 +227,12 @@ build_grid <- function(lb = -Inf, rb = Inf, mode, f, h = NULL, h_prime = NULL, a
 #' @param h_prime first derivative of h
 #' @return list including proposal distribution properties
 #' @importFrom utils head
-grid_builder <- function(lb = -Inf, rb = Inf, a, th, mode, f, h = NA, h_prime=NA, cdf =NA, stps =NA , lstpsp =NA , rstpsp= NA) {
+grid_builder <- function(lb = -Inf, rb = Inf, a, th, modes, f, h = NA, h_prime=NA, cdf =NA, stps =NA , lstpsp =NA , rstpsp= NA) {
   
-  mode_n <- length(mode)
-
+  mode_n <- length(modes)
+  
+  grid_bounds <- rep(NA,2)
+  
   final_grid <- data.frame(
     x = c(), s_upper = c(), s_lower = c(), p_a = c(),
     s_upper_lower = c()
@@ -244,14 +251,14 @@ grid_builder <- function(lb = -Inf, rb = Inf, a, th, mode, f, h = NA, h_prime=NA
     for (mode_i in (1:mode_n)) {
       
       if(mode_i != 1 || is.na(lstpsp))
-      {lsts[[mode_i]] <- find_left_steps(lb, rb, a, th, mode[mode_i], mode_i, mode_n, f)
+      {lsts[[mode_i]] <- find_left_steps(lb, rb, a, th, modes[mode_i], mode_i, mode_n, f)
       if(!is.na(lstpsp)) stps <- stps -  lsts[[mode_i]]$m}
       
       if(mode_i != mode_n || is.na(rstpsp))
-      {rsts[[mode_i]] <- find_right_steps(lb, rb, a, th, mode[mode_i], mode_i, mode_n, f)
+      {rsts[[mode_i]] <- find_right_steps(lb, rb, a, th, modes[mode_i], mode_i, mode_n, f)
       if(!is.na(rstpsp)) stps <- stps -  rsts[[mode_i]]$m}
       
-      # grids2[[mode_i]] <- find_steps(lb = -Inf, rb = Inf, a, th, mode[mode_i], mode_i, mode_n, f)
+      # grids2[[mode_i]] <- find_steps(lb = -Inf, rb = Inf, a, th, modes[mode_i], mode_i, mode_n, f)
       
     }
   
@@ -259,10 +266,10 @@ grid_builder <- function(lb = -Inf, rb = Inf, a, th, mode, f, h = NA, h_prime=NA
   if(!is.na(stps))
   {
     steps_lim_left = round(lstpsp * stps)
-    lsts[[1]] <- find_left_steps(lb, rb, a, th, mode[1], 1, mode_n, f,  steps_lim = steps_lim_left)
+    lsts[[1]] <- find_left_steps(lb, rb, a, th, modes[1], 1, mode_n, f,  steps_lim = steps_lim_left)
     
     steps_lim_right = stps - steps_lim_left
-    rsts[[mode_n]] <- find_right_steps(lb, rb, a, th, mode[mode_n], mode_n, mode_n, f, steps_lim = steps_lim_right)
+    rsts[[mode_n]] <- find_right_steps(lb, rb, a, th, modes[mode_n], mode_n, mode_n, f, steps_lim = steps_lim_right)
   }
   
     
@@ -373,10 +380,13 @@ grid_builder <- function(lb = -Inf, rb = Inf, a, th, mode, f, h = NA, h_prime=NA
     lt_properties <- rep(0,5)
     rt_properties <- rep(0,6)
     tails_method <- "IT"
-  }
+    }
+  
+  grid_bounds[1] = lb
+  grid_bounds[2] = rb
   
   
-  invisible(list(grid_data = final_grid, areas = area, steps_number = steps_number, sampling_probabilities = sampling_probabilities, unif_scaler = unif_scaler, lt_properties = lt_properties, rt_properties = rt_properties, alpha = a, tails_method = tails_method))
+  invisible(list(grid_data = final_grid, areas = area, steps_number = steps_number, sampling_probabilities = sampling_probabilities, unif_scaler = unif_scaler, lt_properties = lt_properties, rt_properties = rt_properties, alpha = a, tails_method = tails_method, grid_bounds = grid_bounds))
 }
 
 

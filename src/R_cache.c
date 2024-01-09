@@ -59,15 +59,20 @@ SEXP cache_grid(SEXP R_Cnum, SEXP R_x, SEXP R_s_upper, SEXP R_p_a, SEXP R_s_uppe
 
 SEXP free_cache(void){
   
-  for( size_t i = 0; i < grids.incache; i++){
-    free(grids.grid[i].x);
-    grids.grid[i].x = NULL;
-    free(grids.grid[i].p_a);
-    grids.grid[i].p_a = NULL;
-    free(grids.grid[i].s_upper);
-    grids.grid[i].s_upper = NULL;
-    free(grids.grid[i].s_upper_lower);
-    grids.grid[i].s_upper_lower = NULL;
+  for( size_t i = 0; i < MAX_GRIDS_NUMBER; i++){
+    
+    if(grids.grid[i].x != NULL){
+      
+      free(grids.grid[i].x);
+      grids.grid[i].x = NULL;
+      free(grids.grid[i].p_a);
+      grids.grid[i].p_a = NULL;
+      free(grids.grid[i].s_upper);
+      grids.grid[i].s_upper = NULL;
+      free(grids.grid[i].s_upper_lower);
+      grids.grid[i].s_upper_lower = NULL;
+      
+    }
     
   }
   

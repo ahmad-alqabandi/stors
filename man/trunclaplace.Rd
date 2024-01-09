@@ -2,8 +2,7 @@
 % Please edit documentation in R/laplace.R
 \name{trunclaplace}
 \alias{trunclaplace}
-\title{I will stick with this function until I found a proper solution.
-Title}
+\title{Title}
 \usage{
 trunclaplace(xl, xr)
 }
@@ -15,6 +14,5 @@ trunclaplace(xl, xr)
 \item{r}{}
 }
 \description{
-I will stick with this function until I found a proper solution.
 Title
 }

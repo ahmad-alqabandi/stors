@@ -1,6 +1,37 @@
 
 ##    STORS
 
+
+modes = 0
+
+f_norm = function(x) {
+  0.3989423 * exp(-0.5 * x * x)
+}
+
+h_norm = function(x) {
+  log(0.3989423) - (x * x) * (1 / 2)
+}
+
+h_prime_norm = function(x) {
+  -x
+}
+
+norm_grid = build_grid(lb = -Inf, rb = Inf, modes , f = f_norm, h = h_norm, h_prime = h_prime_norm)
+
+plot(norm_grid)
+
+norm_grid
+
+norm_sampler = stors(norm_grid)
+
+hist(norm_sampler(1000000))
+
+norm_trunc = trunc(norm_grid, -2,2)
+
+hist(norm_trunc(10000))
+
+#=======================
+
 modes_multi = c(0.00134865,3.99865)
 
 p <- 0.5
@@ -19,9 +50,7 @@ h_prime_multi <- function(x) {
   (-(exp(-1/2 * (-4 + x)^2) * q * (-4 + x))/sqrt(2 * pi) - (exp(-x^2/2) * p * x)/sqrt(2 * pi))/((exp(-x^2/2) * p)/sqrt(2 * pi) + (exp(-1/2 * (-4 + x)^2) * q)/sqrt(2 * pi))
 }
 
-multi_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_multi, f = f_multi, h = h_multi, h_prime = h_prime_multi)
-
-multi_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_multi, f = f_multi, a = 0.01, th = 0.001*2*2*2)
+multi_grid = build_grid(lb = -Inf, rb = Inf, modes = modes_multi, f = f_multi, h = h_multi, h_prime = h_prime_multi)
 
 plot(multi_grid)
 
@@ -39,12 +68,15 @@ multi_sampler = stors(multi_grid)
 
 hist(multi_sampler(1000000))
 
-delete_grid("multi_grid")
+multi_trunc = trunc(multi_grid, 0.5,5)
+
+hist(multi_trunc(1000000))
 
 
-##  prebuilt dists
+##  prebuilt dist
 
 n = 10000
+
 
 ##    srnorm
 
@@ -133,5 +165,4 @@ microbenchmark::microbenchmark(
 
 
 ##    srcauchy
-
 

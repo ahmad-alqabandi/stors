@@ -3,7 +3,7 @@
 
 #define NAME laplace
 
-#define CNUM 1
+#define CNUM 2
 
 #define L_TAIL IT
 

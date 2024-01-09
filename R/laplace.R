@@ -20,7 +20,6 @@ d_laplace_upper = function(n ,xl, xr ,csl , csr, il, ir){
 }
 
 
-#' I will stick with this function until I found a proper solution.
 #' Title
 #' @param n 
 #' @param l 
