@@ -1,7 +1,8 @@
 
 #' @method plot grid
 #' @export
-plot.grid <- function(grid, ...){
+plot.grid <- function(grid, x_min = NA, x_max = NA,...){
+  
   
   n = nrow(grid$grid_data)
   
@@ -29,13 +30,14 @@ plot.grid <- function(grid, ...){
     r_limit = 1
   }
     
-
   
-  xx <- seq(from = grid$grid_data$x[1]-l_limit, to = grid$grid_data$x[n]+r_limit, by = 0.01)
+  xx <- seq(from = grid$grid_data$x[1]-l_limit, to = grid$grid_data$x[n]+r_limit, by = grid$alpha)
   
   xl <- seq( from = grid$grid_data$x[1]-l_limit , to= grid$grid_data$x[1], by = 0.01)
   
   xr <- seq( from = grid$grid_data$x[n] , to= grid$grid_data$x[n]+r_limit, by = 0.01)
+  
+  xs = c(xl, xx,xr)
   
   yy <- f(xx)
   
@@ -43,35 +45,38 @@ plot.grid <- function(grid, ...){
   
   yr <- rf(xr)
   
-  grid$grid_data$s_upper[n] = yr[1]
+  ys = c(yl, yy, yr)
+  
 
+  if(is.na(x_max))  x_max = xr[length(xr)]
+  if(is.na(x_min))  x_min = xl[1]
+  
+  y_max = max(ys[ x_min <= xs &  xs <= x_max ])
+  y_min = min(ys[x_min <= xs &  xs <= x_max])
+  
+  grid$grid_data$s_upper[n] = yr[1]
+  
   grid$grid_data = rbind( c(grid$grid_data$x[1], yl[length(yl)], NA, NA), grid$grid_data)
   
   n <- n+1
   
   if (requireNamespace("ggplot2")) {
-    
+    suppressWarnings({
     ggplot2::ggplot() +
       ggplot2::geom_step(ggplot2::aes(grid$grid_data[1:(n),]$x, grid$grid_data[1:(n),]$s_upper), color = "red") +
       ggplot2::geom_step(ggplot2::aes(grid$grid_data[2:(n-1),]$x, grid$grid_data[2:(n-1),]$s_upper * grid$grid_data[2:(n-1),]$p_a), color = "green") +
       ggplot2::geom_line(ggplot2::aes(x = xx, y = yy), color = "black")  +
       ggplot2::geom_line(ggplot2::aes(x = xl, y = yl), color = "red") +
       ggplot2::geom_line(ggplot2::aes(x = xr, y = yr), color = "red") +
-      ggplot2::coord_cartesian(ylim=c(0, max(yy))) +
       ggplot2::geom_segment(ggplot2::aes(x=grid$grid_data$x[(n-1)], y=grid$grid_data$s_upper[(n-1)] * grid$grid_data$p_a[(n-1)], xend = grid$grid_data$x[(n)], yend = grid$grid_data$s_upper[(n-1)] * grid$grid_data$p_a[(n-1)]), color="green")+
       ggplot2::xlab("x") +
-      ggplot2::ylab("Density")
-    # ggplot2::scale_y_continuous(limits = c(0, max(yy)))
-    
-    # cat("last_y_prop = " , yr[length(yr)], "\n" )
-    # cat("last_y_tail = " , yy[length(yy)] )
-    
+      ggplot2::ylab("Density") +
+      ggplot2::coord_cartesian(xlim = c(x_min, x_max), ylim = c(y_min, y_max))
+    })
   } else{
     class(grid) <- "list"
     plot(grid, ...)
-
   }
-  
   
 }
 

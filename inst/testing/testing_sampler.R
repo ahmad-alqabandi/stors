@@ -52,7 +52,7 @@ h_prime_multi <- function(x) {
 
 multi_grid = build_grid(lb = -Inf, rb = Inf, modes = modes_multi, f = f_multi, h = h_multi, h_prime = h_prime_multi)
 
-plot(multi_grid)
+plot(multi_grid, x_min = 0)
 
 multi_grid
 
@@ -66,9 +66,10 @@ multi_grid = load_grid("multi_grid")
 
 multi_sampler = stors(multi_grid)
 
+
 hist(multi_sampler(1000000))
 
-multi_trunc = trunc(multi_grid, 0.5,5)
+multi_trunc = trunc(multi_grid, -4,5)
 
 hist(multi_trunc(1000000))
 
@@ -82,7 +83,12 @@ n = 10000
 
 srnorm_grid = stors::grid_optimizer("srnorm")
 
+plot(srnorm_grid, -.005,.001)
+
+
 plot(srnorm_grid)
+
+plot(srnorm_grid,  x_min = 0 ,x_max= 0.01)
 
 hist(srnorm(n))
 
@@ -98,7 +104,7 @@ max(trunc_sample)
 
 library(RcppZiggurat)
 
-m=10000
+m=100000
 
 microbenchmark::microbenchmark(
   rnorm(m),
@@ -111,7 +117,18 @@ microbenchmark::microbenchmark(
 
 laplace_grid = grid_optimizer("laplace")
 
+grid = laplace_grid
+
+x_min = 0.5
+
+x_max = 0.5
+
+
 plot(laplace_grid)
+
+plot(laplace_grid, 0, .01)
+
+plot.grid
 
 hist(laplace(n))
 
@@ -121,9 +138,6 @@ trunc_sample = trunc_laplace(n)
   
 hist(trunc_sample)
 
-min(trunc_sample)
-
-max(trunc_sample)
 
 library(LaplacesDemon)
 
@@ -132,6 +146,7 @@ m=10000
 microbenchmark::microbenchmark(
   laplace(m),
   LaplacesDemon::ralaplace(m),
+  rexp(m),
   times = 100
 )
 
@@ -145,7 +160,7 @@ plot(srexp_grid)
 
 hist(srexp(n))
 
-trunc_srexp=truncsrexp(1.0009846662,5.87)
+trunc_srexp=truncsrexp(2,5)
 
 trunc_sample = trunc_srexp(n)
 
