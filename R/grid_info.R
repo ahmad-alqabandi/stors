@@ -31,7 +31,7 @@ plot.grid <- function(grid, x_min = NA, x_max = NA,...){
   }
     
   
-  xx <- seq(from = grid$grid_data$x[1]-l_limit, to = grid$grid_data$x[n]+r_limit, by = grid$alpha)
+  xx <- seq(from = grid$grid_data$x[1]-l_limit, to = grid$grid_data$x[n]+r_limit, by = min(0.01,grid$alpha))
   
   xl <- seq( from = grid$grid_data$x[1]-l_limit , to= grid$grid_data$x[1], by = 0.01)
   

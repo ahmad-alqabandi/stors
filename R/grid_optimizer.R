@@ -23,7 +23,7 @@
 #' This function generates and stores an optimized grid for the specified built-in distribution in R's internal data directory.
 #' 
 #' @export
-grid_optimizer <- function(density_name = stors_env$grids$biultin$names) {
+grid_optimizer <- function(density_name = stors_env$grids$biultin$names, verbose = FALSE, target_sample_size = 1000, steps = NA) {
   
   density_name <- match.arg(density_name)
   
@@ -31,12 +31,24 @@ grid_optimizer <- function(density_name = stors_env$grids$biultin$names) {
   
   dendata <- pbgrids[[density_name]]
   
-  # if(stors_env$grids$biultin[[density_name]]$opt){
-  #   stors_env$grids$biultin[[density_name]]$opt = FALSE
-  #   free_cache_cnum_c(dendata$Cnum)
-  # }
+  if(is.na(steps)){
+    
+    opt_prob = find_optimal_grid(dendata , density_name, verbose = verbose, target_sample_size = target_sample_size)
+    
+  }else{
+    mode_n = length(modes)
+    left_stps = find_left_steps(lb = lb, rb = rb, a = 0.001, th=0.1, mode = modes[1], mode_i = 1, mode_n = mode_n, f = f)$m
+    right_stps = find_right_steps(lb = lb, rb = rb, a = 0.001, th=0.1, mode = modes[mode_n], mode_i = mode_n, mode_n = mode_n, f = f)$m
+    
+    opt_prob = list()
+    opt_prob$area = 1/steps
+    opt_prob$steps = steps
+    opt_prob$lstpsp =left_stps / sum(left_stps, right_stps)
+    opt_prob$rstpsp= 1 - opt_prob$lstpsp
+    
+  }
   
-  opt_prob = find_optimal_grid(dendata , density_name)
+  
   
   
   if(dendata$tails_method == "IT"){
@@ -64,13 +76,22 @@ grid_optimizer <- function(density_name = stors_env$grids$biultin$names) {
 }
 
 
-
+# 
 # {
 # 
-# density_name <- "srexp"
+# density_name <- "srnorm"
 # 
 # dendata <- pbgrids[[density_name]]
 # 
+# verbose = TRUE
+# 
+# modes = NA
+# f = NA
+# h = NA
+# h_prime = NA
+# cdf = NA
+# 
+# target_sample_size = 100
 # 
 # opt_prob = find_optimal_grid(dendata, density_name)
 # 
@@ -96,14 +117,14 @@ grid_optimizer <- function(density_name = stors_env$grids$biultin$names) {
 
 
 #' @importFrom microbenchmark microbenchmark
-find_optimal_grid <- function(dendata = NA, density_name = NA , lb = NA, rb = NA, modes = NA, f = NA, h = NA, h_prime = NA, cdf = NA){
+find_optimal_grid <- function(dendata = NA, density_name = NA , lb = NA, rb = NA, modes = NA, f = NA, h = NA, h_prime = NA, cdf = NA, verbose = FALSE, target_sample_size){
   
+  times = ceiling( 100000 / target_sample_size )
   
   if(is.list(dendata)){
     lb = dendata$lb
     rb = dendata$rb
     modes = dendata$modes
-    print( typeof(modes))
     f= dendata$f
     tails_method = dendata$tails_method
     cnum = dendata$Cnum
@@ -117,9 +138,9 @@ find_optimal_grid <- function(dendata = NA, density_name = NA , lb = NA, rb = NA
     cnum = 0
   }
   
-  cat("\n")
-  cat("cnum = ", cnum)
-  cat("\n")
+  # cat("\n")
+  # cat("cnum = ", cnum)
+  # cat("\n")
   
   mode_n <- length(modes)
   
@@ -133,14 +154,20 @@ find_optimal_grid <- function(dendata = NA, density_name = NA , lb = NA, rb = NA
   
   for (i in (1:length(areas))) {
     
+
+    area = top_areas[i]
+    step = opt_steps[i]
     
+    if(verbose){
+      cat("\n===============================\n","\n--- steps = ", step, " --- \n\n",
+          "     --- area ---   --- best sim time ---\n"
+         )
+    }
     
-    area = areas[i]
-    step = steps[i]
+    area_seq = seq(from = area * 0.95 , to= area * 1.05, length.out = 10)
     
-    area_seq = seq(from = area * 0.9 , to= area * 1, length.out = 10)
-    
-    steps_time = rep(NA, length(area_seq))
+    #steps_time = rep(NA, length(area_seq))
+    steps_time = double()
     
     for (j in (1: length(area_seq))) {
       
@@ -164,23 +191,37 @@ find_optimal_grid <- function(dendata = NA, density_name = NA , lb = NA, rb = NA
       
       
       gc = gc()
-
+      
+suppressWarnings({
+  
       cost <- microbenchmark::microbenchmark(
-        st = density_fun(bm_sample_size), #1000000
-        times = bm_times
+        st = density_fun(target_sample_size), 
+        times = times
       )
       
+})
       free_cache_cnum_c(cnum)
+
+      steps_time = append(steps_time, median(cost$time[cost$expr == "st"]))
       
-      steps_time[j] = median(cost$time[cost$expr == "st"])
+      
+      if(verbose){
+        cat("--- ",area_seq[j]," ---   --- ",steps_time[j]," ---\n")
+      }
     }
-    
-    
 
-    performance[nrow(performance) + 1,] = c(area_seq[steps_time == min(steps_time)], min(steps_time),  step)
+    min_ind = which(steps_time == min(steps_time, na.rm = TRUE))[1]
+    
+    performance[nrow(performance) + 1,] = c(area_seq[min_ind], steps_time[min_ind],  step)
 
-    if(min(steps_time) >  min(performance$time, na.rm = TRUE) ){
-      cat("opt grid size = ", cache_sizes[i-1], " Kb")
+    
+    if(min(steps_time) >  min(performance$time, na.rm = TRUE) && verbose){
+      
+      cat("\n===============================\n\n")
+      print(performance)
+      cat("\n===============================\n\n")
+      cat("optimal grid has ", opt_steps[i-1] ," steps, whith cache size = ", cache_sizes[i-1], " Kb")
+      
       break
     } 
     
@@ -193,18 +234,18 @@ find_optimal_grid <- function(dendata = NA, density_name = NA , lb = NA, rb = NA
 }
 
 
-bm_sample_size = 10000
+# bm_sample_size = 100000
 
-bm_times = 10
+# bm_times = 10
 
-cache_sizes = c(4 ,8 ,16 ,32, 64, 128, 256, 512, 1024)
+opt_cache_sizes = c(4 ,8 ,16 ,32, 64, 128, 256, 512, 1024)
 
-df_var = 4
+opt_df_var = 4
 
-list_var = 20
+opt_list_var = 20
 
-steps = round( ((cache_sizes * 1024) - list_var) / df_var )
+opt_steps = round( ((opt_cache_sizes * 1024) - opt_list_var) / opt_df_var )
 
-areas = 1 / steps
+top_areas = 1 / opt_steps
 
 

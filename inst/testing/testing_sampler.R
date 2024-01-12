@@ -16,7 +16,15 @@ h_prime_norm = function(x) {
   -x
 }
 
-norm_grid = build_grid(lb = -Inf, rb = Inf, modes , f = f_norm, h = h_norm, h_prime = h_prime_norm)
+norm_grid = build_grid(lb = -Inf, rb = Inf, modes , f = f_norm, h = h_norm, h_prime = h_prime_norm, verbose = TRUE, target_sample_size)
+
+norm_grid
+
+steps = 2000
+
+norm_grid = build_grid(lb = -Inf, rb = Inf, modes , f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = steps)
+
+norm_grid
 
 plot(norm_grid)
 
@@ -81,9 +89,8 @@ n = 10000
 
 ##    srnorm
 
-srnorm_grid = stors::grid_optimizer("srnorm")
+srnorm_grid = grid_optimizer("srnorm", verbose = TRUE, target_sample_size = 100, steps = 100)
 
-plot(srnorm_grid, -.005,.001)
 
 
 plot(srnorm_grid)
@@ -180,4 +187,10 @@ microbenchmark::microbenchmark(
 
 
 ##    srcauchy
+
+sampe_size = 1
+
+times = ceiling( 100000 / sampe_size)
+
+
 

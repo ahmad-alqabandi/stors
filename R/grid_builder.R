@@ -172,17 +172,10 @@ load_grid <- function(grid_name) {
 #'  
 #' @import digest digest
 #' @export
-build_grid <- function(lb = -Inf, rb = Inf, modes, f, h = NULL, h_prime = NULL, a = 0.01,th = 0.9) {
+build_grid <- function(lb = -Inf, rb = Inf, modes, f, h = NULL, h_prime = NULL, steps = NA, verbose = FALSE, target_sample_size = 1000) {
+  
+  
 
-    # A <- seq(from = 0.005, to = 0.0002, length.out = 100)
-    # 
-    # for (a in A) {
-    #   
-    #   opt_grid <- grid_builder(lb, rb, a, th = 0.6, mode, f, h, h_prime)
-    # 
-    #   if ((object.size(opt_grid) / 1024) > 128) break
-    # }
-    # 
   if(is.null(h)){
     h <- function(x){log(f(x))}
   }
@@ -191,11 +184,24 @@ build_grid <- function(lb = -Inf, rb = Inf, modes, f, h = NULL, h_prime = NULL, 
     h_prime <- stors_prime(modes[1], h)
   }
   
-  opt_prob = find_optimal_grid(lb = lb, rb = rb, modes = modes, f = f, h =  h, h_prime = h_prime)
   
-  
-  # opt_grid <- grid_builder(lb, rb,a, th, modes, f, h, h_prime)
+  if(is.na(steps)){
     
+    opt_prob = find_optimal_grid(lb = lb, rb = rb, modes = modes, f = f, h =  h, h_prime = h_prime, verbose = verbose, target_sample_size = target_sample_size)
+    
+  }else{
+    mode_n = length(modes)
+    left_stps = find_left_steps(lb = lb, rb = rb, a = 0.001, th=0.1, mode = modes[1], mode_i = 1, mode_n = mode_n, f = f)$m
+    right_stps = find_right_steps(lb = lb, rb = rb, a = 0.001, th=0.1, mode = modes[mode_n], mode_i = mode_n, mode_n = mode_n, f = f)$m
+    
+    opt_prob = list()
+    opt_prob$area = 1/steps
+    opt_prob$steps = steps
+    opt_prob$lstpsp =left_stps / sum(left_stps, right_stps)
+    opt_prob$rstpsp= 1 - opt_prob$lstpsp
+    
+  }
+
   opt_grid <- grid_builder(lb = lb, rb = rb ,a = opt_prob$area , th = 0, modes, f = f, h =  h, h_prime = h_prime , cdf = NA, stps =opt_prob$steps , lstpsp =opt_prob$lstpsp , rstpsp= opt_prob$rstpsp)
   
     func_to_text <- deparse(f)
@@ -250,11 +256,11 @@ grid_builder <- function(lb = -Inf, rb = Inf, a, th, modes, f, h = NA, h_prime=N
 
     for (mode_i in (1:mode_n)) {
       
-      if(mode_i != 1 || is.na(lstpsp))
+      if( (mode_i != 1) || is.na(lstpsp))
       {lsts[[mode_i]] <- find_left_steps(lb, rb, a, th, modes[mode_i], mode_i, mode_n, f)
       if(!is.na(lstpsp)) stps <- stps -  lsts[[mode_i]]$m}
       
-      if(mode_i != mode_n || is.na(rstpsp))
+      if( (mode_i != mode_n) || is.na(rstpsp))
       {rsts[[mode_i]] <- find_right_steps(lb, rb, a, th, modes[mode_i], mode_i, mode_n, f)
       if(!is.na(rstpsp)) stps <- stps -  rsts[[mode_i]]$m}
       
@@ -521,7 +527,7 @@ find_left_steps <- function(lb = -Inf, rb = Inf, a, th, mode, mode_i, mode_n, f,
       x_c <- x_previous - a / f_x_previous
       
       
-      if (l >= steps_lim || x_c < lb || (mode_i == 1 && f(x_c) / f_x_previous  <= th)) {
+      if (l >= steps_lim || x_c < lb || (mode_i == 1 && (f(x_c) / f_x_previous  <= th) ) ) {
         break
       }
       
@@ -581,7 +587,7 @@ find_right_steps <- function(lb = -Inf, rb = Inf, a, th, mode, mode_i, mode_n, f
     while (TRUE) {
       x_next <- x_c + a / f_x
 
-      if (r > steps_lim || x_next > rb || (mode_i == mode_n && f(x_next) / f_x <= th)) {
+      if (r > steps_lim || x_next > rb || (mode_i == mode_n && (f(x_next) / f_x <= th)) ) {
         x[r] <- x_c
         s_upper[r] <- s_lower[r] <- s_upper_lower[r] <- p_a[r] <- NA
         break
