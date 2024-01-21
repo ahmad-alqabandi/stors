@@ -24,7 +24,7 @@ To use the [stors] package, we need to differentiate between two phases. The fir
 
 ## Sampling from Built-in Distrubutions
 
-To sample from any built-in distribution, the user only needs to run the `grid_optimizer()` function once when the package is loaded for the first time. This creates an optimized grid and store it in the internal R data directory, so it can be loaded and used for sampling when needed.
+To sample from any built-in distribution, the user only needs to run the `grid_optimizer()` function once when the package is loaded for the first time. This creates an optimized grid and store it in the internal R data directory, so it can be loaded and used for sampling when needed. Also you can visiulise the grid data using `plot()` function.
 
 The following provides an example of optimizing a grid to sample from standard normal distribution using. The sampling 10 samples using the function 'srnorm()'.
 
@@ -32,7 +32,11 @@ The following provides an example of optimizing a grid to sample from standard n
 
 library(stors)
 
-grid_optimizer("srnorm")
+norm_grid = grid_optimizer("srnorm")
+
+print(norm_grid)
+
+plot(norm_grid)
 
 srnorm(10)
 

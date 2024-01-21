@@ -23,7 +23,7 @@
 #' This function generates and stores an optimized grid for the specified built-in distribution in R's internal data directory.
 #' 
 #' @export
-grid_optimizer <- function(density_name = stors_env$grids$biultin$names, verbose = FALSE, target_sample_size = 1000, steps = NA) {
+grid_optimizer <- function(density_name = stors_env$grids$biultin$names, verbose = FALSE, target_sample_size = 1000, steps = NULL) {
   
   density_name <- match.arg(density_name)
   
@@ -31,7 +31,7 @@ grid_optimizer <- function(density_name = stors_env$grids$biultin$names, verbose
   
   dendata <- pbgrids[[density_name]]
   
-  if(is.na(steps)){
+  if(is.null(steps)){
     
     opt_prob = find_optimal_grid(dendata , density_name, verbose = verbose, target_sample_size = target_sample_size)
     
@@ -47,10 +47,7 @@ grid_optimizer <- function(density_name = stors_env$grids$biultin$names, verbose
     opt_prob$rstpsp= 1 - opt_prob$lstpsp
     
   }
-  
-  
-  
-  
+
   if(dendata$tails_method == "IT"){
     opt_grid <- grid_builder(lb = dendata$lb, rb = dendata$rb ,a = opt_prob$area , th = 0, mode = dendata$modes, f = dendata$f, cdf = dendata$cdf, stps =opt_prob$steps , lstpsp =opt_prob$lstpsp , rstpsp= opt_prob$rstpsp)
   } else if(dendata$tails_method == "ARS"){
@@ -117,7 +114,7 @@ grid_optimizer <- function(density_name = stors_env$grids$biultin$names, verbose
 
 
 #' @importFrom microbenchmark microbenchmark
-find_optimal_grid <- function(dendata = NA, density_name = NA , lb = NA, rb = NA, modes = NA, f = NA, h = NA, h_prime = NA, cdf = NA, verbose = FALSE, target_sample_size){
+find_optimal_grid <- function(dendata = NULL, density_name = NULL , lb = NULL, rb = NULL, modes = NULL, f = NULL, h = NULL, h_prime = NULL, cdf = NULL, verbose = FALSE, target_sample_size){
   
   times = ceiling( 100000 / target_sample_size )
   
@@ -152,10 +149,10 @@ find_optimal_grid <- function(dendata = NA, density_name = NA , lb = NA, rb = NA
   
   performance = data.frame(area = numeric(), time = numeric(), steps = numeric())
   
-  for (i in (1:length(areas))) {
+  for (i in (1:length(opt_areas))) {
     
 
-    area = top_areas[i]
+    area = opt_areas[i]
     step = opt_steps[i]
     
     if(verbose){
@@ -210,25 +207,32 @@ suppressWarnings({
       }
     }
 
-    min_ind = which(steps_time == min(steps_time, na.rm = TRUE))[1]
     
-    performance[nrow(performance) + 1,] = c(area_seq[min_ind], steps_time[min_ind],  step)
-
     
-    if(min(steps_time) >  min(performance$time, na.rm = TRUE) && verbose){
+    if(i != 1 && min(steps_time) >=  min(performance$time, na.rm = TRUE) && verbose){
       
       cat("\n===============================\n\n")
       print(performance)
       cat("\n===============================\n\n")
-      cat("optimal grid has ", opt_steps[i-1] ," steps, whith cache size = ", cache_sizes[i-1], " Kb")
+      cat("optimal grid has around ", opt_steps[i-1] ," steps, whith cache size = ", opt_cache_sizes[i-1], " Kb")
+      
+
+      
+      # cat("\n\n cbind = \n\n")
+      # print(cbind(performance[which(performance$time == min(performance$time, na.rm = TRUE))[1],], lstpsp =lstpsp , rstpsp= rstpsp))
       
       break
     } 
     
+    min_ind = which(steps_time == min(steps_time, na.rm = TRUE))[1]
+    
+    performance[nrow(performance) + 1,] = c(area_seq[min_ind], steps_time[min_ind],  step)
+    
     
   }
   
-  return(cbind(performance[performance$time == min(performance$time, na.rm = TRUE),],lstpsp =lstpsp , rstpsp= rstpsp))
+  
+  return(cbind(performance[which(performance$time == min(performance$time, na.rm = TRUE))[1],], lstpsp =lstpsp , rstpsp= rstpsp))
   # return(list(prob = performance,lstpsp =lstpsp , rstpsp= rstpsp))
   
 }
@@ -246,6 +250,6 @@ opt_list_var = 20
 
 opt_steps = round( ((opt_cache_sizes * 1024) - opt_list_var) / opt_df_var )
 
-top_areas = 1 / opt_steps
+opt_areas = 1 / opt_steps
 
 

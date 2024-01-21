@@ -172,7 +172,7 @@ load_grid <- function(grid_name) {
 #'  
 #' @import digest digest
 #' @export
-build_grid <- function(lb = -Inf, rb = Inf, modes, f, h = NULL, h_prime = NULL, steps = NA, verbose = FALSE, target_sample_size = 1000) {
+build_grid <- function(lb = -Inf, rb = Inf, modes, f, h = NULL, h_prime = NULL, steps = NULL, verbose = FALSE, target_sample_size = 1000) {
   
   
 
@@ -185,7 +185,7 @@ build_grid <- function(lb = -Inf, rb = Inf, modes, f, h = NULL, h_prime = NULL, 
   }
   
   
-  if(is.na(steps)){
+  if(is.null(steps)){
     
     opt_prob = find_optimal_grid(lb = lb, rb = rb, modes = modes, f = f, h =  h, h_prime = h_prime, verbose = verbose, target_sample_size = target_sample_size)
     
@@ -202,7 +202,7 @@ build_grid <- function(lb = -Inf, rb = Inf, modes, f, h = NULL, h_prime = NULL, 
     
   }
 
-  opt_grid <- grid_builder(lb = lb, rb = rb ,a = opt_prob$area , th = 0, modes, f = f, h =  h, h_prime = h_prime , cdf = NA, stps =opt_prob$steps , lstpsp =opt_prob$lstpsp , rstpsp= opt_prob$rstpsp)
+  opt_grid <- grid_builder(lb = lb, rb = rb ,a = opt_prob$area , th = 0, modes, f = f, h =  h, h_prime = h_prime , cdf = NULL, stps =opt_prob$steps , lstpsp =opt_prob$lstpsp , rstpsp= opt_prob$rstpsp)
   
     func_to_text <- deparse(f)
 
@@ -233,7 +233,7 @@ build_grid <- function(lb = -Inf, rb = Inf, modes, f, h = NULL, h_prime = NULL, 
 #' @param h_prime first derivative of h
 #' @return list including proposal distribution properties
 #' @importFrom utils head
-grid_builder <- function(lb = -Inf, rb = Inf, a, th, modes, f, h = NA, h_prime=NA, cdf =NA, stps =NA , lstpsp =NA , rstpsp= NA) {
+grid_builder <- function(lb = -Inf, rb = Inf, a, th, modes, f, h = NULL, h_prime=NULL, cdf =NULL, stps =NULL , lstpsp =NULL , rstpsp= NULL) {
   
   mode_n <- length(modes)
   
@@ -245,7 +245,7 @@ grid_builder <- function(lb = -Inf, rb = Inf, a, th, modes, f, h = NA, h_prime=N
   )
   
   grids <- list()
-  # grids2 <- list()
+
   lsts <- list()
   rsts <- list()
   
@@ -256,20 +256,18 @@ grid_builder <- function(lb = -Inf, rb = Inf, a, th, modes, f, h = NA, h_prime=N
 
     for (mode_i in (1:mode_n)) {
       
-      if( (mode_i != 1) || is.na(lstpsp))
+      if( (mode_i != 1) || is.null(lstpsp))
       {lsts[[mode_i]] <- find_left_steps(lb, rb, a, th, modes[mode_i], mode_i, mode_n, f)
-      if(!is.na(lstpsp)) stps <- stps -  lsts[[mode_i]]$m}
+      if(!is.null(lstpsp)) stps <- stps -  lsts[[mode_i]]$m}
       
-      if( (mode_i != mode_n) || is.na(rstpsp))
+      if( (mode_i != mode_n) || is.null(rstpsp))
       {rsts[[mode_i]] <- find_right_steps(lb, rb, a, th, modes[mode_i], mode_i, mode_n, f)
-      if(!is.na(rstpsp)) stps <- stps -  rsts[[mode_i]]$m}
-      
-      # grids2[[mode_i]] <- find_steps(lb = -Inf, rb = Inf, a, th, modes[mode_i], mode_i, mode_n, f)
+      if(!is.null(rstpsp)) stps <- stps -  rsts[[mode_i]]$m}
       
     }
   
   
-  if(!is.na(stps))
+  if(!is.null(stps))
   {
     steps_lim_left = round(lstpsp * stps)
     lsts[[1]] <- find_left_steps(lb, rb, a, th, modes[1], 1, mode_n, f,  steps_lim = steps_lim_left)
