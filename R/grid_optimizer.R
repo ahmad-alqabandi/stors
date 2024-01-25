@@ -31,14 +31,17 @@ grid_optimizer <- function(density_name = stors_env$grids$biultin$names, verbose
   
   dendata <- pbgrids[[density_name]]
   
+  grid_limits = c(dendata$lb, dendata$rb)
+  
+  
   if(is.null(steps)){
     
-    opt_prob = find_optimal_grid(dendata , density_name, verbose = verbose, target_sample_size = target_sample_size)
+    opt_prob = find_optimal_grid(dendata , density_name, verbose = verbose, target_sample_size = target_sample_size, theta = 0, grid_limits = grid_limits)
     
   }else{
     mode_n = length(modes)
-    left_stps = find_left_steps(lb = lb, rb = rb, a = 0.001, th=0.1, mode = modes[1], mode_i = 1, mode_n = mode_n, f = f)$m
-    right_stps = find_right_steps(lb = lb, rb = rb, a = 0.001, th=0.1, mode = modes[mode_n], mode_i = mode_n, mode_n = mode_n, f = f)$m
+    left_stps = find_left_steps(lb = lb, rb = rb, a = 0.001, mode = modes[1], mode_i = 1, mode_n = mode_n, f = f, theta = 0, grid_limits = grid_limits)$m
+    right_stps = find_right_steps(lb = lb, rb = rb, a = 0.001, mode = modes[mode_n], mode_i = mode_n, mode_n = mode_n, f = f, theta = 0, grid_limits = grid_limits)$m
     
     opt_prob = list()
     opt_prob$area = 1/steps
@@ -49,9 +52,15 @@ grid_optimizer <- function(density_name = stors_env$grids$biultin$names, verbose
   }
 
   if(dendata$tails_method == "IT"){
-    opt_grid <- grid_builder(lb = dendata$lb, rb = dendata$rb ,a = opt_prob$area , th = 0, mode = dendata$modes, f = dendata$f, cdf = dendata$cdf, stps =opt_prob$steps , lstpsp =opt_prob$lstpsp , rstpsp= opt_prob$rstpsp)
+    opt_grid <- grid_builder(lb = dendata$lb, rb = dendata$rb ,a = opt_prob$area ,
+                              mode = dendata$modes, f = dendata$f, cdf = dendata$cdf,
+                             stps =opt_prob$steps , lstpsp =opt_prob$lstpsp ,
+                             rstpsp= opt_prob$rstpsp, theta = 0, grid_limits = grid_limits)
   } else if(dendata$tails_method == "ARS"){
-    opt_grid <- grid_builder(lb = dendata$lb, rb = dendata$rb ,a = opt_prob$area , th = 0, mode = dendata$modes, f = dendata$f,  h = dendata$h, h_prime = dendata$h_prime, stps =opt_prob$steps , lstpsp =opt_prob$lstpsp , rstpsp= opt_prob$rstpsp)
+    opt_grid <- grid_builder(lb = dendata$lb, rb = dendata$rb ,a = opt_prob$area ,
+                              mode = dendata$modes, f = dendata$f,  h = dendata$h,
+                             h_prime = dendata$h_prime, stps =opt_prob$steps , lstpsp =opt_prob$lstpsp ,
+                             rstpsp= opt_prob$rstpsp, theta = 0, grid_limits = grid_limits)
   }
   
   # opt_grid <- grid_builder(lb = dendata$lb, rb = dendata$rb ,a = opt_prob$area , th = 0, mode = dendata$modes, f = dendata$f, cdf = dendata$cdf, stps =opt_prob$steps , lstpsp =opt_prob$lstpsp , rstpsp= opt_prob$rstpsp)
@@ -114,11 +123,15 @@ grid_optimizer <- function(density_name = stors_env$grids$biultin$names, verbose
 
 
 #' @importFrom microbenchmark microbenchmark
-find_optimal_grid <- function(dendata = NULL, density_name = NULL , lb = NULL, rb = NULL, modes = NULL, f = NULL, h = NULL, h_prime = NULL, cdf = NULL, verbose = FALSE, target_sample_size){
+find_optimal_grid <- function(dendata , density_name ,
+                              lb , rb , modes, f,
+                              h = NULL, h_prime = NULL, cdf = NULL, verbose,
+                              target_sample_size, theta, grid_limits){
   
+
   times = ceiling( 100000 / target_sample_size )
   
-  if(is.list(dendata)){
+  if(!missing(dendata)){
     lb = dendata$lb
     rb = dendata$rb
     modes = dendata$modes
@@ -141,20 +154,37 @@ find_optimal_grid <- function(dendata = NULL, density_name = NULL , lb = NULL, r
   
   mode_n <- length(modes)
   
-  left_stps = find_left_steps(lb = lb, rb = rb, a = 0.001, th=0.1, mode = modes[1], mode_i = 1, mode_n = mode_n, f = f)$m
-  right_stps = find_right_steps(lb = lb, rb = rb, a = 0.001, th=0.1, mode = modes[mode_n], mode_i = mode_n, mode_n = mode_n, f = f)$m
+  if( theta == 0 && grid_limits[1] == lb &&  grid_limits[2] == rb)
+  {
+  left_stps = find_left_steps(lb = lb, rb = rb, a = 0.001,
+                              mode = modes[1], mode_i = 1,
+                              mode_n = mode_n, f = f, theta = theta, grid_limits = grid_limits)$m
+  
+  right_stps = find_right_steps(lb = lb, rb = rb, a = 0.001, 
+                                mode = modes[mode_n], mode_i = mode_n,
+                                mode_n = mode_n, f = f, theta = theta, grid_limits = grid_limits)$m
   
   lstpsp = left_stps/ ( left_stps + right_stps )
   rstpsp = 1 - lstpsp
+  theta = 0
+  }else{
+    lstpsp = NA
+    rstpsp = NA
+  }
+  
   
   performance = data.frame(area = numeric(), time = numeric(), steps = numeric())
   
   for (i in (1:length(opt_areas))) {
     
-
     area = opt_areas[i]
-    step = opt_steps[i]
     
+    if(is.na(rstpsp)){
+      step = Inf
+    }else{
+      step = opt_steps[i]
+    }
+
     if(verbose){
       cat("\n===============================\n","\n--- steps = ", step, " --- \n\n",
           "     --- area ---   --- best sim time ---\n"
@@ -163,23 +193,21 @@ find_optimal_grid <- function(dendata = NULL, density_name = NULL , lb = NULL, r
     
     area_seq = seq(from = area * 0.95 , to= area * 1.05, length.out = 10)
     
-    #steps_time = rep(NA, length(area_seq))
     steps_time = double()
     
     for (j in (1: length(area_seq))) {
       
       
-      # if(dendata$tails_method == "IT"){
-      #   grid <- grid_builder( lb = dendata$lb, rb = dendata$rb ,a = area_seq[j] , th = 0, mode = dendata$modes, f = dendata$f, cdf = dendata$cdf, stps =step , lstpsp =lstpsp , rstpsp= rstpsp)
-      # } else if(dendata$tails_method == "ARS"){
-      #   grid <- grid_builder(lb = dendata$lb, rb = dendata$rb, a = area_seq[j] , th = 0, mode = dendata$modes, f = dendata$f,  h = dendata$h, h_prime = dendata$h_prime, stps =step , lstpsp =lstpsp , rstpsp= rstpsp)
-      # }
       
-      grid <- grid_builder( lb = lb, rb = rb ,a = area_seq[j] , th = 0, modes, f = f, h =  h, h_prime = h_prime , cdf = cdf, stps =step , lstpsp =lstpsp , rstpsp= rstpsp)
+      grid <- grid_builder( lb = lb, rb = rb ,a = area_seq[j],
+                            modes, f = f, h =  h, h_prime = h_prime ,
+                            cdf = cdf, stps =step , lstpsp =lstpsp ,
+                            rstpsp= rstpsp, theta = theta,
+                            grid_limits = grid_limits)
      
       cache_grid_c(cnum, grid)
       
-      if( is.list(dendata) ){
+      if( !missing(dendata) ){
         density_fun <- get(density_name, mode = "function")
       }else{
         rfunc_env <- new.env()
@@ -216,11 +244,6 @@ suppressWarnings({
       cat("\n===============================\n\n")
       cat("optimal grid has around ", opt_steps[i-1] ," steps, whith cache size = ", opt_cache_sizes[i-1], " Kb")
       
-
-      
-      # cat("\n\n cbind = \n\n")
-      # print(cbind(performance[which(performance$time == min(performance$time, na.rm = TRUE))[1],], lstpsp =lstpsp , rstpsp= rstpsp))
-      
       break
     } 
     
@@ -231,10 +254,11 @@ suppressWarnings({
     
   }
   
+
   
-  return(cbind(performance[which(performance$time == min(performance$time, na.rm = TRUE))[1],], lstpsp =lstpsp , rstpsp= rstpsp))
-  # return(list(prob = performance,lstpsp =lstpsp , rstpsp= rstpsp))
-  
+  return(cbind(performance[which(performance$time == min(performance$time, na.rm = TRUE))[1],],
+               lstpsp =lstpsp , rstpsp= rstpsp))
+
 }
 
 

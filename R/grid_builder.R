@@ -172,10 +172,45 @@ load_grid <- function(grid_name) {
 #'  
 #' @import digest digest
 #' @export
-build_grid <- function(lb = -Inf, rb = Inf, modes, f, h = NULL, h_prime = NULL, steps = NULL, verbose = FALSE, target_sample_size = 1000) {
+build_grid <- function(lb = -Inf, rb = Inf, modes, f, h = NULL,
+                       h_prime = NULL, steps = NA, verbose = FALSE,
+                       target_sample_size = 1000, grid_limits, theta = 0) {
   
   
+  if(!is.na(steps) && steps < 1){
+    stop("Error: 'steps' must be greater than or equal to 1.")    
+  }
 
+  if ( theta != 0 && !missing(grid_limits)) {
+    stop("Error: You must provide either a pre-acceptance threshold 'theta' value or a proposal x-axis limit 'grid_limits'.")
+  }
+  
+  if ( ( theta != 0 || !missing(grid_limits) ) && !is.na(steps)) {
+    warning("Warning: The pre-acceptance threshold 'theta' value and proposal x-axis limit 'grid_limits' will not take effect because you are specifying a target 'steps' number.")
+  }
+  
+  
+  if(theta != 0 && (theta < 0 || theta > 1) ){
+    
+    stopifnot(theta >= 0 && theta <= 1, "Error: 'theta' must be in the range [0,1]")
+    
+  }
+  
+  
+  if(!missing(grid_limits) ){
+    
+    if(grid_limits[1] < lb && grid_limits[2] > rb)
+      stop("Error: 'grid_limits' must be within the range of distribution bounds.")
+    
+    if(grid_limits[1] > modes[1] || grid_limits[2] < modes[length(modes)])
+      stop("Error: 'grid_limits' range must include distribution's modes.")
+    
+  } else{
+    grid_limits = c(lb, rb)
+  }
+   
+  
+  
   if(is.null(h)){
     h <- function(x){log(f(x))}
   }
@@ -185,24 +220,46 @@ build_grid <- function(lb = -Inf, rb = Inf, modes, f, h = NULL, h_prime = NULL, 
   }
   
   
-  if(is.null(steps)){
+  if(is.na(steps)){
     
-    opt_prob = find_optimal_grid(lb = lb, rb = rb, modes = modes, f = f, h =  h, h_prime = h_prime, verbose = verbose, target_sample_size = target_sample_size)
+    opt_prob = find_optimal_grid(lb = lb, rb = rb, modes = modes, f = f, h =  h,
+                                 h_prime = h_prime, verbose = verbose,
+                                 target_sample_size = target_sample_size,
+                                 theta = theta, grid_limits = grid_limits)
     
-  }else{
-    mode_n = length(modes)
-    left_stps = find_left_steps(lb = lb, rb = rb, a = 0.001, th=0.1, mode = modes[1], mode_i = 1, mode_n = mode_n, f = f)$m
-    right_stps = find_right_steps(lb = lb, rb = rb, a = 0.001, th=0.1, mode = modes[mode_n], mode_i = mode_n, mode_n = mode_n, f = f)$m
+    opt_grid <- grid_builder(lb = lb, rb = rb , a = opt_prob$area,
+                             modes, f = f, h =  h, h_prime = h_prime ,
+                             stps =opt_prob$steps , lstpsp =opt_prob$lstpsp , rstpsp= opt_prob$rstpsp,
+                             theta = theta, grid_limits = grid_limits)
+
+  }
+  else{
     
     opt_prob = list()
-    opt_prob$area = 1/steps
-    opt_prob$steps = steps
-    opt_prob$lstpsp =left_stps / sum(left_stps, right_stps)
-    opt_prob$rstpsp= 1 - opt_prob$lstpsp
+    
+    mode_n = length(modes)
+    
+    left_stps = find_left_steps(lb = lb, rb = rb, a = 0.001,
+                                mode = modes[1], mode_i = 1, mode_n = mode_n, f = f,
+                                theta =0.1, grid_limits = grid_limits)$m
+    
+    right_stps = find_right_steps(lb = lb, rb = rb, a = 0.001,
+                                  mode = modes[mode_n], mode_i = mode_n, mode_n = mode_n, f = f,
+                                  theta =0.1, grid_limits = grid_limits)$m
+    
+    lstpsp =left_stps / sum(left_stps, right_stps)
+    rstpsp= 1 - lstpsp
+  
+    cat("lstpsp = ", lstpsp)
+    cat("\n rstpsp = ", rstpsp)
+    
+    opt_grid <- grid_builder(lb = lb, rb = rb ,a = 1/steps ,
+                             modes = modes, f = f, h =  h, h_prime = h_prime,
+                             stps =steps , lstpsp =lstpsp , rstpsp= rstpsp,
+                             theta = theta, grid_limits = grid_limits)
     
   }
 
-  opt_grid <- grid_builder(lb = lb, rb = rb ,a = opt_prob$area , th = 0, modes, f = f, h =  h, h_prime = h_prime , cdf = NULL, stps =opt_prob$steps , lstpsp =opt_prob$lstpsp , rstpsp= opt_prob$rstpsp)
   
     func_to_text <- deparse(f)
 
@@ -233,7 +290,11 @@ build_grid <- function(lb = -Inf, rb = Inf, modes, f, h = NULL, h_prime = NULL, 
 #' @param h_prime first derivative of h
 #' @return list including proposal distribution properties
 #' @importFrom utils head
-grid_builder <- function(lb = -Inf, rb = Inf, a, th, modes, f, h = NULL, h_prime=NULL, cdf =NULL, stps =NULL , lstpsp =NULL , rstpsp= NULL) {
+grid_builder <- function(lb, rb, a, modes, f = NULL, h = NULL,
+                         h_prime = NULL, cdf = NULL, stps,
+                         lstpsp, rstpsp,
+                         theta, grid_limits) {
+  
   
   mode_n <- length(modes)
   
@@ -256,24 +317,34 @@ grid_builder <- function(lb = -Inf, rb = Inf, a, th, modes, f, h = NULL, h_prime
 
     for (mode_i in (1:mode_n)) {
       
-      if( (mode_i != 1) || is.null(lstpsp))
-      {lsts[[mode_i]] <- find_left_steps(lb, rb, a, th, modes[mode_i], mode_i, mode_n, f)
-      if(!is.null(lstpsp)) stps <- stps -  lsts[[mode_i]]$m}
+      if( (mode_i != 1) || is.na(lstpsp))
+      {lsts[[mode_i]] <- find_left_steps(lb, rb, a, modes[mode_i], mode_i, mode_n, f,
+                                         theta = theta, grid_limits = grid_limits)
       
-      if( (mode_i != mode_n) || is.null(rstpsp))
-      {rsts[[mode_i]] <- find_right_steps(lb, rb, a, th, modes[mode_i], mode_i, mode_n, f)
-      if(!is.null(rstpsp)) stps <- stps -  rsts[[mode_i]]$m}
+      if(!is.na(lstpsp)) stps <- stps -  lsts[[mode_i]]$m}
+      
+      if( (mode_i != mode_n) || is.na(rstpsp))
+      {rsts[[mode_i]] <- find_right_steps(lb, rb, a, modes[mode_i], mode_i, mode_n, f,
+                                          theta = theta, grid_limits = grid_limits)
+      
+      if(!is.na(rstpsp)) stps <- stps -  rsts[[mode_i]]$m}
       
     }
   
   
-  if(!is.null(stps))
+  if(!is.na(rstpsp) || !is.na(lstpsp))
   {
+
     steps_lim_left = round(lstpsp * stps)
-    lsts[[1]] <- find_left_steps(lb, rb, a, th, modes[1], 1, mode_n, f,  steps_lim = steps_lim_left)
+    
+    lsts[[1]] <- find_left_steps(lb = lb, rb = rb, a = a,mode = modes[1],
+                                 mode_i = 1, mode_n = mode_n,
+                                 f = f,  steps_lim = steps_lim_left, theta = theta, grid_limits = grid_limits)
     
     steps_lim_right = stps - steps_lim_left
-    rsts[[mode_n]] <- find_right_steps(lb, rb, a, th, modes[mode_n], mode_n, mode_n, f, steps_lim = steps_lim_right)
+    rsts[[mode_n]] <- find_right_steps(lb = lb, rb = rb, a = a, mode = modes[mode_n],
+                                       mode_i = mode_n, mode_n = mode_n,
+                                       f = f, steps_lim = steps_lim_right, theta = theta, grid_limits = grid_limits)
   }
   
     
@@ -396,110 +467,17 @@ grid_builder <- function(lb = -Inf, rb = Inf, a, th, modes, f, h = NULL, h_prime
 
 
 
-# find_steps <- function(lb = -Inf, rb = Inf, a, th, mode, mode_i, mode_n, f) {
-#   memory_res <- (max(500, ceiling(1 / a)) + 500) / 2
-# 
-#   x <- rep(NA, memory_res * 2 + 1)
-#   s_upper <- rep(NA, memory_res * 2 + 1)
-#   s_lower <- rep(NA, memory_res * 2 + 1)
-#   p_a <- rep(NA, memory_res * 2 + 1)
-#   s_upper_lower <- rep(NA, memory_res * 2 + 1)
-# 
-# 
-#   r <- 0
-#   l <- 0
-# 
-#   i <- memory_res + 1
-# 
-# 
-#   if (mode != rb) {
-#     x_c <- mode
-# 
-#     f_x <- f(x_c)
-# 
-#     while (TRUE) {
-#       x_next <- x_c + a / f_x
-# 
-#       if (x_next > rb || (mode_i == mode_n && f(x_next) / f_x < th)) {
-#         x[i + r] <- x_c
-#         break
-#       }
-# 
-#       f_x_next <- f(x_next)
-# 
-#       if (f_x_next > f_x) {
-#         x[i + r] <- x_c
-#         s_upper[i + r] <- f_x
-#         r_tail_area <- 0
-#         break
-#       }
-# 
-# 
-#       x[i + r] <- x_c
-#       s_upper[i + r] <- f_x
-#       s_lower[i + r] <- f_x_next
-#       s_upper_lower[i + r] <- s_upper[i + r] / s_lower[i + r]
-#       p_a[i + r] <- s_lower[i + r] / s_upper[i + r]
-# 
-# 
-#       f_x <- f_x_next
-#       x_c <- x_next
-# 
-#       r <- r + 1
-#     }
-#   }
-# 
-# 
-# 
-#   if (mode != lb) {
-#     x_previous <- mode
-#     f_x_previous <- f(x_previous)
-# 
-# 
-#     while (TRUE) {
-#       x_c <- x_previous - a / f_x_previous
-# 
-# 
-# 
-#       if (x_c < lb || (mode_i == 1 && f(x_c) / f_x_previous  < th)) {
-#         break
-#       }
-# 
-#       f_x <- f(x_c)
-# 
-#       if (f(x_c) > f_x_previous) {
-#         break
-#       }
-# 
-#       l <- l + 1
-#       x[i - l] <- x_c
-#       s_upper[i - l] <- f_x_previous
-#       s_lower[i - l] <- f_x
-#       s_upper_lower[i - l] <- s_upper[i - l] / s_lower[i - l]
-#       p_a[i - l] <- f_x / f_x_previous
-# 
-# 
-#       f_x_previous <- f_x
-#       x_previous <- x_c
-#     }
-#   }
-# 
-#   m <- l + r
-# 
-#   d <- data.frame(
-#     x = x, s_upper = s_upper, p_a = p_a,
-#     s_upper_lower = s_upper_lower
-#   )
-# 
-#   d <- subset(d, rowSums(is.na(d)) != ncol(d))
-# 
-#   return(list(d = d, m = m))
-# }
-
-
-
-
-find_left_steps <- function(lb = -Inf, rb = Inf, a, th, mode, mode_i, mode_n, f, steps_lim = Inf) {
+find_left_steps <- function(lb, rb, a, mode, mode_i, mode_n, f, steps_lim = Inf, theta, grid_limits) {
+  
+  # if(is.null(steps_lim))
+  #   steps_lim = Inf
+  # 
+  # if(is.null(grid_limits))
+  #   grid_limits = c(lb,rb)
+  # 
+  # if(is.null(theta))
+  #   theta = 0
+  
   
   memory_res <- (max(500, ceiling(1 / a)) + 500)
   
@@ -525,7 +503,7 @@ find_left_steps <- function(lb = -Inf, rb = Inf, a, th, mode, mode_i, mode_n, f,
       x_c <- x_previous - a / f_x_previous
       
       
-      if (l >= steps_lim || x_c < lb || (mode_i == 1 && (f(x_c) / f_x_previous  <= th) ) ) {
+      if (l >= steps_lim || x_c < lb || (mode_i == 1 && ((f(x_c) / f_x_previous  <= theta) || x_previous < grid_limits[1]) ) ) {
         break
       }
       
@@ -562,8 +540,17 @@ find_left_steps <- function(lb = -Inf, rb = Inf, a, th, mode, mode_i, mode_n, f,
 
 
 
+find_right_steps <- function(lb , rb, a, mode, mode_i, mode_n, f, steps_lim = Inf, theta, grid_limits) {
+  
 
-find_right_steps <- function(lb = -Inf, rb = Inf, a, th, mode, mode_i, mode_n, f, steps_lim = Inf) {
+  # if(is.null(steps_lim))
+  #   steps_lim = Inf
+  # 
+  # if(is.null(grid_limits))
+  #   grid_limits = c(lb,rb)
+  # 
+  # if(is.null(theta))
+  #   theta = 0
   
   memory_res <- (max(500, ceiling(1 / a)) + 500) 
   
@@ -585,7 +572,7 @@ find_right_steps <- function(lb = -Inf, rb = Inf, a, th, mode, mode_i, mode_n, f
     while (TRUE) {
       x_next <- x_c + a / f_x
 
-      if (r > steps_lim || x_next > rb || (mode_i == mode_n && (f(x_next) / f_x <= th)) ) {
+      if (r > steps_lim || x_next > rb || (mode_i == mode_n && ((f(x_next) / f_x <= theta) || x_c > grid_limits[2])) ) {
         x[r] <- x_c
         s_upper[r] <- s_lower[r] <- s_upper_lower[r] <- p_a[r] <- NA
         break

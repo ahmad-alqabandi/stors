@@ -16,8 +16,10 @@ h_prime_norm = function(x) {
   -x
 }
 
+devtools::load_all()
+
 norm_grid = build_grid(lb = -Inf, rb = Inf, modes , f = f_norm, h = h_norm, h_prime = h_prime_norm,
-                       verbose = TRUE, target_sample_size = 100)
+                       verbose = TRUE,steps = 2, grid_limits = c(-1,1),  target_sample_size = 10000)
 
 plot(norm_grid)
 
@@ -65,8 +67,6 @@ multi_grid = build_grid(lb = -Inf, rb = Inf, modes = modes_multi, f = f_multi, h
 
 plot(multi_grid)
 
-plot(multi_grid, x_min = 0, x_max = 0.01)
-
 
 multi_grid
 
@@ -103,9 +103,7 @@ print(srnorm_grid)
 
 plot(srnorm_grid, x_min = 3 ,x_max =7 )
 
-
-
-plot(srnorm_grid,  x_min = 0 ,x_max= 0.01)
+n = 10000
 
 hist(srnorm(n))
 
@@ -121,7 +119,7 @@ max(trunc_sample)
 
 library(RcppZiggurat)
 
-m=100000000
+m=10000000
 
 microbenchmark::microbenchmark(
   rnorm(m),
@@ -137,8 +135,6 @@ laplace_grid = grid_optimizer("laplace")
 plot(laplace_grid)
 
 plot(laplace_grid)
-
-plot.grid
 
 hist(laplace(n))
 
