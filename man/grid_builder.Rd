@@ -5,39 +5,20 @@
 \title{Grid Builder}
 \usage{
 grid_builder(
-  lb = -Inf,
-  rb = Inf,
+  lb,
+  rb,
   a,
-  th,
   modes,
-  f,
-  h = NA,
-  h_prime = NA,
-  cdf = NA,
-  stps = NA,
-  lstpsp = NA,
-  rstpsp = NA
+  f = NULL,
+  h = NULL,
+  h_prime = NULL,
+  cdf = NULL,
+  stps,
+  lstpsp,
+  rstpsp,
+  theta,
+  grid_limits
 )
-}
-\arguments{
-\item{lb}{scaler density lower bound}
-
-\item{rb}{scaler density upper bound}
-
-\item{a}{scaler step area}
-
-\item{th}{scaler pre_acceptance threshold}
-
-\item{f}{density function}
-
-\item{h}{log transform of the density function}
-
-\item{h_prime}{first derivative of h}
-
-\item{mode}{vector density modes}
-}
-\value{
-list including proposal distribution properties
 }
 \description{
 Grid Builder

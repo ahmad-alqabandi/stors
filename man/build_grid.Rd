@@ -11,8 +11,11 @@ build_grid(
   f,
   h = NULL,
   h_prime = NULL,
-  a = 0.01,
-  th = 0.9
+  steps = NA,
+  verbose = FALSE,
+  target_sample_size = 1000,
+  grid_limits = c(lb, rb),
+  theta = 0
 )
 }
 \arguments{

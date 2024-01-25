@@ -4,7 +4,14 @@
 \alias{grid_optimizer}
 \title{Optimize Built-in Grid}
 \usage{
-grid_optimizer(density_name = stors_env$grids$biultin$names)
+grid_optimizer(
+  density_name = stors_env$grids$biultin$names,
+  verbose = FALSE,
+  target_sample_size = 1000,
+  steps = NA,
+  grid_limits,
+  theta = 0
+)
 }
 \arguments{
 \item{density_name}{string specifying the name of the distribution.}
