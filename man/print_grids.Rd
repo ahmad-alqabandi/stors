@@ -2,14 +2,23 @@
 % Please edit documentation in R/grid_info.R
 \name{print_grids}
 \alias{print_grids}
-\title{Print All Grids}
+\title{Print Grids}
 \usage{
 print_grids()
 }
 \description{
-Prints details of all grids stored by the user, including grid name, size, efficiency, etc.
+This function prints details of all grids stored by the user. It provides information on each grid, including the grid name, size, efficiency, and other relevant details.
 }
 \examples{
-# To print details of all stored grids
+# First, let's create a grid to sample from a standard normal distribution
+f_normal <- function(x) { 0.3989423 * exp(-0.5 * x^2) }
+normal_grid = build_grid(f = f_normal, modes = 0, lb = -Inf, rb = Inf, steps = 1000)
+print(normal_grid)
+
+# `print_grids()` prints all grids stored by the user on their machine. To see this, we first save 'normal_grid' using `save_grid()`
+save_grid(normal_grid, "normal")
+
+# Since 'normal_grid' is now stored on this machine, we can confirm this by printing all saved grids
 print_grids()
+
 }

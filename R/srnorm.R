@@ -68,6 +68,7 @@ d_srnorm_upper = function(n ,xl, xr ,csl , csr, il, ir){
 #' @export
 #'
 #' @examples
+#' 
 truncsrnorm = function(xl, xr){
   
   stopifnot(

@@ -9,7 +9,7 @@ grid_optimizer(
   verbose = FALSE,
   target_sample_size = 1000,
   steps = NA,
-  grid_limits,
+  grid_range,
   theta = 0
 )
 }

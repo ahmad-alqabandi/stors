@@ -2,10 +2,13 @@
 % Please edit documentation in R/stors.R
 \name{cache_stors_grid}
 \alias{cache_stors_grid}
-\title{Title}
+\title{}
 \usage{
 cache_stors_grid(grid)
 }
 \description{
-Title
+force(grid)
+}
+\details{
+
 }

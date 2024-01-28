@@ -3,73 +3,113 @@
 #' Build User Grid
 #'
 #' @description
-#' This function is used to create an optimized grid representing the proposal distribution for a target density, especially when sampling from certain density functions not prebuilt in stors, such as `srnorm` and `srgamma`.
+#' This function is essential for sampling from any uni-modal or multi-modal log-concave density function. It generates a proposal grid 
+#' that can be utilized for this purpose. Simply provide the density function 'f' and its modes. For enhanced accuracy, include 
+#' the log-transform 'h' of the density and its first derivative 'h_prime'. The grid optimization is pre-configured for efficiency, 
+#' but you can customize the grid-building process through various parameters to suit your specific needs.
 #'
-#' @param lb Scalar target density lower bound.
-#' @param rb Scalar target density upper bound.
-#' @param mode Vector representing the modes of the density.
-#' @param f Function accepting one argument which returns the probability density of the target.
-#' @param h Function accepting one argument which returns the Log-transform of the target.
-#' @param h_prime Function accepting one argument which returns the first derivative of the log-transformed target density.
+#' @param lb Scalar representing the lower bound of the target density.
+#' @param rb Scalar representing the upper bound of the target density.
+#' @param modes Vector indicating the modes of the density function.
+#' @param f Function accepting a single argument, returning the probability density of the target.
+#' @param h Function accepting a single argument, returning the log-transform of the target density.
+#' @param h_prime Function accepting a single argument, returning the first derivative of the log-transformed target density.
+#' @param steps Scalar integer indicating the number of steps in the proposal distribution.
+#' @param grid_range Vector of two elements specifying the start and end points for constructing steps along the x-axis.
+#' @param theta Scalar defining the pre-acceptance threshold, dictating when the proposal steps constructing break based on the probability of pre-acceptance.
+#' @param target_sample_size Scalar integer indicating the target sample size. The grid optimization process will take this number into account.
+#' @param verbose Boolean; if set to True, a table detailing the optimization areas and steps will be displayed during grid optimization.
 #'
 #' @details
-#' The grid building is conducted through constant area rectangles starting from the target distribution modes. For each mode, steps are constructed around as rectangles with a width of \(x_i - x_{i-1}\) and a height determined by \(\max(f(x_{i-1}), f(x_i))\), effectively covering the target distribution in a step pattern. The function grid_builder() constructs these steps and computes values that contribute to the sampling process. These values are later cached when the resulting grid is passed to the stors() function. This approach enhances the computational efficiency of stors.
-#' 
+#' The grid building process is executed through the construction of constant area rectangles, starting from the modes of the target distribution.
+#' For each mode, rectangles are formed as steps around it, with a width defined by \eqn{(x_i - x_{i-1})} and a height determined by \eqn{\max(f(x_{i-1}), f(x_i))}.
+#' This method effectively covers the target distribution in a stepped pattern.
+
+#' The function `grid_builder()` manages the construction of these steps and calculates values critical for the sampling process. When the resultant grid is used with the `stors()` function, these values are cached, 
+#' significantly enhancing the computational efficiency and hence improving sampling speed. During the optimization process, we aim for a certain grid
+#' size based on L1-3 memory cache size. Therefore, we test the speed of grids of sizes \eqn{2^m} Kb. To achieve this, we estimate the uniform step area
+#' based on a certain steps number that leads to the target cache size, \eqn{ \alpha = \frac{1}{\text{number of steps}} }.
+
+#' The speed testing for each possible grid is initially based on a sample size of 1000. However, if the user wishes to optimize the grid for a different sample size, they can do so
+#' by specifying the desired sample size using the 'target_sample_size' argument.
+
+#' In case the user wants to select a specific number of steps for the proposal grid
+#' and bypass the optimization process, this can be done by specifying a steps number greater than the number of modes by 2 using the 'steps' argument. If the target
+#' density is heavy-tailed, and the user wishes to stop the grid building process at a certain pre-acceptance threshold, this can be achieved by setting
+#' the acceptance probability threshold 'theta' \eqn{\theta}. Once the steps reach this level of pre-acceptance probability, the step construction will end \eqn{ \frac{\min(f(x_i), f(x_{i+1}))}{\max(f(x_i), f(x_{i+1}))} < \theta }.
+#' Alternatively, if the user wishes to create the steps within certain limits on the
+#' x-axis, they can do so by specifying the proposal grid limits using the 'grid_range' argument.
 #' 
 #' @return
-#' Returns a list that contains the following data that is related to the proposal distribution:
+#' Returns a list containing the following elements related to the proposal distribution:
 #' \itemize{
-#' \item{"grid_data"} {Data frame that includes the created steps information, such as x (the beginning of each step on the x-axis), s_upper (the step height on the y-axis), p_a (pre-acceptance probability for each step), and s_upper_lower (a vector used to re-scale the uniform random number when the sample is accepted).}
-#' \item{"areas"} {Vector that contains the area under the left tail bound, the steps in the middle, and the right tail bound.}
-#' \item{"steps_number"} {Scalar representing the number of steps in the proposal.}
-#' \item{"sampling_probabilities"} {Vector that contains the area under the left tail, and the area under the left tail and middle steps.}
-#' \item{"unif_scaler"} {Scalar representing the inverse probability of sampling from the step part of the proposal, \eqn{\frac{1}{p(lb < x < rb)}}. This value, similar to s_upper_lower in the grid_data data frame, is used to scale the uniform random value under the condition that we are going to sample from the steps part of the proposal.}
-#' \item{"lt_properties"} {Vector that includes 5 values used when sampling under the proposal's left tail using the ARS method.}
-#' \item{"rt_properties"} {Vector that includes 6 values used when sampling under the proposal's right tail using the ARS method.}
+#'   \item{"grid_data"}{A data frame including the created steps information, such as 'x' (the beginning of each step on the x-axis), 's_upper' (the step height on the y-axis), 'p_a' (pre-acceptance probability for each step), and 's_upper_lower' (a vector used to re-scale the uniform random number when the sample is accepted).}
+#'   \item{"areas"}{A vector containing the areas under the left tail bound, the steps in the middle, and the right tail bound.}
+#'   \item{"steps_number"}{A scalar representing the number of steps in the proposal.}
+#'   \item{"sampling_probabilities"}{A vector containing the areas under the left tail and the combined area of the left tail and middle steps.}
+#'   \item{"unif_scaler"}{A scalar representing the inverse probability of sampling from the step part of the proposal, \eqn{\frac{1}{p(lb < x < rb)}}. Similar to 's_upper_lower' in the 'grid_data' data frame, this value is used to scale the uniform random value when sampling from the steps part of the proposal.}
+#'   \item{"lt_properties"}{A vector including 5 values used when sampling under the proposal's left tail using the ARS (Adaptive Rejection Sampling) method.}
+#'   \item{"rt_properties"}{A vector including 6 values used when sampling under the proposal's right tail using the ARS method.}
+#'   \item{"alpha"}{A scalar representing the uniform step area.}
+#'   \item{"tails_method"}{A string representing the tails sampling method, either 'ARS' for Adaptive Rejection Sampling or 'IT' for Inverse Transform.}
+#'   \item{"grid_bounds"}{A vector including the left and right bounds of the target density.}
+#'   \item{"dens_func"}{The function passed by the user for the target density 'f'.}
 #' }
-#' @seealso [func()]
-#' #\deqn{}
+#' 
+#' 
+#' @seealso
+#' \code{\link{stors}} 
+#' 
 #' @examples
 #' 
-#' library(stors)
+#' # Example 1: Building a Grid for Standard Normal Distribution
+#' # This example demonstrates constructing a grid for a standard normal distribution \( f(x) \sim \mathcal{N}(0,1) \),
+#' # and shows the optimization table by setting `verbose` to `TRUE`.
+#'
+#' # Define the density function, its logarithm, and its derivative for the standard normal distribution
+#' modes_norm = 0
+#' f_norm <- function(x) { 1 / sqrt(2 * pi) * exp(-0.5 * x^2) }
+#' h_norm <- function(x) { log(f_norm(x)) }
+#' h_prime_norm <- function(x) { -x }
+#'
+#' # Build the proposal grid for the standard normal distribution
+#' norm_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_norm, f = f_norm, h = h_norm, h_prime = h_prime_norm, verbose = TRUE)
+#'
+#' # Plot the generated grid
+#' plot(norm_grid)
+#'
+#' # Example 2: Grid for a Bimodal Distribution
+#' # This example shows how to build a grid for sampling from a bimodal distribution, combining two normal distributions 
+#' # \( f(x) = 0.5 \cdot w_1(x) + 0.5 \cdot w_2(x) \), where \( w_1(x) \sim \mathcal{N}(0, 1) \) and \( w_2(x) \sim \mathcal{N}(4, 1) \).
+#'
+#' # Define the bimodal density function
+#' f_bimodal <- function(x) {
+#'   0.5 * (1 / sqrt(2 * pi)) * exp(-(x^2) / 2) + 0.5 * (1 / sqrt(2 * pi)) * exp(-((x - 4)^2) / 2)
+#' }
+#' modes_bimodal = c(0, 4)
+#'
+#' # Build the proposal grid for the bimodal distribution
+#' bimodal_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_bimodal, f = f_bimodal)
+#'
+#' # Print and plot the bimodal grid
+#' print(bimodal_grid)
+#' plot(bimodal_grid)
+#'
+#' # Example 3: Grid with 500 Steps for Bimodal Distribution
+#' # This example demonstrates constructing a grid with 500 steps for the bimodal distribution used in Example 2.
+#'
+#' bimodal_grid_500 = build_grid(lb = -Inf, rb = Inf, mode = modes_bimodal, f = f_bimodal, steps = 500)
+#'
+#' # Print and plot the grid with 500 steps
+#' print(bimodal_grid_500)
 #' 
-#' #EXAMPLE:1 The following example shows the grid building steps for a basic standard normal distribution f(x) \sim N(0,1)
-#' 
-#'  modes_norm = 0
-#' 
-#'   f_norm  <- function(x)  1/sqrt(2 * pi) * exp(-0.5 *x^2)
-#'    
-#'    h_norm <- function(x) log(f_norm(x))
-#'    
-#'    h_norm <- function(x) -x
-#' 
-#'  norm_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_norm, f = f_norm, h = h_norm, h_prime = h_norm)
-#' 
-#' 
-#' #EXAMPLE:2  The following example demonstrates how to build a grid for sampling from a bimodal distribution, which is a combination of two normal distributions \( f(x) = 0.5 \cdot w_1(x) + 0.5 \cdot w_2(x) \), where \( w_1(x) \sim \mathcal{N}(0, 1) \) and \( w_2(x) \sim \mathcal{N}(4, 1) \).
-#'  
-#'  modes_bi = c(0,4)
-#'  
-#'  f_bi <- function(x) {
-#'    0.5 * (sqrt(2 * pi))^(-1) * exp(-(x^2)/2) + 0.5 * ( sqrt(2 * pi))^(-1) * exp(-((x - 4)^2)/2)
-#'    }
-#'    
-#'  h_bi <- function(x) log(f_bi(x))
-#'    
-#'  h_prime_bi <- function(x) {
-#'      (-(exp(-1/2 * (-4 + x)^2) * 0.5 * (-4 + x))/sqrt(2 * pi) - (exp(-x^2/2) * 0.5 * x)/sqrt(2 * pi))/((exp(-x^2/2) * 0.5)/sqrt(2 * pi) + (exp(-1/2 * (-4 + x)^2) * 0.5)/sqrt(2 * pi))
-#'      }
-#'  
-#'  bi_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_bi, f = f_bi, h = h_bi, h_prime = h_prime_bi)
-#'  
 #' @import digest digest
 #' @export
 build_grid <- function(lb = -Inf, rb = Inf, modes, f, h = NULL,
-                       h_prime = NULL, steps = NA, verbose = FALSE,
-                       target_sample_size = 1000, grid_limits = c(lb, rb), theta = 0) {
+                       h_prime = NULL, steps = NA, grid_range = c(lb, rb), theta = 0,target_sample_size = 1000, verbose = FALSE) {
   
   
-  grid_prob_error_checking(steps, grid_limits, theta, lb, rb, modes)
+  grid_prob_error_checking(steps, grid_range, theta, lb, rb, modes)
   
   if(is.null(h)){
     h <- function(x){log(f(x))}
@@ -85,12 +125,12 @@ build_grid <- function(lb = -Inf, rb = Inf, modes, f, h = NULL,
     opt_prob = find_optimal_grid(lb = lb, rb = rb, modes = modes, f = f, h =  h,
                                  h_prime = h_prime, verbose = verbose,
                                  target_sample_size = target_sample_size,
-                                 theta = theta, grid_limits = grid_limits)
+                                 theta = theta, grid_range = grid_range)
     
     opt_grid <- grid_builder(lb = lb, rb = rb , a = opt_prob$area,
                              modes, f = f, h =  h, h_prime = h_prime ,
                              stps =opt_prob$steps , lstpsp =opt_prob$lstpsp , rstpsp= opt_prob$rstpsp,
-                             theta = theta, grid_limits = grid_limits)
+                             theta = theta, grid_range = grid_range)
 
   }
   else{
@@ -101,11 +141,11 @@ build_grid <- function(lb = -Inf, rb = Inf, modes, f, h = NULL,
     
     left_stps = find_left_steps(lb = lb, rb = rb, a = 0.001,
                                 mode = modes[1], mode_i = 1, mode_n = mode_n, f = f,
-                                theta =0.1, grid_limits = grid_limits)$m
+                                theta =0.1, grid_range = grid_range)$m
     
     right_stps = find_right_steps(lb = lb, rb = rb, a = 0.001,
                                   mode = modes[mode_n], mode_i = mode_n, mode_n = mode_n, f = f,
-                                  theta =0.1, grid_limits = grid_limits)$m
+                                  theta =0.1, grid_range = grid_range)$m
     
     lstpsp =left_stps / sum(left_stps, right_stps)
     rstpsp= 1 - lstpsp
@@ -113,7 +153,7 @@ build_grid <- function(lb = -Inf, rb = Inf, modes, f, h = NULL,
     opt_grid <- grid_builder(lb = lb, rb = rb ,a = 1/steps ,
                              modes = modes, f = f, h =  h, h_prime = h_prime,
                              stps =steps , lstpsp =lstpsp , rstpsp= rstpsp,
-                             theta = theta, grid_limits = grid_limits)
+                             theta = theta, grid_range = grid_range)
     
   }
 
@@ -140,7 +180,7 @@ build_grid <- function(lb = -Inf, rb = Inf, modes, f, h = NULL,
 grid_builder <- function(lb, rb, a, modes, f = NULL, h = NULL,
                          h_prime = NULL, cdf = NULL, stps,
                          lstpsp, rstpsp,
-                         theta, grid_limits) {
+                         theta, grid_range) {
   
   
   mode_n <- length(modes)
@@ -166,13 +206,13 @@ grid_builder <- function(lb, rb, a, modes, f = NULL, h = NULL,
       
       if( (mode_i != 1) || is.na(lstpsp))
       {lsts[[mode_i]] <- find_left_steps(lb, rb, a, modes[mode_i], mode_i, mode_n, f,
-                                         theta = theta, grid_limits = grid_limits)
+                                         theta = theta, grid_range = grid_range)
       
       if(!is.na(lstpsp)) stps <- stps -  lsts[[mode_i]]$m}
       
       if( (mode_i != mode_n) || is.na(rstpsp))
       {rsts[[mode_i]] <- find_right_steps(lb, rb, a, modes[mode_i], mode_i, mode_n, f,
-                                          theta = theta, grid_limits = grid_limits)
+                                          theta = theta, grid_range = grid_range)
       
       if(!is.na(rstpsp)) stps <- stps -  rsts[[mode_i]]$m}
       
@@ -186,12 +226,12 @@ grid_builder <- function(lb, rb, a, modes, f = NULL, h = NULL,
     
     lsts[[1]] <- find_left_steps(lb = lb, rb = rb, a = a,mode = modes[1],
                                  mode_i = 1, mode_n = mode_n,
-                                 f = f,  steps_lim = steps_lim_left, theta = theta, grid_limits = grid_limits)
+                                 f = f,  steps_lim = steps_lim_left, theta = theta, grid_range = grid_range)
     
     steps_lim_right = stps - steps_lim_left
     rsts[[mode_n]] <- find_right_steps(lb = lb, rb = rb, a = a, mode = modes[mode_n],
                                        mode_i = mode_n, mode_n = mode_n,
-                                       f = f, steps_lim = steps_lim_right, theta = theta, grid_limits = grid_limits)
+                                       f = f, steps_lim = steps_lim_right, theta = theta, grid_range = grid_range)
   }
   
     
@@ -314,7 +354,7 @@ grid_builder <- function(lb, rb, a, modes, f = NULL, h = NULL,
 
 
 
-find_left_steps <- function(lb, rb, a, mode, mode_i, mode_n, f, steps_lim = Inf, theta, grid_limits) {
+find_left_steps <- function(lb, rb, a, mode, mode_i, mode_n, f, steps_lim = Inf, theta, grid_range) {
   
   
   memory_res <- (max(500, ceiling(1 / a)) + 500)
@@ -341,7 +381,7 @@ find_left_steps <- function(lb, rb, a, mode, mode_i, mode_n, f, steps_lim = Inf,
       x_c <- x_previous - a / f_x_previous
       
       
-      if (l >= steps_lim || x_c < lb || (mode_i == 1 && ((f(x_c) / f_x_previous  <= theta) || x_previous < grid_limits[1]) ) ) {
+      if (l >= steps_lim || x_c < lb || (mode_i == 1 && ((f(x_c) / f_x_previous  <= theta) || x_previous < grid_range[1]) ) ) {
         break
       }
       
@@ -378,7 +418,7 @@ find_left_steps <- function(lb, rb, a, mode, mode_i, mode_n, f, steps_lim = Inf,
 
 
 
-find_right_steps <- function(lb , rb, a, mode, mode_i, mode_n, f, steps_lim = Inf, theta, grid_limits) {
+find_right_steps <- function(lb , rb, a, mode, mode_i, mode_n, f, steps_lim = Inf, theta, grid_range) {
   
   memory_res <- (max(500, ceiling(1 / a)) + 500) 
   
@@ -400,7 +440,7 @@ find_right_steps <- function(lb , rb, a, mode, mode_i, mode_n, f, steps_lim = In
     while (TRUE) {
       x_next <- x_c + a / f_x
 
-      if (r > steps_lim || x_next > rb || (mode_i == mode_n && ((f(x_next) / f_x <= theta) || x_c > grid_limits[2])) ) {
+      if (r > steps_lim || x_next > rb || (mode_i == mode_n && ((f(x_next) / f_x <= theta) || x_c > grid_range[2])) ) {
         x[r] <- x_c
         s_upper[r] <- s_lower[r] <- s_upper_lower[r] <- p_a[r] <- NA
         break
@@ -516,18 +556,18 @@ save_builtin_grid <- function(Cnum, grid) {
 }
 
 
-grid_prob_error_checking = function(steps, grid_limits, theta, lb, rb, modes){
+grid_prob_error_checking = function(steps, grid_range, theta, lb, rb, modes){
   
   if(!is.na(steps) && steps < 1){
     stop("Error: 'steps' must be greater than or equal to 1.")    
   }
   
-  if ( theta != 0 && !identical(grid_limits, c(lb, rb))) {
-    stop("Error: You must provide either a pre-acceptance threshold 'theta' value or a proposal x-axis limit 'grid_limits'.")
+  if ( theta != 0 && !identical(grid_range, c(lb, rb))) {
+    stop("Error: You must provide either a pre-acceptance threshold 'theta' value or a proposal x-axis limit 'grid_range'.")
   }
   
-  if ( ( theta != 0 || !identical(grid_limits, c(lb, rb)) ) && !is.na(steps)) {
-    warning("Warning: The pre-acceptance threshold 'theta' value and proposal x-axis limit 'grid_limits' will not take effect because you are specifying a target 'steps' number.")
+  if ( ( theta != 0 || !identical(grid_range, c(lb, rb)) ) && !is.na(steps)) {
+    warning("Warning: The pre-acceptance threshold 'theta' value and proposal x-axis limit 'grid_range' will not take effect because you are specifying a target 'steps' number.")
   }
   
   
@@ -538,13 +578,13 @@ grid_prob_error_checking = function(steps, grid_limits, theta, lb, rb, modes){
   }
   
   
-  if(!identical(grid_limits, c(lb, rb)) ){
+  if(!identical(grid_range, c(lb, rb)) ){
     
-    if(grid_limits[1] < lb && grid_limits[2] > rb)
-      stop("Error: 'grid_limits' must be within the range of distribution bounds.")
+    if(grid_range[1] < lb && grid_range[2] > rb)
+      stop("Error: 'grid_range' must be within the range of distribution bounds.")
     
-    if(grid_limits[1] > modes[1] || grid_limits[2] < modes[length(modes)])
-      stop("Error: 'grid_limits' range must include distribution's modes.")
+    if(grid_range[1] > modes[1] || grid_range[2] < modes[length(modes)])
+      stop("Error: 'grid_range' range must include distribution's modes.")
     
   }
   

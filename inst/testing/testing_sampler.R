@@ -16,14 +16,24 @@ h_prime_norm = function(x) {
   -x
 }
 
-devtools::load_all()
-
 norm_grid = build_grid(lb = -Inf, rb = Inf, modes , f = f_norm, h = h_norm, h_prime = h_prime_norm,
-                       verbose = TRUE,theta = 3,  target_sample_size = 10000)
+                       steps = 1000, verbose = TRUE,  target_sample_size = 10000)
 
 plot(norm_grid)
 
+? save_grid
+
+? print_grids
+
+? delete_grid
+
+? load_grid
+
 norm_grid
+
+save_grid(norm_grid, "normal")
+
+print_grids()
 
 steps = 2000
 
@@ -95,7 +105,7 @@ n = 10000
 
 ##    srnorm
 
-srnorm_grid = grid_optimizer("srnorm" , grid_limits = c(-1,1), verbose = TRUE)
+srnorm_grid = grid_optimizer("srnorm" , verbose = TRUE)
 
 print(srnorm_grid)
 
@@ -117,13 +127,13 @@ max(trunc_sample)
 
 library(RcppZiggurat)
 
-m=1000
+m=100
 
 microbenchmark::microbenchmark(
   rnorm(m),
   srnorm(m),
   zrnormR(m),
-  times = 100
+  times = 10
 )
 
 ##    laplace

@@ -10,8 +10,22 @@ load_grid(grid_name)
 \item{grid_name}{A string specifying the name of the grid to be loaded.}
 }
 \value{
-Returns a list of the grid stored under `grid_name` in R's internal data directory. If the specified grid name does not exist, it shows an error.
+Returns a list representing the grid stored under `grid_name` in R's internal data directory. If the grid corresponding to the specified name does not exist, an error message is displayed.
 }
 \description{
-This function loads a grid into memory that was previously saved using the `save_grid()` function.
+This function loads a grid into memory that was previously saved using the `save_grid()` function. It is useful for retrieving saved grids for further analysis or processing.
+}
+\examples{
+# First, let's create a grid to sample from a standard normal distribution
+f_normal <- function(x) { 0.3989423 * exp(-0.5 * x^2) }
+normal_grid = build_grid(f = f_normal, modes = 0, lb = -Inf, rb = Inf, steps = 1000)
+print(normal_grid)
+
+# Then, save this grid on the user's machine using `save_grid()` with the name "normal"
+save_grid(normal_grid, "normal")
+
+# Now, in case the R session is restarted and the grid is no longer in memory, it can be loaded from the machine as follows:
+loaded_normal_grid <- load_grid("normal")
+print(loaded_normal_grid)
+ 
 }

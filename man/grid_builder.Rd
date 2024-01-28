@@ -17,7 +17,7 @@ grid_builder(
   lstpsp,
   rstpsp,
   theta,
-  grid_limits
+  grid_range
 )
 }
 \description{

@@ -1,94 +1,102 @@
 
-#' 
-#' 
-#' #' Optimize Built-in Grid
-#' #'
-#' #' @description
-#' #' This function optimizes and stores the sampling grid for STROS built-in distributions.
-#' #'
-#' #' @param density_name string specifying the name of the distribution.
-#' #'
-#' #' @details
-#' #' Before users can sample from a built-in distribution in the STROS package, they must first optimize the sampling grid using this function.
-#' #'
-#' #' @seealso [grid_optimizer()] is used to optimize and cache grid to sample from multible distrubution such as [srnorm()] and [srgamma()]
-#' #'
-#' #' @examples
-#' #' # optimize grid to sample 10 values from normal distribution N(0,1) 
-#' #' library(stors)
-#' #' grid_optimizer("srnorm")
-#' #' srnorm(10)
-#' #'
-#' #' @return
-#' #' This function generates and stores an optimized grid for the specified built-in distribution in R's internal data directory.
-#' #' 
-#' #' @export
-#' grid_optimizer <- function(density_name = stors_env$grids$biultin$names, verbose = FALSE, target_sample_size = 1000, steps = NULL) {
-#'   
-#'   density_name <- match.arg(density_name)
-#'   
-#'   stopifnot(" Grid already optimized for this distrubution" = !stors_env$grids$biultin[[density_name]]$opt)
-#'   
-#'   dendata <- pbgrids[[density_name]]
-#'   
-#'   grid_limits = c(dendata$lb, dendata$rb)
-#'   
-#'   
-#'   if(is.null(steps)){
-#'     
-#'     opt_prob = find_optimal_grid(dendata , density_name, verbose = verbose, target_sample_size = target_sample_size, theta = 0, grid_limits = grid_limits)
-#'     
-#'   }else{
-#'     mode_n = length(modes)
-#'     left_stps = find_left_steps(lb = lb, rb = rb, a = 0.001, mode = modes[1], mode_i = 1, mode_n = mode_n, f = f, theta = 0, grid_limits = grid_limits)$m
-#'     right_stps = find_right_steps(lb = lb, rb = rb, a = 0.001, mode = modes[mode_n], mode_i = mode_n, mode_n = mode_n, f = f, theta = 0, grid_limits = grid_limits)$m
-#'     
-#'     opt_prob = list()
-#'     opt_prob$area = 1/steps
-#'     opt_prob$steps = steps
-#'     opt_prob$lstpsp =left_stps / sum(left_stps, right_stps)
-#'     opt_prob$rstpsp= 1 - opt_prob$lstpsp
-#'     
-#'   }
-#' 
-#'   if(dendata$tails_method == "IT"){
-#'     opt_grid <- grid_builder(lb = dendata$lb, rb = dendata$rb ,a = opt_prob$area ,
-#'                               mode = dendata$modes, f = dendata$f, cdf = dendata$cdf,
-#'                              stps =opt_prob$steps , lstpsp =opt_prob$lstpsp ,
-#'                              rstpsp= opt_prob$rstpsp, theta = 0, grid_limits = grid_limits)
-#'   } else if(dendata$tails_method == "ARS"){
-#'     opt_grid <- grid_builder(lb = dendata$lb, rb = dendata$rb ,a = opt_prob$area ,
-#'                               mode = dendata$modes, f = dendata$f,  h = dendata$h,
-#'                              h_prime = dendata$h_prime, stps =opt_prob$steps , lstpsp =opt_prob$lstpsp ,
-#'                              rstpsp= opt_prob$rstpsp, theta = 0, grid_limits = grid_limits)
-#'   }
-#'   
-#'   # opt_grid <- grid_builder(lb = dendata$lb, rb = dendata$rb ,a = opt_prob$area , th = 0, mode = dendata$modes, f = dendata$f, cdf = dendata$cdf, stps =opt_prob$steps , lstpsp =opt_prob$lstpsp , rstpsp= opt_prob$rstpsp)
-#'   
-#'   cache_grid_c(dendata$Cnum, opt_grid)
-#'   
-#'   save_builtin_grid(dendata$Cnum, opt_grid)
-#'   
-#'   stors_env$grids$biultin[[density_name]]$opt <- TRUE
-#'   
-#'   func_to_text <- deparse(dendata$f)
-#'   
-#'   opt_grid$dens_func <- func_to_text
-#'   
-#'   class(opt_grid) <- "grid"
-#'   
-#'   return(opt_grid)
-#'   
-#' }
 
-
+#' Optimize Built-in Grid
+#'
+#' @description
+#' This function optimizes and stores the sampling grid for STROS built-in distributions.
+#'
+#' @param density_name string specifying the name of the distribution.
+#'
+#' @details
+#' Before users can sample from a built-in distribution in the STROS package, they must first optimize the sampling grid using this function.
+#'
+#' @seealso [grid_optimizer()] is used to optimize and cache grid to sample from multible distrubution such as [srnorm()] and [srgamma()]
+#'
+#' @examples
+#' # optimize grid to sample 10 values from normal distribution N(0,1) 
+#' library(stors)
+#' grid_optimizer("srnorm")
+#' srnorm(10)
+#'
+#' @return
+#' This function generates and stores an optimized grid for the specified built-in distribution in R's internal data directory.
+#' 
+#' @export
+grid_optimizer <- function(density_name = stors_env$grids$biultin$names, verbose = FALSE, target_sample_size = 1000,
+                           steps = NA, grid_range , theta = 0) {
+  
+  density_name <- match.arg(density_name)
+  
+  dendata <- pbgrids[[density_name]]
+  
+  free_cache_cnum_c(dendata$Cnum)
+  
+  
+  
+  if( missing(grid_range) )
+    grid_range = c(dendata$lb, dendata$rb)
+  
+  grid_prob_error_checking(steps, grid_range, theta, dendata$lb, dendata$rb, dendata$modes)
+  
+  
+  
+  
+  
+  if(is.na(steps)){
+    
+    opt_prob = find_optimal_grid(dendata , density_name, verbose = verbose,
+                                 target_sample_size = target_sample_size,
+                                 theta = theta, grid_range = grid_range)
+    
+  }else{
+    mode_n = length(modes)
+    left_stps = find_left_steps(lb = lb, rb = rb, a = 0.001, mode = modes[1], mode_i = 1, mode_n = mode_n, f = f, theta = 0, grid_range = grid_range)$m
+    right_stps = find_right_steps(lb = lb, rb = rb, a = 0.001, mode = modes[mode_n], mode_i = mode_n, mode_n = mode_n, f = f, theta = 0, grid_range = grid_range)$m
+    
+    opt_prob = list()
+    opt_prob$area = 1/steps
+    opt_prob$steps = steps
+    opt_prob$lstpsp =left_stps / sum(left_stps, right_stps)
+    opt_prob$rstpsp= 1 - opt_prob$lstpsp
+    
+  }
+  
+  if(dendata$tails_method == "IT"){
+    opt_grid <- grid_builder(lb = dendata$lb, rb = dendata$rb ,a = opt_prob$area ,
+                             mode = dendata$modes, f = dendata$f, cdf = dendata$cdf,
+                             stps =opt_prob$steps , lstpsp =opt_prob$lstpsp ,
+                             rstpsp= opt_prob$rstpsp, theta = 0, grid_range = grid_range)
+  } else if(dendata$tails_method == "ARS"){
+    opt_grid <- grid_builder(lb = dendata$lb, rb = dendata$rb ,a = opt_prob$area ,
+                             mode = dendata$modes, f = dendata$f,  h = dendata$h,
+                             h_prime = dendata$h_prime, stps =opt_prob$steps , lstpsp =opt_prob$lstpsp ,
+                             rstpsp= opt_prob$rstpsp, theta = 0, grid_range = grid_range)
+  }
+  
+  # opt_grid <- grid_builder(lb = dendata$lb, rb = dendata$rb ,a = opt_prob$area , th = 0, mode = dendata$modes, f = dendata$f, cdf = dendata$cdf, stps =opt_prob$steps , lstpsp =opt_prob$lstpsp , rstpsp= opt_prob$rstpsp)
+  
+  cache_grid_c(dendata$Cnum, opt_grid)
+  
+  save_builtin_grid(dendata$Cnum, opt_grid)
+  
+  stors_env$grids$biultin[[density_name]]$opt <- TRUE
+  
+  func_to_text <- deparse(dendata$f)
+  
+  opt_grid$dens_func <- func_to_text
+  
+  class(opt_grid) <- "grid"
+  
+  return(opt_grid)
+  
+}
 
 
 #' @importFrom microbenchmark microbenchmark
 find_optimal_grid <- function(dendata , density_name ,
                               lb , rb , modes, f,
                               h = NULL, h_prime = NULL, cdf = NULL, verbose,
-                              target_sample_size, theta, grid_limits){
+                              target_sample_size, theta, grid_range){
   
 
   times = ceiling( 100000 / target_sample_size )
@@ -116,15 +124,15 @@ find_optimal_grid <- function(dendata , density_name ,
   
   mode_n <- length(modes)
   
-  if( theta == 0 && grid_limits[1] == lb &&  grid_limits[2] == rb)
+  if( theta == 0 && grid_range[1] == lb &&  grid_range[2] == rb)
   {
   left_stps = find_left_steps(lb = lb, rb = rb, a = 0.001,
                               mode = modes[1], mode_i = 1,
-                              mode_n = mode_n, f = f, theta = theta, grid_limits = grid_limits)$m
+                              mode_n = mode_n, f = f, theta = theta, grid_range = grid_range)$m
   
   right_stps = find_right_steps(lb = lb, rb = rb, a = 0.001, 
                                 mode = modes[mode_n], mode_i = mode_n,
-                                mode_n = mode_n, f = f, theta = theta, grid_limits = grid_limits)$m
+                                mode_n = mode_n, f = f, theta = theta, grid_range = grid_range)$m
   
   lstpsp = left_stps/ ( left_stps + right_stps )
   rstpsp = 1 - lstpsp
@@ -165,7 +173,7 @@ find_optimal_grid <- function(dendata , density_name ,
                             modes, f = f, h =  h, h_prime = h_prime ,
                             cdf = cdf, stps =step , lstpsp =lstpsp ,
                             rstpsp= rstpsp, theta = theta,
-                            grid_limits = grid_limits)
+                            grid_range = grid_range)
      
       cache_grid_c(cnum, grid)
       
@@ -246,96 +254,5 @@ opt_areas = 1 / opt_steps
 
 
 
-
-#' Optimize Built-in Grid
-#'
-#' @description
-#' This function optimizes and stores the sampling grid for STROS built-in distributions.
-#'
-#' @param density_name string specifying the name of the distribution.
-#'
-#' @details
-#' Before users can sample from a built-in distribution in the STROS package, they must first optimize the sampling grid using this function.
-#'
-#' @seealso [grid_optimizer()] is used to optimize and cache grid to sample from multible distrubution such as [srnorm()] and [srgamma()]
-#'
-#' @examples
-#' # optimize grid to sample 10 values from normal distribution N(0,1) 
-#' library(stors)
-#' grid_optimizer("srnorm")
-#' srnorm(10)
-#'
-#' @return
-#' This function generates and stores an optimized grid for the specified built-in distribution in R's internal data directory.
-#' 
-#' @export
-grid_optimizer <- function(density_name = stors_env$grids$biultin$names, verbose = FALSE, target_sample_size = 1000,
-                           steps = NA, grid_limits , theta = 0) {
-  
-  density_name <- match.arg(density_name)
-  
-  dendata <- pbgrids[[density_name]]
-  
-  free_cache_cnum_c(dendata$Cnum)
-  
-
-    
-  if( missing(grid_limits) )
-    grid_limits = c(dendata$lb, dendata$rb)
-
-  grid_prob_error_checking(steps, grid_limits, theta, dendata$lb, dendata$rb, dendata$modes)
-  
-  
-  
-  
-  
-  if(is.na(steps)){
-    
-    opt_prob = find_optimal_grid(dendata , density_name, verbose = verbose,
-                                 target_sample_size = target_sample_size,
-                                 theta = theta, grid_limits = grid_limits)
-    
-  }else{
-    mode_n = length(modes)
-    left_stps = find_left_steps(lb = lb, rb = rb, a = 0.001, mode = modes[1], mode_i = 1, mode_n = mode_n, f = f, theta = 0, grid_limits = grid_limits)$m
-    right_stps = find_right_steps(lb = lb, rb = rb, a = 0.001, mode = modes[mode_n], mode_i = mode_n, mode_n = mode_n, f = f, theta = 0, grid_limits = grid_limits)$m
-    
-    opt_prob = list()
-    opt_prob$area = 1/steps
-    opt_prob$steps = steps
-    opt_prob$lstpsp =left_stps / sum(left_stps, right_stps)
-    opt_prob$rstpsp= 1 - opt_prob$lstpsp
-    
-  }
-  
-  if(dendata$tails_method == "IT"){
-    opt_grid <- grid_builder(lb = dendata$lb, rb = dendata$rb ,a = opt_prob$area ,
-                             mode = dendata$modes, f = dendata$f, cdf = dendata$cdf,
-                             stps =opt_prob$steps , lstpsp =opt_prob$lstpsp ,
-                             rstpsp= opt_prob$rstpsp, theta = 0, grid_limits = grid_limits)
-  } else if(dendata$tails_method == "ARS"){
-    opt_grid <- grid_builder(lb = dendata$lb, rb = dendata$rb ,a = opt_prob$area ,
-                             mode = dendata$modes, f = dendata$f,  h = dendata$h,
-                             h_prime = dendata$h_prime, stps =opt_prob$steps , lstpsp =opt_prob$lstpsp ,
-                             rstpsp= opt_prob$rstpsp, theta = 0, grid_limits = grid_limits)
-  }
-  
-  # opt_grid <- grid_builder(lb = dendata$lb, rb = dendata$rb ,a = opt_prob$area , th = 0, mode = dendata$modes, f = dendata$f, cdf = dendata$cdf, stps =opt_prob$steps , lstpsp =opt_prob$lstpsp , rstpsp= opt_prob$rstpsp)
-  
-  cache_grid_c(dendata$Cnum, opt_grid)
-  
-  save_builtin_grid(dendata$Cnum, opt_grid)
-  
-  # stors_env$grids$biultin[[density_name]]$opt <- TRUE
-  
-  func_to_text <- deparse(dendata$f)
-  
-  opt_grid$dens_func <- func_to_text
-  
-  class(opt_grid) <- "grid"
-  
-  return(opt_grid)
-  
-}
 
 

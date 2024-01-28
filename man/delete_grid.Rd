@@ -2,16 +2,37 @@
 % Please edit documentation in R/grid_info.R
 \name{delete_grid}
 \alias{delete_grid}
-\title{Delete Stored Grid}
+\title{Delete Grid}
 \usage{
 delete_grid(grid_name)
 }
 \arguments{
-\item{grid_name}{string specifying the name of the grid to be deleted.}
+\item{grid_name}{A string specifying the name of the grid to be deleted.}
 }
 \value{
-Shows an error if `grid_name` does not exist. Otherwise, it successfully deletes the grid without returning any value upon completion.
+If `grid_name` does not exist, the function returns an error message. If the grid exists and is successfully deleted, a message confirming its successful removal will be displayed.
 }
 \description{
-Deletes a grid previously stored by the user using the `save_grid()` function.
+This function deletes a grid that was previously stored by the user using the `save_grid()` function. It is useful for managing stored grids and freeing up space.
+}
+\examples{
+# First, let's create a grid to sample from a standard normal distribution
+f_normal <- function(x) { 0.3989423 * exp(-0.5 * x^2) }
+normal_grid = build_grid(f = f_normal, modes = 0, lb = -Inf, rb = Inf, steps = 1000)
+print(normal_grid)
+
+# Then, save this grid on the user's machine using `save_grid()` with the name "normal"
+save_grid(normal_grid, "normal")
+
+# Now, we can print all grids stored on this machine using `print_grids()`
+print_grids()
+
+# The list will include the 'normal_grid' stored under the name "normal"
+
+# To delete the "normal" grid from the machine, pass its name to `delete_grid`
+delete_grid("normal")
+
+# Now, when we print all stored grids, the "normal" grid will no longer be listed
+print_grids()
+
 }
