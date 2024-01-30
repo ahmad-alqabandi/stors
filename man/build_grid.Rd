@@ -31,15 +31,15 @@ build_grid(
 
 \item{h_prime}{Function accepting a single argument, returning the first derivative of the log-transformed target density.}
 
-\item{steps}{Scalar integer indicating the number of steps in the proposal distribution.}
+\item{steps}{Optional Scalar integer indicating the number of steps in the proposal distribution.}
 
-\item{grid_range}{Vector of two elements specifying the start and end points for constructing steps along the x-axis.}
+\item{grid_range}{Optional Vector of two elements specifying the start and end points for constructing steps along the x-axis.}
 
-\item{theta}{Scalar defining the pre-acceptance threshold, dictating when the proposal steps constructing break based on the probability of pre-acceptance.}
+\item{theta}{Optional Scalar defining the pre-acceptance threshold, dictating when the proposal steps constructing break based on the probability of pre-acceptance.}
 
 \item{target_sample_size}{Scalar integer indicating the target sample size. The grid optimization process will take this number into account.}
 
-\item{verbose}{Boolean; if set to True, a table detailing the optimization areas and steps will be displayed during grid optimization.}
+\item{verbose}{Boolean if set to True, a table detailing the optimization areas and steps will be displayed during grid optimization.}
 }
 \value{
 Returns a list containing the following elements related to the proposal distribution:
@@ -67,12 +67,18 @@ but you can customize the grid-building process through various parameters to su
 The grid building process is executed through the construction of constant area rectangles, starting from the modes of the target distribution.
 For each mode, rectangles are formed as steps around it, with a width defined by \eqn{(x_i - x_{i-1})} and a height determined by \eqn{\max(f(x_{i-1}), f(x_i))}.
 This method effectively covers the target distribution in a stepped pattern.
+
+
 The function `grid_builder()` manages the construction of these steps and calculates values critical for the sampling process. When the resultant grid is used with the `stors()` function, these values are cached, 
 significantly enhancing the computational efficiency and hence improving sampling speed. During the optimization process, we aim for a certain grid
 size based on L1-3 memory cache size. Therefore, we test the speed of grids of sizes \eqn{2^m} Kb. To achieve this, we estimate the uniform step area
 based on a certain steps number that leads to the target cache size, \eqn{ \alpha = \frac{1}{\text{number of steps}} }.
+
+
 The speed testing for each possible grid is initially based on a sample size of 1000. However, if the user wishes to optimize the grid for a different sample size, they can do so
 by specifying the desired sample size using the 'target_sample_size' argument.
+
+
 In case the user wants to select a specific number of steps for the proposal grid
 and bypass the optimization process, this can be done by specifying a steps number greater than the number of modes by 2 using the 'steps' argument. If the target
 density is heavy-tailed, and the user wishes to stop the grid building process at a certain pre-acceptance threshold, this can be achieved by setting

@@ -6,24 +6,49 @@
 #' This function optimizes and stores the sampling grid for STROS built-in distributions.
 #'
 #' @param density_name string specifying the name of the distribution.
+#' @param steps Optional Scalar integer indicating the number of steps in the proposal distribution.
+#' @param grid_range Optional Vector of two elements specifying the start and end points for constructing steps along the x-axis.
+#' @param theta Optional Scalar defining the pre-acceptance threshold, dictating when the proposal steps constructing break based on the probability of pre-acceptance.
+#' @param target_sample_size Scalar integer indicating the target sample size. The grid optimization process will take this number into account.
+#' @param verbose Boolean if set to True, a table detailing the optimization areas and steps will be displayed during grid optimization.
 #'
 #' @details
-#' Before users can sample from a built-in distribution in the STROS package, they must first optimize the sampling grid using this function.
+#' Before sampling from built-in distributions in the STROS package,
+#'  it is necessary to first optimize the sampling grid for the specific distribution using `grid_optimizer()`.
+#'  This function calculates and stores an optimized grid based on the given parameters or defaults.
+#'  The optimization primarily focuses on balancing memory usage and computational efficiency,
+#'  ensuring that the grid is both space-efficient and capable of facilitating fast sampling.
 #'
-#' @seealso [grid_optimizer()] is used to optimize and cache grid to sample from multible distrubution such as [srnorm()] and [srgamma()]
+#' For optimal grid configuration, it is advised that users refrain from manually setting the `Theta`, `steps`, or `grid_range` parameters, as `grid_optimizer()` automatically determines the best settings.
+#'  However, users can provide their own values for these parameters to customize the grid according to specific requirements. For more detailed information about these arguments and optimization process, please refer to the manual page of `grid_builder()`.
+#'   
 #'
 #' @examples
-#' # optimize grid to sample 10 values from normal distribution N(0,1) 
+#' # Optimize grid for sampling from the normal distribution
 #' library(stors)
 #' grid_optimizer("srnorm")
+#' # Generate 10 samples from the optimized standard normal distribution
 #' srnorm(10)
 #'
 #' @return
-#' This function generates and stores an optimized grid for the specified built-in distribution in R's internal data directory.
+#' This function generates and stores and return an optimized grid for the specified built-in distribution in R's internal data directory.
+#' \itemize{
+#'   \item{"grid_data"}{A data frame including the created steps information, such as 'x' (the beginning of each step on the x-axis), 's_upper' (the step height on the y-axis), 'p_a' (pre-acceptance probability for each step), and 's_upper_lower' (a vector used to re-scale the uniform random number when the sample is accepted).}
+#'   \item{"areas"}{A vector containing the areas under the left tail bound, the steps in the middle, and the right tail bound.}
+#'   \item{"steps_number"}{A scalar representing the number of steps in the proposal.}
+#'   \item{"sampling_probabilities"}{A vector containing the areas under the left tail and the combined area of the left tail and middle steps.}
+#'   \item{"unif_scaler"}{A scalar representing the inverse probability of sampling from the step part of the proposal, \eqn{\frac{1}{p(lb < x < rb)}}. Similar to 's_upper_lower' in the 'grid_data' data frame, this value is used to scale the uniform random value when sampling from the steps part of the proposal.}
+#'   \item{"lt_properties"}{A vector including 5 values used when sampling under the proposal's left tail using the ARS (Adaptive Rejection Sampling) method.}
+#'   \item{"rt_properties"}{A vector including 6 values used when sampling under the proposal's right tail using the ARS method.}
+#'   \item{"alpha"}{A scalar representing the uniform step area.}
+#'   \item{"tails_method"}{A string representing the tails sampling method, either 'ARS' for Adaptive Rejection Sampling or 'IT' for Inverse Transform.}
+#'   \item{"grid_bounds"}{A vector including the left and right bounds of the target density.}
+#'   \item{"dens_func"}{The function passed by the user for the target density 'f'.}
+#' }
 #' 
 #' @export
-grid_optimizer <- function(density_name = stors_env$grids$biultin$names, verbose = FALSE, target_sample_size = 1000,
-                           steps = NA, grid_range , theta = 0) {
+grid_optimizer <- function(density_name = stors_env$grids$biultin$names, steps = NA, grid_range, theta = 0
+                           , target_sample_size = 1000, verbose = FALSE) {
   
   density_name <- match.arg(density_name)
   
@@ -99,7 +124,7 @@ find_optimal_grid <- function(dendata , density_name ,
                               target_sample_size, theta, grid_range){
   
 
-  times = ceiling( 100000 / target_sample_size )
+  times = ceiling( opt_times / target_sample_size )
   
   if(!missing(dendata)){
     lb = dendata$lb
@@ -117,10 +142,7 @@ find_optimal_grid <- function(dendata , density_name ,
   }else{
     cnum = 0
   }
-  
-  # cat("\n")
-  # cat("cnum = ", cnum)
-  # cat("\n")
+
   
   mode_n <- length(modes)
   
@@ -161,7 +183,7 @@ find_optimal_grid <- function(dendata , density_name ,
          )
     }
     
-    area_seq = seq(from = area * 0.95 , to= area * 1.05, length.out = 10)
+    area_seq = seq(from = area * 0.95 , to= area * 1.05, length.out = opt_alpha_length)
     
     steps_time = double()
     
@@ -207,12 +229,13 @@ suppressWarnings({
 
     
     
-    if(i != 1 && min(steps_time) >=  min(performance$time, na.rm = TRUE) && verbose){
+    if(i != 1 && min(steps_time) >=  min(performance$time, na.rm = TRUE)){
       
-      cat("\n===============================\n\n")
-      print(performance)
-      cat("\n===============================\n\n")
-      cat("optimal grid has around ", opt_steps[i-1] ," steps, whith cache size = ", opt_cache_sizes[i-1], " Kb")
+      if(verbose){
+        cat("\n===============================\n\n")
+        print(performance)
+        cat("\n===============================\n\n")
+      }
       
       break
     } 
@@ -232,9 +255,9 @@ suppressWarnings({
 }
 
 
-# bm_sample_size = 100000
+ opt_alpha_length = 3
 
-# bm_times = 10
+ opt_times = 1000
 
 opt_cache_sizes = c(4 ,8 ,16 ,32, 64, 128, 256, 512, 1024)
 

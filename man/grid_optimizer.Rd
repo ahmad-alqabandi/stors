@@ -6,32 +6,60 @@
 \usage{
 grid_optimizer(
   density_name = stors_env$grids$biultin$names,
-  verbose = FALSE,
-  target_sample_size = 1000,
   steps = NA,
   grid_range,
-  theta = 0
+  theta = 0,
+  target_sample_size = 1000,
+  verbose = FALSE
 )
 }
 \arguments{
 \item{density_name}{string specifying the name of the distribution.}
+
+\item{steps}{Optional Scalar integer indicating the number of steps in the proposal distribution.}
+
+\item{grid_range}{Optional Vector of two elements specifying the start and end points for constructing steps along the x-axis.}
+
+\item{theta}{Optional Scalar defining the pre-acceptance threshold, dictating when the proposal steps constructing break based on the probability of pre-acceptance.}
+
+\item{target_sample_size}{Scalar integer indicating the target sample size. The grid optimization process will take this number into account.}
+
+\item{verbose}{Boolean if set to True, a table detailing the optimization areas and steps will be displayed during grid optimization.}
 }
 \value{
-This function generates and stores an optimized grid for the specified built-in distribution in R's internal data directory.
+This function generates and stores and return an optimized grid for the specified built-in distribution in R's internal data directory.
+\itemize{
+  \item{"grid_data"}{A data frame including the created steps information, such as 'x' (the beginning of each step on the x-axis), 's_upper' (the step height on the y-axis), 'p_a' (pre-acceptance probability for each step), and 's_upper_lower' (a vector used to re-scale the uniform random number when the sample is accepted).}
+  \item{"areas"}{A vector containing the areas under the left tail bound, the steps in the middle, and the right tail bound.}
+  \item{"steps_number"}{A scalar representing the number of steps in the proposal.}
+  \item{"sampling_probabilities"}{A vector containing the areas under the left tail and the combined area of the left tail and middle steps.}
+  \item{"unif_scaler"}{A scalar representing the inverse probability of sampling from the step part of the proposal, \eqn{\frac{1}{p(lb < x < rb)}}. Similar to 's_upper_lower' in the 'grid_data' data frame, this value is used to scale the uniform random value when sampling from the steps part of the proposal.}
+  \item{"lt_properties"}{A vector including 5 values used when sampling under the proposal's left tail using the ARS (Adaptive Rejection Sampling) method.}
+  \item{"rt_properties"}{A vector including 6 values used when sampling under the proposal's right tail using the ARS method.}
+  \item{"alpha"}{A scalar representing the uniform step area.}
+  \item{"tails_method"}{A string representing the tails sampling method, either 'ARS' for Adaptive Rejection Sampling or 'IT' for Inverse Transform.}
+  \item{"grid_bounds"}{A vector including the left and right bounds of the target density.}
+  \item{"dens_func"}{The function passed by the user for the target density 'f'.}
+}
 }
 \description{
 This function optimizes and stores the sampling grid for STROS built-in distributions.
 }
 \details{
-Before users can sample from a built-in distribution in the STROS package, they must first optimize the sampling grid using this function.
+Before sampling from built-in distributions in the STROS package,
+ it is necessary to first optimize the sampling grid for the specific distribution using `grid_optimizer()`.
+ This function calculates and stores an optimized grid based on the given parameters or defaults.
+ The optimization primarily focuses on balancing memory usage and computational efficiency,
+ ensuring that the grid is both space-efficient and capable of facilitating fast sampling.
+
+For optimal grid configuration, it is advised that users refrain from manually setting the `Theta`, `steps`, or `grid_range` parameters, as `grid_optimizer()` automatically determines the best settings.
+ However, users can provide their own values for these parameters to customize the grid according to specific requirements. For more detailed information about these arguments and optimization process, please refer to the manual page of `grid_builder()`.
 }
 \examples{
-# optimize grid to sample 10 values from normal distribution N(0,1) 
+# Optimize grid for sampling from the normal distribution
 library(stors)
 grid_optimizer("srnorm")
+# Generate 10 samples from the optimized standard normal distribution
 srnorm(10)
 
-}
-\seealso{
-[grid_optimizer()] is used to optimize and cache grid to sample from multible distrubution such as [srnorm()] and [srgamma()]
 }

@@ -15,7 +15,7 @@ f_normal <- function(x) { 0.3989423 * exp(-0.5 * x^2) }
 normal_grid = build_grid(f = f_normal, modes = 0, lb = -Inf, rb = Inf, steps = 1000)
 print(normal_grid)
 
-# `print_grids()` prints all grids stored by the user on their machine. To see this, we first save 'normal_grid' using `save_grid()`
+# `print_grids()` prints all grids stored in R's internal data directory. To see this, we first save 'normal_grid' using `save_grid()`
 save_grid(normal_grid, "normal")
 
 # Since 'normal_grid' is now stored on this machine, we can confirm this by printing all saved grids

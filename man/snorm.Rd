@@ -3,25 +3,83 @@
 \name{srnorm}
 \alias{srnorm}
 \alias{srsnorm}
-\title{Sampling from Normal distribution}
+\alias{truncsrnorm}
+\title{Sampling from Normal Distribution}
 \usage{
 srnorm(n)
 
 srsnorm(n, mu = 0, sd = 1)
+
+truncsrnorm(xl = -Inf, xr = Inf)
 }
 \arguments{
-\item{n}{Integer sample size}
+\item{n}{Integer sample size.}
 
-\item{mu}{Scalar mean}
+\item{mu}{Scalar mean.}
 
-\item{sd}{Scalar standard deviations}
+\item{sd}{Scalar standard deviation.}
+
+\item{xl}{Lower bound for truncation.}
+
+\item{xr}{Upper bound for truncation.}
 }
 \value{
-sample of size n
+`srnorm()` returns a sample of size `n` from a standard normal distribution.
+
+`srsnorm()` returns a sample of size `n` from a normal distribution with mean \eqn{\mu} and standard deviation \eqn{\sigma}.
+
+`truncsrnorm()` returns a function that, when called with a sample size `n`, generates `n` samples from a normal distribution truncated between `xl` and `xr`.
 }
 \description{
-Sampling from Normal distribution using stors.
+Sampling from the Normal distribution using Stors.
 }
 \details{
-The function srnorm() is used to sample from a standard Normal distribution with a mean equal to zero and a standard deviation equal to 1. In contrast, srsnorm() is used to sample from any Normal distribution by accepting the mean and standard deviation as inputs. The reason for having these two separate functions is to improve performance. The Stors algorithm is so fast that even simple operations like multiplication and addition could impact its speed.
+The function `srnorm()` is used for sampling from a standard Normal distribution (mean = 0, standard deviation = 1).
+
+
+
+Normal distribution has the density:
+
+\deqn{ f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{(x - \mu)^2}{2\sigma^2}} }
+
+Where \eqn{\mu} is the mean and \eqn{\sigma} is the standard deviation.
+
+`srsnorm()` allows sampling from any Normal distribution by specifying the mean and standard deviation.
+The separation of these functions enhances performance, as the Stors algorithm is highly efficient, and even simple arithmetic can impact its speed.
+
+'truncsrnorm()', this function allows sampling from a standard normal distribution that is truncated within specified bounds.
+ It is particularly useful when the area of interest in a normal distribution is limited to a specific range.
+ The function first validates the truncation bounds to ensure they are within the allowable range of the distribution and then creates a tailored sampling function based on these bounds.
+}
+\examples{
+# Generating Samples from a Standard Normal Distribution
+# This example illustrates how to generate 10 samples from a standard normal distribution.
+# It first optimizes the grid for sampling using `grid_optimizer` and then generates samples using `srnorm`.
+
+# Optimize the grid for the standard normal distribution
+grid_optimizer("srnorm")
+
+# Generate and print 10 samples from the standard normal distribution
+samples <- srnorm(10)
+print(samples)
+
+
+# Generating Samples from a Normal Distribution with Specific Mean and Standard Deviation
+# This example demonstrates how to generate 10 samples from a normal distribution with a mean of 4 and a standard deviation of 2.
+
+samples <- srsnorm(n = 10, mu = 4, sd = 2)
+print(samples)
+
+# Generating Samples from a Truncated Standard Normal Distribution
+# This example demonstrates how to generate 100 samples from a standard normal distribution truncated in the range [-2, 2].
+
+# Create the truncated sampling function
+norm_trunc <- truncsrnorm(xl = -2, xr = 2)
+
+# Generate 100 samples
+sample <- norm_trunc(100)
+
+# Plot a histogram of the samples
+hist(sample, main = "Histogram of Truncated Normal Samples", xlab = "Value", breaks = 20)
+
 }

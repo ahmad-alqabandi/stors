@@ -1,89 +1,112 @@
-
-
-
-#' Sampling from Normal distribution
+#' Sampling from Normal Distribution
 #' @rdname snorm
 #' @order 1
-#' 
-#' @description
-#' Sampling from Normal distribution using stors.
-#' 
-#' @details
-#' The function srnorm() is used to sample from a standard Normal distribution with a mean equal to zero and a standard deviation equal to 1. In contrast, srsnorm() is used to sample from any Normal distribution by accepting the mean and standard deviation as inputs. The reason for having these two separate functions is to improve performance. The Stors algorithm is so fast that even simple operations like multiplication and addition could impact its speed.
-#' 
-#' @param n sample size
-#' 
-#' @return sample of size n
-#' 
-#' 
-#' @example
-#' # the following example shows how to generate 10 samples from standard normal distribution using stors
-#' 
-#' grid_optimizer("srnorm")
-#' 
-#' srnorm(10)
-#' 
-#' # the following example shows how to generate 10 samples from normal distribution with mean equal 4 and standard deviation equal to 2
 #'
-#' srsnorm(10,4,2)
+#' @description
+#' Sampling from the Normal distribution using Stors.
+#'
+#' @details
+#' The function `srnorm()` is used for sampling from a standard Normal distribution (mean = 0, standard deviation = 1).
 #' 
+#' 
+#'
+#' Normal distribution has the density:
+#' 
+#' \deqn{ f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{(x - \mu)^2}{2\sigma^2}} }
+#' 
+#' Where \eqn{\mu} is the mean and \eqn{\sigma} is the standard deviation.
+#'
+#'
+#' @param n Integer sample size.
+#'
+#' @return
+#' `srnorm()` returns a sample of size `n` from a standard normal distribution.
+#'
+#' @examples
+#' # Generating Samples from a Standard Normal Distribution
+#' # This example illustrates how to generate 10 samples from a standard normal distribution.
+#' # It first optimizes the grid for sampling using `grid_optimizer` and then generates samples using `srnorm`.
+#'
+#' # Optimize the grid for the standard normal distribution
+#' grid_optimizer("srnorm")
+#'
+#' # Generate and print 10 samples from the standard normal distribution
+#' samples <- srnorm(10)
+#' print(samples)
+#'
+#'
 #' @export
 srnorm <- function(n) {
   .Call(C_srnorm, n)
 }
 
-
-
 #' @rdname snorm
 #' @order 2
-#' 
-#' @param n Integer sample size
-#' @param mu Scalar mean
-#' @param sd Scalar standard deviations
 #'
+#' @param mu Scalar mean.
+#' @param sd Scalar standard deviation.
+#' 
+#' 
+#' @details
+#' `srsnorm()` allows sampling from any Normal distribution by specifying the mean and standard deviation.
+#' The separation of these functions enhances performance, as the Stors algorithm is highly efficient, and even simple arithmetic can impact its speed.
+#'
+#' @return
+#' `srsnorm()` returns a sample of size `n` from a normal distribution with mean \eqn{\mu} and standard deviation \eqn{\sigma}.
+#'
+#' @examples
+#' # Generating Samples from a Normal Distribution with Specific Mean and Standard Deviation
+#' # This example demonstrates how to generate 10 samples from a normal distribution with a mean of 4 and a standard deviation of 2.
+#'
+#' samples <- srsnorm(n = 10, mu = 4, sd = 2)
+#' print(samples)
+#' 
 #' @export
-srsnorm <- function(n, mu =0, sd = 1) {
+srsnorm <- function(n, mu = 0, sd = 1) {
   .Call(C_srnorm, n) * sd + mu
 }
 
-
-#' Title
+#' @rdname snorm
+#' @order 3
 #'
-#' @export
-d_srnorm_upper = function(n ,xl, xr ,csl , csr, il, ir){
-  
-  .Call(C_srnorm_trunc, n,xl, xr, csl, csr, il, ir)
-  
-}
-
-
-# I will stick with this function until I found a proper solution.
-#' Title
-#'
-#' @param n 
-#' @param l 
-#' @param r 
-#'
+#' @param xl Lower bound for truncation.
+#' @param xr Upper bound for truncation.
+#' 
+#' 
+#' @details
+#' 'truncsrnorm()', this function allows sampling from a standard normal distribution that is truncated within specified bounds.
+#'  It is particularly useful when the area of interest in a normal distribution is limited to a specific range.
+#'  The function first validates the truncation bounds to ensure they are within the allowable range of the distribution and then creates a tailored sampling function based on these bounds.
+#' 
 #' @return
-#' @export
+#' `truncsrnorm()` returns a function that, when called with a sample size `n`, generates `n` samples from a normal distribution truncated between `xl` and `xr`.
 #'
 #' @examples
+#' # Generating Samples from a Truncated Standard Normal Distribution
+#' # This example demonstrates how to generate 100 samples from a standard normal distribution truncated in the range [-2, 2].
+#'
+#' # Create the truncated sampling function
+#' norm_trunc <- truncsrnorm(xl = -2, xr = 2)
+#'
+#' # Generate 100 samples
+#' sample <- norm_trunc(100)
+#'
+#' # Plot a histogram of the samples
+#' hist(sample, main = "Histogram of Truncated Normal Samples", xlab = "Value", breaks = 20)
 #' 
-truncsrnorm = function(xl, xr){
-  
+#' @export
+truncsrnorm <- function(xl = -Inf, xr = Inf) {
   stopifnot(
-    "xl must be smaller that xr" = xl < xr,
-    "xl must be greater than the density lower bound" = xl >=  pbgrids$srnorm$lb,
-    "xr must be smaller than the density upper bound" = xr <=  pbgrids$srnorm$rb
+    "xl must be smaller than xr" = xl < xr,
+    "xl must be greater than or equal to the density lower bound" = xl >= pbgrids$srnorm$lb,
+    "xr must be smaller than or equal to the density upper bound" = xr <= pbgrids$srnorm$rb
   )
   
   Upper_cumsum = .Call(C_srnorm_trunc_nav, xl, xr)
   
-  print(Upper_cumsum)
-  return(
-    function(n){
-      d_srnorm_upper(n, xl, xr, Upper_cumsum[1], Upper_cumsum[2], as.integer(Upper_cumsum[3]), as.integer(Upper_cumsum[4]))
-    }
-  )
+  function_string <- paste0("function(n) { .Call(C_srnorm_trunc, n, ", paste0(xl), ", ", paste0(xr), ", ", paste0(Upper_cumsum[1]), ", ", paste0(Upper_cumsum[2]), ", ", paste0(as.integer(Upper_cumsum[3])), ", ", paste0(as.integer(Upper_cumsum[4])), ")}")
+  function_expression <- parse(text = function_string)
+  sampling_function <- eval(function_expression)
   
+  return(sampling_function)
 }
