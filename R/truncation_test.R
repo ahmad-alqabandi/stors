@@ -16,7 +16,6 @@
 #' #' @param r 
 #' #'
 #' #' @return
-#' #' @export
 #' #'
 #' #' @examples
 #' trunclaplace = function(xl, xr){
@@ -43,7 +42,6 @@
 #' 
 #' 
 #' # Using paste0 which makes it slower, what is happening here is when the parent function get called it fetches the values of CDF(x_l) and CDF(x_r) from memmory then apply function paste0() which make it slower anstede.
-#' #' @export
 #' truncsrnorm_paste_0 = function(xl, xr){
 #'   
 #'   stopifnot(
@@ -72,7 +70,6 @@
 #' 
 #' 
 #' # Hard coded just as a standard measure
-#' #' @export
 #' truncsrnorm_hard_code = function(xl, xr){
 #'   
 #'   stopifnot(
@@ -97,7 +94,6 @@
 #' 
 #' 
 #' # Here we parse the function to hard code the values of CDF(x_l) and CDF(x_r).
-#' #' @export
 #' truncsrnorm_trick = function(xl, xr){
 #'   
 #'   stopifnot(

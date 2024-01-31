@@ -74,9 +74,14 @@ grid_optimizer <- function(density_name = stors_env$grids$biultin$names, steps =
                                  theta = theta, grid_range = grid_range)
     
   }else{
-    mode_n = length(modes)
-    left_stps = find_left_steps(lb = lb, rb = rb, a = 0.001, mode = modes[1], mode_i = 1, mode_n = mode_n, f = f, theta = 0, grid_range = grid_range)$m
-    right_stps = find_right_steps(lb = lb, rb = rb, a = 0.001, mode = modes[mode_n], mode_i = mode_n, mode_n = mode_n, f = f, theta = 0, grid_range = grid_range)$m
+    mode_n = length(dendata$modes)
+    left_stps = find_left_steps(lb = dendata$lb, rb = dendata$rb, a = 0.001,
+                                mode = dendata$modes[1], mode_i = 1, mode_n = mode_n,
+                                f = dendata$f, theta = 0, grid_range = grid_range)$m
+    
+    right_stps = find_right_steps(lb = dendata$lb, rb = dendata$rb, a = 0.001,
+                                  mode = dendata$modes[mode_n], mode_i = mode_n, mode_n = mode_n,
+                                  f = dendata$f, theta = 0, grid_range = grid_range)$m
     
     opt_prob = list()
     opt_prob$area = 1/steps
@@ -90,12 +95,12 @@ grid_optimizer <- function(density_name = stors_env$grids$biultin$names, steps =
     opt_grid <- grid_builder(lb = dendata$lb, rb = dendata$rb ,a = opt_prob$area ,
                              mode = dendata$modes, f = dendata$f, cdf = dendata$cdf,
                              stps =opt_prob$steps , lstpsp =opt_prob$lstpsp ,
-                             rstpsp= opt_prob$rstpsp, theta = 0, grid_range = grid_range)
+                             rstpsp= opt_prob$rstpsp, theta = theta, grid_range = grid_range)
   } else if(dendata$tails_method == "ARS"){
     opt_grid <- grid_builder(lb = dendata$lb, rb = dendata$rb ,a = opt_prob$area ,
                              mode = dendata$modes, f = dendata$f,  h = dendata$h,
                              h_prime = dendata$h_prime, stps =opt_prob$steps , lstpsp =opt_prob$lstpsp ,
-                             rstpsp= opt_prob$rstpsp, theta = 0, grid_range = grid_range)
+                             rstpsp= opt_prob$rstpsp, theta = theta, grid_range = grid_range)
   }
   
   # opt_grid <- grid_builder(lb = dendata$lb, rb = dendata$rb ,a = opt_prob$area , th = 0, mode = dendata$modes, f = dendata$f, cdf = dendata$cdf, stps =opt_prob$steps , lstpsp =opt_prob$lstpsp , rstpsp= opt_prob$rstpsp)
@@ -257,7 +262,7 @@ suppressWarnings({
 
  opt_alpha_length = 3
 
- opt_times = 1000
+ opt_times = 10000
 
 opt_cache_sizes = c(4 ,8 ,16 ,32, 64, 128, 256, 512, 1024)
 

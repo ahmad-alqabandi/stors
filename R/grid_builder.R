@@ -359,8 +359,7 @@ grid_builder <- function(lb, rb, a, modes, f = NULL, h = NULL,
 
 
 find_left_steps <- function(lb, rb, a, mode, mode_i, mode_n, f, steps_lim = Inf, theta, grid_range) {
-  
-  
+   
   memory_res <- (max(500, ceiling(1 / a)) + 500)
   
   x <- rep(NA, memory_res)
