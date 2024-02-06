@@ -111,7 +111,7 @@ stors_env <- new.env(parent = emptyenv())
   
   if(ft_load){
   for (name in names(pbgrids)){
-    grid_optimizer(density_name = name, steps = 65531)
+    grid_optimizer(density_name = name, steps = 4091)
   }
   }
 
