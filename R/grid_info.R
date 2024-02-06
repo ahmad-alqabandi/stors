@@ -1,6 +1,37 @@
 
-#' @method plot grid
+#' Plot Method for Grid Objects
+#'
+#' This method extends the generic `plot` function for objects of class `grid`.
+#' It offers custom plotting functionality specifically designed for visualizing grid objects.
+#'
+#' @description
+#' This function evaluates the properties of the included target and proposal functions to create a plot for both functions. In cases where the
+#' proposal function's steps part is too dense, `x_min` and `x_max` can be set to crop and scale the chart for better visualization.
+#'
+#' @param grid A list generated using STORS' `build_grid()` or `grid_optimizer()` functions.
+#' @param x_min A scalar that represents the left cropping of the chart on the x-axis.
+#' @param x_max A scalar that represents the right cropping of the chart on the x-axis.
+#' 
+#' @return A plot.
+#'
+#' @examples
+#' # Define the density function, its logarithm, and its derivative for the standard normal distribution
+#' modes_norm = 0
+#' f_norm <- function(x) { 1 / sqrt(2 * pi) * exp(-0.5 * x^2) }
+#' h_norm <- function(x) { log(f_norm(x)) }
+#' h_prime_norm <- function(x) { -x }
+#'
+#' # Build a dense grid for the standard normal distribution
+#' norm_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_norm, f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 4000)
+#'
+#' # Plot the generated grid
+#' plot(norm_grid)
+#'
+#' # To visualize the grid in a cropped area between -0.1 and 0
+#' plot(norm_grid, x_min = -0.1, x_max = 0)
+#'
 #' @export
+#' @S3method(plot, grid)
 plot.grid <- function(grid, x_min = NA, x_max = NA,...){
   
   
@@ -82,13 +113,39 @@ plot.grid <- function(grid, x_min = NA, x_max = NA,...){
 
 
 
-#' @method print grid
+
+#' Print Method for Grid Objects
+#'
+#' This method extends the generic `print` function for objects of class `grid`.
+#' It prints the provided grid's features such as the number of steps, steps limit, and efficiency.
+#'
+#' @description
+#' The function displays detailed information about the grid object created by STORS' `build_grid()` or `grid_optimizer()` functions.
+#'  This includes the number of steps within the grid, the range of values covered by the grid, and the grid's sampling efficiency.
+#'   This information is crucial for understanding the structure and performance of the grid in sampling processes.
+#'
+#' @param grid A list generated using STORS' `build_grid()` or `grid_optimizer()` functions.
+#'
+#' @return Prints a summary of the grid's properties, but does not return any value.
+#'
+#' @examples
+#' # Define the density function, its logarithm, and its derivative for the standard normal distribution
+#' modes_norm = 0
+#' f_norm <- function(x) { 1 / sqrt(2 * pi) * exp(-0.5 * x^2) }
+#' h_norm <- function(x) { log(f_norm(x)) }
+#' h_prime_norm <- function(x) { -x }
+#'
+#' # Build a dense grid for the standard normal distribution
+#' norm_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_norm, f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 1000)
+#'
+#' # Print the properties of the generated grid
+#' print(norm_grid)
+#'
 #' @export
-print.grid <-function(grid, ...){
-  
-  cat("The grid has ", grid$steps_number ," steps, in the domain range [", grid$grid_data$x[1] ,",", grid$grid_data$x[grid$steps_number+1],"].\n")
-  cat(sprintf("With a sampling efficiency of %.2f%%", 1/sum(grid$areas) * 100))
-  
+#' @S3method(print, grid)
+print.grid <- function(grid, ...) {
+  cat("The grid has", grid$steps_number, "steps, in the domain range [", grid$grid_data$x[1], ",", grid$grid_data$x[grid$steps_number + 1], "].\n")
+  cat(sprintf("With a sampling efficiency of %.2f%%", 1 / sum(grid$areas) * 100), "\n")
 }
 
 

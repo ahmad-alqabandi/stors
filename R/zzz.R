@@ -70,6 +70,7 @@ stors_env <- new.env(parent = emptyenv())
   
   if (file.exists(stors_grids_path)) {
     
+    
     grids <- readRDS(stors_grids_path)
 
     for (name in grids$biultin$names) {
@@ -81,14 +82,20 @@ stors_env <- new.env(parent = emptyenv())
       
     }
     
+    ft_load = FALSE
+    
   } else{
     grids <- list(biultin = list(names = names(pbgrids),
                           builtin_num = length(pbgrids)),
                   user = data.frame( name = character(), efficiency = double()) )
     
+    
     for (name in names(pbgrids)){
+      
       grids$biultin[[name]] = list(opt = FALSE, Cnum = pbgrids[[name]]$Cnum)
     }
+    
+    ft_load = TRUE
     
   } 
   
@@ -96,11 +103,17 @@ stors_env <- new.env(parent = emptyenv())
   user_dirs <- list(data_dir = data_dir, builtin_dir = builtin_dir)
   created_girds_Id = character()
     
-  
   assign("grids", grids, envir = stors_env)
   assign("user_cached_grids", user_cached_grids, envir = stors_env)
   assign("user_dirs", user_dirs, envir = stors_env)
   assign("created_girds_Id", created_girds_Id, envir = stors_env)
+  
+  
+  if(ft_load){
+  for (name in names(pbgrids)){
+    grid_optimizer(density_name = name, steps = 65531)
+  }
+  }
 
 }
 

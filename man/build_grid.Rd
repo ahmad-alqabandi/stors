@@ -112,7 +112,7 @@ plot(norm_grid)
 f_bimodal <- function(x) {
   0.5 * (1 / sqrt(2 * pi)) * exp(-(x^2) / 2) + 0.5 * (1 / sqrt(2 * pi)) * exp(-((x - 4)^2) / 2)
 }
-modes_bimodal = c(0, 4)
+modes_bimodal = c(0.00134865, 3.99865)
 
 # Build the proposal grid for the bimodal distribution
 bimodal_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_bimodal, f = f_bimodal)
