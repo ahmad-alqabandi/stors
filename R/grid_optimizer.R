@@ -266,9 +266,9 @@ suppressWarnings({
 
 opt_cache_sizes = c(4 ,8 ,16 ,32, 64, 128, 256, 512, 1024)
 
-opt_df_var = 4
+opt_df_var = 32 # 4 doubles
 
-opt_list_var = 20
+opt_list_var = 160 # 20 doubles
 
 opt_steps = round( ((opt_cache_sizes * 1024) - opt_list_var) / opt_df_var )
 

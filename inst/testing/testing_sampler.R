@@ -133,7 +133,7 @@ microbenchmark::microbenchmark(
   rnorm(m),
   srnorm(m),
   zrnormR(m),
-  times = 10
+  times = 100
 )
 
 ##    laplace
