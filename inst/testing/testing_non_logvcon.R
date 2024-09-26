@@ -50,11 +50,6 @@ xx = seq(from = -10, to = l_range[2], length.out = 1000)
 
 plot(xx, w(xx), type = "line")
 
-
-
-
-
-
 h_upper <- function(grid_point, val, h_prime, h) {
   h_prime(grid_point) * (val - grid_point) + h(grid_point)
 }

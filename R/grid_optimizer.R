@@ -1,5 +1,10 @@
 
 
+
+
+
+
+
 #' Optimize Built-in Grid
 #'
 #' @description
@@ -20,8 +25,8 @@
 #'  ensuring that the grid is both space-efficient and capable of facilitating fast sampling.
 #'
 #' For optimal grid configuration, it is advised that users refrain from manually setting the `Theta`, `steps`, or `grid_range` parameters, as `grid_optimizer()` automatically determines the best settings.
-#'  However, users can provide their own values for these parameters to customize the grid according to specific requirements. For more detailed information about these arguments and optimization process, please refer to the manual page of `grid_builder()`.
-#'   
+#'  However, users can provide their own values for these parameters to customize the grid according to specific requirements. For more detailed information about these arguments and optimization process, please refer to the manual page of `build_final_grid()`.
+#'
 #'
 #' @examples
 #' # Optimize grid for sampling from the normal distribution
@@ -45,71 +50,66 @@
 #'   \item{"grid_bounds"}{A vector including the left and right bounds of the target density.}
 #'   \item{"dens_func"}{The function passed by the user for the target density 'f'.}
 #' }
-#' 
+#'
 #' @export
-grid_optimizer <- function(density_name = stors_env$grids$biultin$names, steps = NA, grid_range, theta = 0
-                           , target_sample_size = 1000, verbose = FALSE) {
-  
+grid_optimizer <- function(density_name = stors_env$grids$builtin$names,
+                           steps = NULL,
+                           grid_range = NULL,
+                           theta = NULL,
+                           target_sample_size = 1000,
+                           verbose = FALSE) {
   density_name <- match.arg(density_name)
   
   dendata <- pbgrids[[density_name]]
-  
   free_cache_cnum_c(dendata$Cnum)
   
+  grid_param <- list(
+    target = list(
+      density = dendata$f,
+      log_density = NULL,
+      log_target_prime = NULL,
+      Cumulitive_density = NULL,
+      modes = dendata$modes,
+      modes_count = length(dendata$modes),
+      between_minima = NULL,
+      right_bound = dendata$rb,
+      left_bound = dendata$lb
+    ),
+    proposal = list(
+      grid_range = grid_range,
+      tails_method = dendata$tails_method,
+      steps = steps,
+      optimal_step_area = NULL,
+      left_steps_proportion = NULL,
+      right_steps_proportion = NULL,
+      pre_acceptance_threshold = theta,
+      target_sample_size = target_sample_size
+      ),
+    built_in = TRUE,
+    cnum = dendata$Cnum,
+    c_function_name = density_name,
+    verbose = verbose
+  )
   
-  
-  if( missing(grid_range) )
-    grid_range = c(dendata$lb, dendata$rb)
-  
-  grid_prob_error_checking(steps, grid_range, theta, dendata$lb, dendata$rb, dendata$modes)
-  
-  
-  
-  
-  
-  if(is.na(steps)){
-    
-    opt_prob = find_optimal_grid(dendata , density_name, verbose = verbose,
-                                 target_sample_size = target_sample_size,
-                                 theta = theta, grid_range = grid_range)
-    
-  }else{
-    mode_n = length(dendata$modes)
-    left_stps = find_left_steps(lb = dendata$lb, rb = dendata$rb, a = 0.001,
-                                mode = dendata$modes[1], mode_i = 1, mode_n = mode_n,
-                                f = dendata$f, theta = 0, grid_range = grid_range)$m
-    
-    right_stps = find_right_steps(lb = dendata$lb, rb = dendata$rb, a = 0.001,
-                                  mode = dendata$modes[mode_n], mode_i = mode_n, mode_n = mode_n,
-                                  f = dendata$f, theta = 0, grid_range = grid_range)$m
-    
-    opt_prob = list()
-    opt_prob$area = 1/steps
-    opt_prob$steps = steps
-    opt_prob$lstpsp =left_stps / sum(left_stps, right_stps)
-    opt_prob$rstpsp= 1 - opt_prob$lstpsp
-    
+  if (grid_param$proposal$tails_method == "IT") {
+    grid_param$target$Cumulitive_density = dendata$cdf
+  } else{
+    grid_param$target$log_density = dendata$h
+    grid_param$target$log_density_prime = dendata$h_prime
   }
   
-  if(dendata$tails_method == "IT"){
-    opt_grid <- grid_builder(lb = dendata$lb, rb = dendata$rb ,a = opt_prob$area ,
-                             mode = dendata$modes, f = dendata$f, cdf = dendata$cdf,
-                             stps =opt_prob$steps , lstpsp =opt_prob$lstpsp ,
-                             rstpsp= opt_prob$rstpsp, theta = theta, grid_range = grid_range)
-  } else if(dendata$tails_method == "ARS"){
-    opt_grid <- grid_builder(lb = dendata$lb, rb = dendata$rb ,a = opt_prob$area ,
-                             mode = dendata$modes, f = dendata$f,  h = dendata$h,
-                             h_prime = dendata$h_prime, stps =opt_prob$steps , lstpsp =opt_prob$lstpsp ,
-                             rstpsp= opt_prob$rstpsp, theta = theta, grid_range = grid_range)
-  }
   
-  # opt_grid <- grid_builder(lb = dendata$lb, rb = dendata$rb ,a = opt_prob$area , th = 0, mode = dendata$modes, f = dendata$f, cdf = dendata$cdf, stps =opt_prob$steps , lstpsp =opt_prob$lstpsp , rstpsp= opt_prob$rstpsp)
+  grid_param <- grid_error_checking_and_preparation(grid_param)
+
+  optimal_grid_params = find_optimal_grid(grid_param)
   
+  opt_grid <- build_final_grid(gp = optimal_grid_params)
+
   cache_grid_c(dendata$Cnum, opt_grid)
   
   save_builtin_grid(dendata$Cnum, opt_grid)
   
-  stors_env$grids$biultin[[density_name]]$opt <- TRUE
+  stors_env$grids$builtin[[density_name]]$opt <- TRUE
   
   func_to_text <- deparse(dendata$f)
   
@@ -123,164 +123,161 @@ grid_optimizer <- function(density_name = stors_env$grids$biultin$names, steps =
 
 
 #' @importFrom microbenchmark microbenchmark
-find_optimal_grid <- function(dendata , density_name ,
-                              lb , rb , modes, f,
-                              h = NULL, h_prime = NULL, cdf = NULL, verbose,
-                              target_sample_size, theta, grid_range){
-  
+find_optimal_grid <- function(gp) {
+    
+    target_sample_size <- gp$proposal$target_sample_size
+    theta <- gp$proposal$pre_acceptance_threshold
+    grid_range <- gp$proposal$grid_range
+    lb <- gp$target$left_bound
+    rb <- gp$target$right_bound
+    modes <- gp$target$modes
+    f<- gp$target$density
+    lstpsp <- gp$proposal$left_steps_proportion
+    rstpsp <- gp$proposal$right_steps_proportion
+    mode_n <- gp$target$modes_count
+    steps <- gp$proposal$steps
+    c_function_name <- gp$c_function_name
+    verbose <- gp$verbose
 
-  times = ceiling( opt_times / target_sample_size )
-  
-  if(!missing(dendata)){
-    lb = dendata$lb
-    rb = dendata$rb
-    modes = dendata$modes
-    f= dendata$f
-    tails_method = dendata$tails_method
-    cnum = dendata$Cnum
-    if(tails_method == "IT"){
-      cdf = dendata$cdf
+    times = ceiling(opt_times / target_sample_size)
+    
+    
+    if ( (theta == 0 && identical(grid_range, c(lb, rb))) || !is.null(steps) )
+    {
+      max_left_stps = find_left_steps(
+        gp = gp,
+        area = 0.001,
+        mode_i = 1,
+        steps_lim = Inf
+      )$steps
+      
+      max_right_stps = find_right_steps(
+        gp = gp,
+        a = 0.001,
+        mode_i = mode_n,
+        steps_lim = Inf
+      )$steps
+      
+      lstpsp = max_left_stps / (max_left_stps + max_right_stps)
+      rstpsp = 1 - lstpsp
+      
+      if(!is.null(steps)){
+        
+        gp$proposal$optimal_step_area = 1 / steps
+        gp$proposal$left_steps_proportion = lstpsp
+        gp$proposal$right_steps_proportion = rstpsp
+        
+        return(gp)
+      }
+    }
+    
+    
+    performance = data.frame(area = numeric(),
+                             time = numeric(),
+                             steps = numeric())
+    
+
+    if (gp$built_in) {
+      cnum <- gp$cnum
+      density_fun <- get(gp$c_function_name, mode = "function")
     } else{
-      h = dendata$h
-      h_prime = dendata$h_prime
+      cnum <- 0
+      rfunc_env <- new.env()
+      density_fun <- function(n) {
+        .Call(C_stors, n, cnum, f, rfunc_env)
+      }
     }
-  }else{
-    cnum = 0
-  }
-
-  
-  mode_n <- length(modes)
-  
-  if( theta == 0 && grid_range[1] == lb &&  grid_range[2] == rb)
-  {
-  left_stps = find_left_steps(lb = lb, rb = rb, a = 0.001,
-                              mode = modes[1], mode_i = 1,
-                              mode_n = mode_n, f = f, theta = theta, grid_range = grid_range)$m
-  
-  right_stps = find_right_steps(lb = lb, rb = rb, a = 0.001, 
-                                mode = modes[mode_n], mode_i = mode_n,
-                                mode_n = mode_n, f = f, theta = theta, grid_range = grid_range)$m
-  
-  lstpsp = left_stps/ ( left_stps + right_stps )
-  rstpsp = 1 - lstpsp
-  theta = 0
-  }else{
-    lstpsp = NA
-    rstpsp = NA
-  }
-  
-  
-  performance = data.frame(area = numeric(), time = numeric(), steps = numeric())
-  
-  for (i in (1:length(opt_areas))) {
-    
-    area = opt_areas[i]
-    
-    if(is.na(rstpsp)){
-      step = Inf
-    }else{
-      step = opt_steps[i]
-    }
-
-    if(verbose){
-      cat("\n===============================\n","\n--- steps = ", step, " --- \n\n",
+ 
+    for (i in (1:length(opt_areas))) {
+      area = opt_areas[i]
+      
+      if (is.na(rstpsp)) {
+        step = Inf
+      } else{
+        step = opt_steps[i]
+      }
+      
+      if (verbose) {
+        cat(
+          "\n===============================\n",
+          "\n--- steps = ",
+          step,
+          " --- \n\n",
           "     --- area ---   --- best sim time ---\n"
-         )
+        )
+      }
+      
+      area_seq = seq(from = area * 0.95 ,
+                     to = area * 1.05,
+                     length.out = opt_alpha_length)
+      
+      steps_time = double()
+      
+      for (j in (1:length(area_seq))) {
+        
+        grid <- build_final_grid(gp = gp, opt_area = area_seq[j])
+        
+        cache_grid_c(cnum, grid)
+        
+        gc = gc()
+        
+        suppressWarnings({
+          cost <- microbenchmark::microbenchmark(st = density_fun(target_sample_size),
+                                                 times = times)
+          
+        })
+        free_cache_cnum_c(cnum)
+        
+        steps_time = append(steps_time, median(cost$time[cost$expr == "st"]))
+        
+        
+        if (verbose) {
+          cat("--- ", area_seq[j], " ---   --- ", steps_time[j], " ---\n")
+        }
+      }
+      
+      
+      
+      if (i != 1 &&
+          min(steps_time) >=  min(performance$time, na.rm = TRUE)) {
+        if (verbose) {
+          cat("\n===============================\n\n")
+          print(performance)
+          cat("\n===============================\n\n")
+        }
+        
+        break
+      }
+      
+      min_ind = which(steps_time == min(steps_time, na.rm = TRUE))[1]
+      
+      performance[nrow(performance) + 1, ] = c(area_seq[min_ind], steps_time[min_ind], step)
+      
+      
     }
     
-    area_seq = seq(from = area * 0.95 , to= area * 1.05, length.out = opt_alpha_length)
+    opt_performance = performance[which(performance$time == min(performance$time, na.rm = TRUE))[1], ]
+    print(opt_performance)
+    gp$proposal$optimal_step_area = opt_performance$area
+    gp$proposal$steps = opt_performance$steps
+    gp$proposal$left_steps_proportion = lstpsp
+    gp$proposal$right_steps_proportion = rstpsp
     
-    steps_time = double()
+    return(gp)
     
-    for (j in (1: length(area_seq))) {
-      
-      
-      
-      grid <- grid_builder( lb = lb, rb = rb ,a = area_seq[j],
-                            modes, f = f, h =  h, h_prime = h_prime ,
-                            cdf = cdf, stps =step , lstpsp =lstpsp ,
-                            rstpsp= rstpsp, theta = theta,
-                            grid_range = grid_range)
-     
-      cache_grid_c(cnum, grid)
-      
-      if( !missing(dendata) ){
-        density_fun <- get(density_name, mode = "function")
-      }else{
-        rfunc_env <- new.env()
-        density_fun <- function(n) { .Call(C_stors,n,0,f,rfunc_env) }
-      }
-      
-      
-      gc = gc()
-      
-suppressWarnings({
-  
-      cost <- microbenchmark::microbenchmark(
-        st = density_fun(target_sample_size), 
-        times = times
-      )
-      
-})
-      free_cache_cnum_c(cnum)
-
-      steps_time = append(steps_time, median(cost$time[cost$expr == "st"]))
-      
-      
-      if(verbose){
-        cat("--- ",area_seq[j]," ---   --- ",steps_time[j]," ---\n")
-      }
-    }
-
-    
-    
-    if(i != 1 && min(steps_time) >=  min(performance$time, na.rm = TRUE)){
-      
-      if(verbose){
-        cat("\n===============================\n\n")
-        print(performance)
-        cat("\n===============================\n\n")
-      }
-      
-      break
-    } 
-    
-    min_ind = which(steps_time == min(steps_time, na.rm = TRUE))[1]
-    
-    performance[nrow(performance) + 1,] = c(area_seq[min_ind], steps_time[min_ind],  step)
-    
-    
-  }
-  
-
-  
-  return(cbind(performance[which(performance$time == min(performance$time, na.rm = TRUE))[1],],
-               lstpsp =lstpsp , rstpsp= rstpsp))
-
 }
 
 
- opt_alpha_length = 3
+opt_alpha_length = 3
 
- opt_times = 10000
+opt_times = 10000
 
-opt_cache_sizes = c(4 ,8 ,16 ,32, 64, 128, 256, 512, 1024)
+opt_cache_sizes = c(4 , 8 , 16 , 32, 64, 128, 256, 512, 1024)
 
 opt_df_var = 32 # 4 doubles
 
 opt_list_var = 160 # 20 doubles
 
-opt_steps = round( ((opt_cache_sizes * 1024) - opt_list_var) / opt_df_var )
+opt_steps = round(((opt_cache_sizes * 1024) - opt_list_var) / opt_df_var)
 
 opt_areas = 1 / opt_steps
-
-
-
-
-
-
-
-
-
-
-

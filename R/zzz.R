@@ -3,7 +3,7 @@
 # pbgrids : 1 Normal
 
 pbgrids <- list(
-  srnorm = c(
+  srnorm = list(
     Cnum = 1,
     tails_method = "ARS",
     f = function(x) {
@@ -19,7 +19,7 @@ pbgrids <- list(
     lb = -Inf,
     rb = Inf
   ),
-  laplace = c(
+  srlaplace = list(
     Cnum = 2,
     tails_method = "IT",
     f = function(x) {
@@ -35,7 +35,7 @@ pbgrids <- list(
     lb = -Inf,
     rb = Inf
   ),
-  srexp = c(
+  srexp = list(
     Cnum = 3,
     tails_method = "IT",
     f = function(x) {
@@ -58,13 +58,18 @@ stors_env <- new.env(parent = emptyenv())
 
 .onLoad <- function(lib, pkg) {
   
+  # look at all exported functions from STORS namespace
+  # get all functions start with "sr"
+  # add them as string in builtin list
+  
   data_dir <- tools::R_user_dir("stors", "data")
   
-  builtin_dir = file.path(data_dir,"biultin_grids")
+  builtin_dir = file.path(data_dir,"builtin_grids")
   
 
   if (!dir.exists(builtin_dir)) dir.create(builtin_dir, recursive = TRUE)
-
+  
+  
   stors_grids_path <- file.path(builtin_dir, "grids.rds")
   
   
@@ -73,31 +78,30 @@ stors_env <- new.env(parent = emptyenv())
     
     grids <- readRDS(stors_grids_path)
 
-    for (name in grids$biultin$names) {
+    for (name in grids$builtin$names) {
       
-      if (grids$biultin[[name]]$opt) {
-        opt_grid <- readRDS(file.path(builtin_dir, paste0(grids$biultin[[name]]$Cnum, ".rds")))
-        cache_grid_c(grids$biultin[[name]]$Cnum, opt_grid)
+      if (grids$builtin[[name]]$opt) {
+        opt_grid <- readRDS(file.path(builtin_dir, paste0(grids$builtin[[name]]$Cnum, ".rds")))
+        cache_grid_c(grids$builtin[[name]]$Cnum, opt_grid)
       }
       
     }
     
-    ft_load = FALSE
+    first_time_load = FALSE
     
   } else{
-    grids <- list(biultin = list(names = names(pbgrids),
+    grids <- list(builtin = list(names = names(pbgrids),
                           builtin_num = length(pbgrids)),
                   user = data.frame( name = character(), efficiency = double()) )
     
     
     for (name in names(pbgrids)){
-      
-      grids$biultin[[name]] = list(opt = FALSE, Cnum = pbgrids[[name]]$Cnum)
+      grids$builtin[[name]] = list(opt = FALSE, Cnum = pbgrids[[name]]$Cnum)
     }
     
-    ft_load = TRUE
+    first_time_load = TRUE
     
-  } 
+  }
   
   user_cached_grids <- data.frame( Id = character(), Cnum = integer())
   user_dirs <- list(data_dir = data_dir, builtin_dir = builtin_dir)
@@ -109,9 +113,9 @@ stors_env <- new.env(parent = emptyenv())
   assign("created_girds_Id", created_girds_Id, envir = stors_env)
   
   
-  if(ft_load){
+  if(first_time_load){
   for (name in names(pbgrids)){
-    grid_optimizer(density_name = name, steps = 4091)
+    #grid_optimizer(density_name = name, steps = 4091)
   }
   }
 

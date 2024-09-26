@@ -2,15 +2,15 @@
 % Please edit documentation in R/srnorm.R
 \name{srnorm}
 \alias{srnorm}
-\alias{srsnorm}
-\alias{truncsrnorm}
+\alias{srnorm_scaled}
+\alias{srnorm_truncate}
 \title{Sampling from Normal Distribution}
 \usage{
 srnorm(n)
 
-srsnorm(n, mu = 0, sd = 1)
+srnorm_scaled(n, mu = 0, sd = 1)
 
-truncsrnorm(xl = -Inf, xr = Inf)
+srnorm_truncate(xl = -Inf, xr = Inf)
 }
 \arguments{
 \item{n}{Integer sample size.}
@@ -26,9 +26,9 @@ truncsrnorm(xl = -Inf, xr = Inf)
 \value{
 `srnorm()` returns a sample of size `n` from a standard normal distribution.
 
-`srsnorm()` returns a sample of size `n` from a normal distribution with mean \eqn{\mu} and standard deviation \eqn{\sigma}.
+`srnorm_scaled()` returns a sample of size `n` from a normal distribution with mean \eqn{\mu} and standard deviation \eqn{\sigma}.
 
-`truncsrnorm()` returns a function that, when called with a sample size `n`, generates `n` samples from a normal distribution truncated between `xl` and `xr`.
+`srnorm_truncate()` returns a function that, when called with a sample size `n`, generates `n` samples from a normal distribution truncated between `xl` and `xr`.
 }
 \description{
 Sampling from the Normal distribution using Stors.
@@ -44,10 +44,10 @@ Normal distribution has the density:
 
 Where \eqn{\mu} is the mean and \eqn{\sigma} is the standard deviation.
 
-`srsnorm()` allows sampling from any Normal distribution by specifying the mean and standard deviation.
+`srnorm_scaled()` allows sampling from any Normal distribution by specifying the mean and standard deviation.
 The separation of these functions enhances performance, as the Stors algorithm is highly efficient, and even simple arithmetic can impact its speed.
 
-'truncsrnorm()', this function allows sampling from a standard normal distribution that is truncated within specified bounds.
+'srnorm_truncate()', this function allows sampling from a standard normal distribution that is truncated within specified bounds.
  It is particularly useful when the area of interest in a normal distribution is limited to a specific range.
  The function first validates the truncation bounds to ensure they are within the allowable range of the distribution and then creates a tailored sampling function based on these bounds.
 }
@@ -67,14 +67,14 @@ print(samples)
 # Generating Samples from a Normal Distribution with Specific Mean and Standard Deviation
 # This example demonstrates how to generate 10 samples from a normal distribution with a mean of 4 and a standard deviation of 2.
 
-samples <- srsnorm(n = 10, mu = 4, sd = 2)
+samples <- srnorm_scaled(n = 10, mu = 4, sd = 2)
 print(samples)
 
 # Generating Samples from a Truncated Standard Normal Distribution
 # This example demonstrates how to generate 100 samples from a standard normal distribution truncated in the range [-2, 2].
 
 # Create the truncated sampling function
-norm_trunc <- truncsrnorm(xl = -2, xr = 2)
+norm_trunc <- srnorm_truncate(xl = -2, xr = 2)
 
 # Generate 100 samples
 sample <- norm_trunc(100)

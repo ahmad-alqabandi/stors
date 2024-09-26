@@ -30,8 +30,8 @@
 #' # To visualize the grid in a cropped area between -0.1 and 0
 #' plot(norm_grid, x_min = -0.1, x_max = 0)
 #'
+#'@method plot grid
 #' @export
-#' @S3method(plot, grid)
 plot.grid <- function(grid, x_min = NA, x_max = NA,...){
   
   
@@ -142,9 +142,10 @@ plot.grid <- function(grid, x_min = NA, x_max = NA,...){
 #' print(norm_grid)
 #'
 #' @export
-#' @S3method(print, grid)
+#' @method print grid
 print.grid <- function(grid, ...) {
-  cat("The grid has", grid$steps_number, "steps, in the domain range [", grid$grid_data$x[1], ",", grid$grid_data$x[grid$steps_number + 1], "].\n")
+  formatted_steps <- format(grid$steps_number, big.mark = ",", scientific = FALSE)
+  cat("The grid contains", formatted_steps, "steps within the domain range  [", grid$grid_data$x[1], ",", grid$grid_data$x[grid$steps_number + 1], "].\n")
   cat(sprintf("With a sampling efficiency of %.2f%%", 1 / sum(grid$areas) * 100), "\n")
 }
 

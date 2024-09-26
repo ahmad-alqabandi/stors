@@ -5,10 +5,10 @@
 \title{Optimize Built-in Grid}
 \usage{
 grid_optimizer(
-  density_name = stors_env$grids$biultin$names,
-  steps = NA,
-  grid_range,
-  theta = 0,
+  density_name = stors_env$grids$builtin$names,
+  steps = NULL,
+  grid_range = NULL,
+  theta = NULL,
   target_sample_size = 1000,
   verbose = FALSE
 )

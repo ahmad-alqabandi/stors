@@ -7,13 +7,14 @@
 build_grid(
   lb = -Inf,
   rb = Inf,
-  modes,
-  f,
+  modes = NA,
+  between_minima = NULL,
+  f = NA,
   h = NULL,
   h_prime = NULL,
-  steps = NA,
-  grid_range = c(lb, rb),
-  theta = 0,
+  steps = NULL,
+  grid_range = NULL,
+  theta = NULL,
   target_sample_size = 1000,
   verbose = FALSE
 )
@@ -24,6 +25,8 @@ build_grid(
 \item{rb}{Scalar representing the upper bound of the target density.}
 
 \item{modes}{Vector indicating the modes of the density function.}
+
+\item{between_minima}{Optional vector indicating the minima located between the modes of the density function. If not provided, the approximate locations of these minima will be estimated.}
 
 \item{f}{Function accepting a single argument, returning the probability density of the target.}
 
@@ -58,9 +61,9 @@ Returns a list containing the following elements related to the proposal distrib
 }
 }
 \description{
-This function is essential for sampling from any uni-modal or multi-modal log-concave density function. It generates a proposal grid 
-that can be utilized for this purpose. Simply provide the density function 'f' and its modes. For enhanced accuracy, include 
-the log-transform 'h' of the density and its first derivative 'h_prime'. The grid optimization is pre-configured for efficiency, 
+This function is essential for sampling from any uni-modal or multi-modal log-concave density function. It generates a proposal grid
+that can be utilized for this purpose. Simply provide the density function 'f' and its modes. For enhanced accuracy, include
+the log-transform 'h' of the density and its first derivative 'h_prime'. The grid optimization is pre-configured for efficiency,
 but you can customize the grid-building process through various parameters to suit your specific needs.
 }
 \details{
@@ -69,7 +72,7 @@ For each mode, rectangles are formed as steps around it, with a width defined by
 This method effectively covers the target distribution in a stepped pattern.
 
 
-The function `grid_builder()` manages the construction of these steps and calculates values critical for the sampling process. When the resultant grid is used with the `stors()` function, these values are cached, 
+The function `grid_builder()` manages the construction of these steps and calculates values critical for the sampling process. When the resultant grid is used with the `stors()` function, these values are cached,
 significantly enhancing the computational efficiency and hence improving sampling speed. During the optimization process, we aim for a certain grid
 size based on L1-3 memory cache size. Therefore, we test the speed of grids of sizes \eqn{2^m} Kb. To achieve this, we estimate the uniform step area
 based on a certain steps number that leads to the target cache size, \eqn{ \alpha = \frac{1}{\text{number of steps}} }.
@@ -105,7 +108,7 @@ norm_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_norm, f = f_norm, h = h
 plot(norm_grid)
 
 # Example 2: Grid for a Bimodal Distribution
-# This example shows how to build a grid for sampling from a bimodal distribution, combining two normal distributions 
+# This example shows how to build a grid for sampling from a bimodal distribution, combining two normal distributions
 # \( f(x) = 0.5 \cdot w_1(x) + 0.5 \cdot w_2(x) \), where \( w_1(x) \sim \mathcal{N}(0, 1) \) and \( w_2(x) \sim \mathcal{N}(4, 1) \).
 
 # Define the bimodal density function

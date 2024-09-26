@@ -43,16 +43,16 @@ srexp <- function(n) {
 #' @param scale Scalar scale parameter.
 #'
 #' @return
-#' `srsexp()` returns a sample of size `n` from an exponential distribution with the specified scale parameter.
+#' `srexp_scaled()` returns a sample of size `n` from an exponential distribution with the specified scale parameter.
 #'
 #' @examples
 #' # Generating Samples from an Exponential Distribution with a Specific Scale
 #' # This example demonstrates how to generate 10 samples from an exponential distribution with a scale parameter of 2.
-#' samples <- srsexp(n = 10, scale = 2)
+#' samples <- srexp_scaled(n = 10, scale = 2)
 #' print(samples)
 #'
 #' @export
-srsexp <- function(n, scale = 1) {
+srexp_scaled <- function(n, scale = 1) {
   .Call(C_srexp, n) * scale
 }
 
@@ -65,24 +65,24 @@ srsexp <- function(n, scale = 1) {
 #' Creating a sampling function for a truncated exponential distribution.
 #'
 #' @details
-#' `truncsrexp()` is used for sampling from a standard exponential distribution truncated within specified bounds.
+#' `srexp_truncate()` is used for sampling from a standard exponential distribution truncated within specified bounds.
 #' The function validates the truncation bounds before creating the sampling function.
 #'
 #' @param xl Lower bound for truncation.
 #' @param xr Upper bound for truncation.
 #'
 #' @return
-#' `truncsrexp()` returns a function that generates `n` samples from a truncated exponential distribution between `xl` and `xr`.
+#' `srexp_truncate()` returns a function that generates `n` samples from a truncated exponential distribution between `xl` and `xr`.
 #'
 #' @examples
 #' # Generating Samples from a Truncated Exponential Distribution
 #' # This example demonstrates how to generate 100 samples from an exponential distribution truncated in the range [1, 3].
-#' exp_trunc <- truncsrexp(xl = 1, xr = 3)
+#' exp_trunc <- srexp_truncate(xl = 1, xr = 3)
 #' samples <- exp_trunc(100)
 #' hist(samples, main = "Histogram of Truncated Exponential Samples", xlab = "Value", breaks = 20)
 #'
 #' @export
-truncsrexp = function(xl, xr){
+srexp_truncate = function(xl, xr){
   
   stopifnot(
     "xl must be smaller that xr" = xl < xr,

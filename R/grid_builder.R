@@ -1,16 +1,21 @@
 
 
+
+
+
+
 #' Build User Grid
 #'
 #' @description
-#' This function is essential for sampling from any uni-modal or multi-modal log-concave density function. It generates a proposal grid 
-#' that can be utilized for this purpose. Simply provide the density function 'f' and its modes. For enhanced accuracy, include 
-#' the log-transform 'h' of the density and its first derivative 'h_prime'. The grid optimization is pre-configured for efficiency, 
+#' This function is essential for sampling from any uni-modal or multi-modal log-concave density function. It generates a proposal grid
+#' that can be utilized for this purpose. Simply provide the density function 'f' and its modes. For enhanced accuracy, include
+#' the log-transform 'h' of the density and its first derivative 'h_prime'. The grid optimization is pre-configured for efficiency,
 #' but you can customize the grid-building process through various parameters to suit your specific needs.
 #'
 #' @param lb Scalar representing the lower bound of the target density.
 #' @param rb Scalar representing the upper bound of the target density.
 #' @param modes Vector indicating the modes of the density function.
+#' @param between_minima Optional vector indicating the minima located between the modes of the density function. If not provided, the approximate locations of these minima will be estimated.
 #' @param f Function accepting a single argument, returning the probability density of the target.
 #' @param h Function accepting a single argument, returning the log-transform of the target density.
 #' @param h_prime Function accepting a single argument, returning the first derivative of the log-transformed target density.
@@ -24,25 +29,25 @@
 #' The grid building process is executed through the construction of constant area rectangles, starting from the modes of the target distribution.
 #' For each mode, rectangles are formed as steps around it, with a width defined by \eqn{(x_i - x_{i-1})} and a height determined by \eqn{\max(f(x_{i-1}), f(x_i))}.
 #' This method effectively covers the target distribution in a stepped pattern.
-#' 
-#' 
-#' The function `grid_builder()` manages the construction of these steps and calculates values critical for the sampling process. When the resultant grid is used with the `stors()` function, these values are cached, 
+#'
+#'
+#' The function `build_final_grid()` manages the construction of these steps and calculates values critical for the sampling process. When the resultant grid is used with the `stors()` function, these values are cached,
 #' significantly enhancing the computational efficiency and hence improving sampling speed. During the optimization process, we aim for a certain grid
 #' size based on L1-3 memory cache size. Therefore, we test the speed of grids of sizes \eqn{2^m} Kb. To achieve this, we estimate the uniform step area
 #' based on a certain steps number that leads to the target cache size, \eqn{ \alpha = \frac{1}{\text{number of steps}} }.
-#' 
-#' 
+#'
+#'
 #' The speed testing for each possible grid is initially based on a sample size of 1000. However, if the user wishes to optimize the grid for a different sample size, they can do so
 #' by specifying the desired sample size using the 'target_sample_size' argument.
-#' 
-#' 
+#'
+#'
 #' In case the user wants to select a specific number of steps for the proposal grid
 #' and bypass the optimization process, this can be done by specifying a steps number greater than the number of modes by 2 using the 'steps' argument. If the target
 #' density is heavy-tailed, and the user wishes to stop the grid building process at a certain pre-acceptance threshold, this can be achieved by setting
 #' the acceptance probability threshold 'theta' \eqn{\theta}. Once the steps reach this level of pre-acceptance probability, the step construction will end \eqn{ \frac{\min(f(x_i), f(x_{i+1}))}{\max(f(x_i), f(x_{i+1}))} < \theta }.
 #' Alternatively, if the user wishes to create the steps within certain limits on the
 #' x-axis, they can do so by specifying the proposal grid limits using the 'grid_range' argument.
-#' 
+#'
 #' @return
 #' Returns a list containing the following elements related to the proposal distribution:
 #' \itemize{
@@ -58,13 +63,13 @@
 #'   \item{"grid_bounds"}{A vector including the left and right bounds of the target density.}
 #'   \item{"dens_func"}{The function passed by the user for the target density 'f'.}
 #' }
-#' 
-#' 
+#'
+#'
 #' @seealso
-#' \code{\link{stors}} 
-#' 
+#' \code{\link{stors}}
+#'
 #' @examples
-#' 
+#'
 #' # Example 1: Building a Grid for Standard Normal Distribution
 #' # This example demonstrates constructing a grid for a standard normal distribution \( f(x) \sim \mathcal{N}(0,1) \),
 #' # and shows the optimization table by setting `verbose` to `TRUE`.
@@ -82,7 +87,7 @@
 #' plot(norm_grid)
 #'
 #' # Example 2: Grid for a Bimodal Distribution
-#' # This example shows how to build a grid for sampling from a bimodal distribution, combining two normal distributions 
+#' # This example shows how to build a grid for sampling from a bimodal distribution, combining two normal distributions
 #' # \( f(x) = 0.5 \cdot w_1(x) + 0.5 \cdot w_2(x) \), where \( w_1(x) \sim \mathcal{N}(0, 1) \) and \( w_2(x) \sim \mathcal{N}(4, 1) \).
 #'
 #' # Define the bimodal density function
@@ -105,75 +110,85 @@
 #'
 #' # Print and plot the grid with 500 steps
 #' print(bimodal_grid_500)
-#' 
-#' @import digest digest
+#'
+#' @import digest
 #' @export
-build_grid <- function(lb = -Inf, rb = Inf, modes, f, h = NULL,
-                       h_prime = NULL, steps = NA, grid_range = c(lb, rb), theta = 0,target_sample_size = 1000, verbose = FALSE) {
+build_grid <- function(lb = -Inf,
+                       rb = Inf,
+                       modes = NA,
+                       between_minima = NULL,
+                       f = NA,
+                       h = NULL,
+                       h_prime = NULL,
+                       steps = NULL,
+                       grid_range = NULL,
+                       theta = NULL,
+                       target_sample_size = 1000,
+                       verbose = FALSE) {
   
   
-  grid_prob_error_checking(steps, grid_range, theta, lb, rb, modes)
   
-  if(is.null(h)){
-    h <- function(x){log(f(x))}
+  grid_param <- list(
+    target = list(
+      density = f,
+      log_density = h,
+      log_target_prime = h_prime,
+      Cumulitive_density = NULL,
+      modes = modes,
+      modes_count = length(modes),
+      between_minima = NULL,
+      right_bound = rb,
+      left_bound = lb
+    ),
+    proposal = list(
+      grid_range = grid_range,
+      tails_method = "ARS",
+      steps = steps,
+      optimal_step_area = NULL,
+      left_steps_proportion = NULL,
+      right_steps_proportion = NULL,
+      pre_acceptance_threshold = theta,
+      target_sample_size = target_sample_size
+    ),
+    built_in = FALSE,
+    cnum = NULL,
+    verbose = verbose
+  )
+  
+  
+  
+  if (is.null(h)) {
+    h <- function(x) {
+      log(f(x))
+    }
   }
   
-  if(is.null(h_prime)){
-    h_prime <- stors_prime(modes[1], h)
+  if (is.null(h_prime)) {
+    h_prime <- stors_prime(modes, h) # Return h_prime(x) estimating the slope at x
   }
   
+  grid_param <- grid_error_checking_and_preparation(grid_param)
   
-  if(is.na(steps)){
-    
-    opt_prob = find_optimal_grid(lb = lb, rb = rb, modes = modes, f = f, h =  h,
-                                 h_prime = h_prime, verbose = verbose,
-                                 target_sample_size = target_sample_size,
-                                 theta = theta, grid_range = grid_range)
-    
-    opt_grid <- grid_builder(lb = lb, rb = rb , a = opt_prob$area,
-                             modes, f = f, h =  h, h_prime = h_prime ,
-                             stps =opt_prob$steps , lstpsp =opt_prob$lstpsp , rstpsp= opt_prob$rstpsp,
-                             theta = theta, grid_range = grid_range)
+  
+  if(!is.null(steps)) grid_param$proposal$pre_acceptance_thres_hold <- 0.1
+  
+  optimal_grid_params = find_optimal_grid(grid_param)
+  
 
-  }
-  else{
-    
-    opt_prob = list()
-    
-    mode_n = length(modes)
-    
-    left_stps = find_left_steps(lb = lb, rb = rb, a = 0.001,
-                                mode = modes[1], mode_i = 1, mode_n = mode_n, f = f,
-                                theta =0.1, grid_range = grid_range)$m
-    
-    right_stps = find_right_steps(lb = lb, rb = rb, a = 0.001,
-                                  mode = modes[mode_n], mode_i = mode_n, mode_n = mode_n, f = f,
-                                  theta =0.1, grid_range = grid_range)$m
-    
-    lstpsp =left_stps / sum(left_stps, right_stps)
-    rstpsp= 1 - lstpsp
-    
-    opt_grid <- grid_builder(lb = lb, rb = rb ,a = 1/steps ,
-                             modes = modes, f = f, h =  h, h_prime = h_prime,
-                             stps =steps , lstpsp =lstpsp , rstpsp= rstpsp,
-                             theta = theta, grid_range = grid_range)
-    
-  }
-
+  opt_grid <- build_final_grid(gp = optimal_grid_params)
   
-    func_to_text <- deparse(f)
-
-    opt_grid$dens_func <- func_to_text
-    
-    
-    class(opt_grid) <- "grid"
-    
-    
-    if(!(digest(opt_grid) %in% stors_env$created_girds_Id))
+  func_to_text <- deparse(f)
+  
+  opt_grid$dens_func <- func_to_text
+  
+  class(opt_grid) <- "grid"
+  
+  
+  if (!(digest(opt_grid) %in% stors_env$created_girds_Id))
     stors_env$created_girds_Id  = append(stors_env$created_girds_Id , digest(opt_grid))
-    
-    
-    return(opt_grid)
+  
+  
+  return(opt_grid)
   
 }
 
@@ -181,210 +196,270 @@ build_grid <- function(lb = -Inf, rb = Inf, modes, f, h = NULL,
 
 
 #' @importFrom utils head
-grid_builder <- function(lb, rb, a, modes, f = NULL, h = NULL,
-                         h_prime = NULL, cdf = NULL, stps,
-                         lstpsp, rstpsp,
-                         theta, grid_range) {
+build_final_grid <- function(gp, opt_area = NULL) {
   
+  if(is.null(opt_area)) opt_area <- gp$proposal$optimal_step_area
   
-  mode_n <- length(modes)
+  lb <- gp$target$left_bound
+  rb <- gp$target$right_bound
+  mode_n <- gp$target$modes_count
+  lstpsp <- gp$proposal$left_steps_proportion
+  rstpsp <- gp$proposal$right_steps_proportion
+  total_steps <- gp$proposal$steps
+  f <- gp$target$density
+  h <- gp$target$log_density
+  h_prime <- gp$target$log_density_prime
   
-  grid_bounds <- rep(NA,2)
+  grid_bounds <- rep(NA, 2)
   
   final_grid <- data.frame(
-    x = c(), s_upper = c(), s_lower = c(), p_a = c(),
+    x = c(),
+    s_upper = c(),
+    s_lower = c(),
+    p_a = c(),
     s_upper_lower = c()
   )
   
+  # grids : include lists of steps around each mode
   grids <- list()
-
-  lsts <- list()
-  rsts <- list()
   
-  area <- c(0, 0, 0)
+  left_steps <- list() # left_steps[[i]] includes steps data positioned to the left of the i-th mode
+  right_steps <- list() # right_steps[[i]] includes steps data positioned to the right of the i-th mode
+  
+  proposal_areas <- c(0, 0, 0)  # area under left tail, steps, right tail
+  
   g_len <- c()
-
   
-
+    for (mode_i in  (1:mode_n)) {
+      if ((mode_i != 1) || is.null(lstpsp))
+      {
+        
+        left_steps[[mode_i]] <- find_left_steps(gp = gp, area = opt_area, mode_i = mode_i, steps_lim = Inf)
+        
+        
+        if (!is.null(lstpsp))
+          total_steps <- total_steps -  left_steps[[mode_i]]$steps
+      }
+      
+      if ((mode_i != mode_n) || is.null(rstpsp))
+      {
+        right_steps[[mode_i]] <- find_right_steps(gp = gp, area = opt_area, mode_i = mode_i, steps_lim = Inf)
+        
+        if (!is.null(rstpsp))
+          total_steps <- total_steps -  right_steps[[mode_i]]$steps
+      }
+      
+    }
+    
+    
+    if (!is.null(rstpsp) || !is.null(lstpsp))
+    {
+      steps_lim_left = round(lstpsp * total_steps)
+      
+      left_steps[[1]] <- find_left_steps(
+        gp = gp,
+        area = opt_area,
+        mode_i = 1,
+        steps_lim = steps_lim_left,
+      )
+      
+      steps_lim_right = total_steps - steps_lim_left
+      right_steps[[mode_n]] <- find_right_steps(
+        gp = gp,
+        area = opt_area,
+        mode_i = mode_n,
+        steps_lim = steps_lim_right,
+      )
+    }
+    
     for (mode_i in (1:mode_n)) {
-      
-      if( (mode_i != 1) || is.na(lstpsp))
-      {lsts[[mode_i]] <- find_left_steps(lb, rb, a, modes[mode_i], mode_i, mode_n, f,
-                                         theta = theta, grid_range = grid_range)
-      
-      if(!is.na(lstpsp)) stps <- stps -  lsts[[mode_i]]$m}
-      
-      if( (mode_i != mode_n) || is.na(rstpsp))
-      {rsts[[mode_i]] <- find_right_steps(lb, rb, a, modes[mode_i], mode_i, mode_n, f,
-                                          theta = theta, grid_range = grid_range)
-      
-      if(!is.na(rstpsp)) stps <- stps -  rsts[[mode_i]]$m}
-      
+      grids[[mode_i]] <- list(data = rbind(left_steps[[mode_i]]$data, right_steps[[mode_i]]$data),
+                              steps = left_steps[[mode_i]]$steps + right_steps[[mode_i]]$steps)
     }
-  
-  
-  if(!is.na(rstpsp) || !is.na(lstpsp))
-  {
-
-    steps_lim_left = round(lstpsp * stps)
     
-    lsts[[1]] <- find_left_steps(lb = lb, rb = rb, a = a,mode = modes[1],
-                                 mode_i = 1, mode_n = mode_n,
-                                 f = f,  steps_lim = steps_lim_left, theta = theta, grid_range = grid_range)
-    
-    steps_lim_right = stps - steps_lim_left
-    rsts[[mode_n]] <- find_right_steps(lb = lb, rb = rb, a = a, mode = modes[mode_n],
-                                       mode_i = mode_n, mode_n = mode_n,
-                                       f = f, steps_lim = steps_lim_right, theta = theta, grid_range = grid_range)
-  }
-  
-    
-  for (mode_i in (1:mode_n)) {
-    grids[[mode_i]] <- list(d = rbind(lsts[[mode_i]]$d,rsts[[mode_i]]$d), m = lsts[[mode_i]]$m + rsts[[mode_i]]$m)
-  }
-
-
-  if (mode_n > 1) {
-    for (i in (1:(mode_n - 1))) {
-      if (grids[[i]]$d$x[grids[[i]]$m + 1] > grids[[i + 1]]$d$x[1]) {
-        if (grids[[i]]$d$s_upper[grids[[i]]$m] > grids[[i + 1]]$d$s_upper[1]) {
-          grids[[i]]$d <- head(grids[[i]]$d, -1)
-
-          grids[[i]]$d$s_upper[grids[[i]]$m] <- a / (grids[[i + 1]]$d$x[1] - grids[[i]]$d$x[grids[[i]]$m])
-
-          grids[[i]]$d$p_a[grids[[i]]$m] <- 0
-
-          grids[[i + 1]]$d$p_a[1] <- 0
+    if (mode_n > 1) {
+      # binding grids data ( if the minima is not provided)
+      for (i in (1:(mode_n - 1))) {
+        if (grids[[i]]$data$x[grids[[i]]$steps + 1] > grids[[i + 1]]$data$x[1]) {
+          if (grids[[i]]$data$s_upper[grids[[i]]$steps] > grids[[i + 1]]$data$s_upper[1]) {
+            grids[[i]]$data <- head(grids[[i]]$data, -1)
+            
+            grids[[i]]$data$s_upper[grids[[i]]$steps] <- opt_area / (grids[[i + 1]]$data$x[1] - grids[[i]]$data$x[grids[[i]]$steps])
+            
+            grids[[i]]$data$p_a[grids[[i]]$steps] <- 0
+            
+            grids[[i + 1]]$data$p_a[1] <- 0
+          } else {
+            grids[[i + 1]]$data$x[1] <- grids[[i]]$data$x[grids[[i]]$steps + 1]
+            
+            grids[[i]]$data <- head(grids[[i]]$data, -1)
+            
+            
+            grids[[i + 1]]$data$s_upper[1] <- opt_area / (grids[[i + 1]]$data$x[2] - grids[[i + 1]]$data$x[1])
+            
+            grids[[i + 1]]$data$p_a[1] <- 0
+            
+            grids[[i]]$data$p_a[grids[[i]]$steps] <- 0
+          }
         } else {
-          grids[[i + 1]]$d$x[1] <- grids[[i]]$d$x[grids[[i]]$m + 1]
-
-          grids[[i]]$d <- head(grids[[i]]$d, -1)
-
-
-          grids[[i + 1]]$d$s_upper[1] <- a / (grids[[i + 1]]$d$x[2] - grids[[i + 1]]$d$x[1])
-
-          grids[[i + 1]]$d$p_a[1] <- 0
-
-          grids[[i]]$d$p_a[grids[[i]]$m] <- 0
+          grids[[i]]$steps <- grids[[i]]$steps + 1
+          
+          grids[[i]]$data$s_upper[grids[[i]]$steps] <- opt_area / (grids[[i + 1]]$data$x[1] - grids[[i]]$data$x[grids[[i]]$steps])
+          
+          grids[[i]]$data$p_a[grids[[i]]$steps] <- 0
         }
-      } else {
-        grids[[i]]$m <- grids[[i]]$m + 1
-
-        grids[[i]]$d$s_upper[grids[[i]]$m] <- a / (grids[[i + 1]]$d$x[1] - grids[[i]]$d$x[grids[[i]]$m])
-
-        grids[[i]]$d$p_a[grids[[i]]$m] <- 0
+        
+        m1 <- grids[[i]]$steps
+        
+        m2 <- grids[[i + 1]]$steps
+        
+        proposal_areas[2] <- proposal_areas[2] + m1 * opt_area
+        
+        g_len[length(g_len) + 1] <- m1
+        
+        
+        
+        if (i == (mode_n - 1)) {
+          final_grid <- rbind(final_grid, grids[[i]]$data, grids[[i + 1]]$data)
+          
+          proposal_areas[2] <- proposal_areas[2] + m2 * opt_area
+          
+          g_len[length(g_len) + 1] <- m2
+        } else {
+          final_grid <- rbind(final_grid, grids[[i]]$data)
+        }
       }
-
-      m1 <- grids[[i]]$m
-
-      m2 <- grids[[i + 1]]$m
-
-      area[2] <- area[2] + m1 * a
-
-      g_len[length(g_len) + 1] <- m1
-
-
-
-      if (i == (mode_n - 1)) {
-        final_grid <- rbind(final_grid, grids[[i]]$d, grids[[i + 1]]$d)
-
-        area[2] <- area[2] + m2 * a
-
-        g_len[length(g_len) + 1] <- m2
-      } else {
-        final_grid <- rbind(final_grid, grids[[i]]$d)
-      }
+    } else {
+      final_grid <- grids[[1]]$data
+      
+      proposal_areas[2] <- grids[[1]]$steps * opt_area
+      
+      g_len[length(g_len) + 1] <- grids[[1]]$steps
     }
-  } else {
-    final_grid <- grids[[1]]$d
-
-    area[2] <- grids[[1]]$m * a
-
-    g_len[length(g_len) + 1] <- grids[[1]]$m
-  }
-
-  
-  
-  steps_number <- sum(g_len) # m
-  
-  x1 <- final_grid$x[1]
-  xm <- final_grid$x[steps_number + 1]
-  
-  
-  if(is.function(h)){
-
-    tails_area = tails_ars(final_grid, f, h, h_prime, lb, rb)
     
-    area[1] <- tails_area$lta
     
-    area[3] <- tails_area$rta
     
-  } else{
-
-    area[1] <- cdf(x1)
+    steps_number <- sum(g_len) # steps
     
-    area[3] <- 1 - cdf(xm)
-  }
-  
-  
-
-  normalizing_con <- sum(area)
-
-  area_cum_sum <- cumsum(area)
-
-  sampling_probabilities <- (area_cum_sum / normalizing_con)[1:2]
-
-  unif_scaler <- normalizing_con / area[2]
-
-  
-  
-  if(is.function(h)){
-    lt_properties <- c(exp(h_upper(x1, lb, h_prime, h)), normalizing_con * h_prime(x1), h(x1), 1 / h_prime(x1), h_prime(x1)) #4
-    rt_properties <- c(normalizing_con, area_cum_sum[2], h_prime(xm) / f(xm), 1 / h_prime(xm), h_prime(xm), h(xm))
-    tails_method <- "ARS"
+    x1 <- final_grid$x[1]
+    xm <- final_grid$x[steps_number + 1]
+    
+    
+    if (is.function(h)) {
+      tails_area = tails_ars(final_grid, f, h, h_prime, lb, rb)
+      
+      proposal_areas[1] <- tails_area$lta
+      
+      proposal_areas[3] <- tails_area$rta
+      
     } else{
-    lt_properties <- rep(0,5)
-    rt_properties <- rep(0,6)
-    tails_method <- "IT"
+      proposal_areas[1] <- cdf(x1)
+      
+      proposal_areas[3] <- 1 - cdf(xm)
     }
+    
+    
+    
+    normalizing_con <- sum(proposal_areas)
+    
+    area_cum_sum <- cumsum(proposal_areas)
+    
+    sampling_probabilities <- (area_cum_sum / normalizing_con)[1:2]
+    
+    unif_scaler <- normalizing_con / proposal_areas[2]
+    
+    
+    
+    if (is.function(h)) {
+      lt_properties <- c(
+        exp(h_upper(x1, lb, h_prime, h)),
+        normalizing_con * h_prime(x1),
+        h(x1),
+        1 / h_prime(x1),
+        h_prime(x1)
+      ) #4
+      rt_properties <- c(
+        normalizing_con,
+        area_cum_sum[2],
+        h_prime(xm) / f(xm),
+        1 / h_prime(xm),
+        h_prime(xm),
+        h(xm)
+      )
+      tails_method <- "ARS"
+    } else{
+      lt_properties <- rep(0, 5)
+      rt_properties <- rep(0, 6)
+      tails_method <- "IT"
+    }
+    
+    grid_bounds[1] = lb
+    grid_bounds[2] = rb
+    
+    
+    invisible(
+      list(
+        grid_data = final_grid,
+        areas = proposal_areas,
+        steps_number = steps_number,
+        sampling_probabilities = sampling_probabilities,
+        unif_scaler = unif_scaler,
+        lt_properties = lt_properties,
+        rt_properties = rt_properties,
+        alpha = opt_area,
+        tails_method = tails_method,
+        grid_bounds = grid_bounds
+      )
+    )
+    
   
-  grid_bounds[1] = lb
-  grid_bounds[2] = rb
-  
-  
-  invisible(list(grid_data = final_grid, areas = area, steps_number = steps_number, sampling_probabilities = sampling_probabilities, unif_scaler = unif_scaler, lt_properties = lt_properties, rt_properties = rt_properties, alpha = a, tails_method = tails_method, grid_bounds = grid_bounds))
 }
 
 
 
 
-find_left_steps <- function(lb, rb, a, mode, mode_i, mode_n, f, steps_lim = Inf, theta, grid_range) {
-   
-  memory_res <- (max(500, ceiling(1 / a)) + 500)
+find_left_steps <- function(gp,
+                            area,
+                            mode_i,
+                            steps_lim = Inf
+                            ) {
+  
+  lb <- gp$target$left_bound
+  rb <- gp$target$right_bound
+  mode <- gp$target$modes[mode_i]
+  mode_n <- gp$target$modes_count
+  f <- gp$target$density
+  theta <- gp$proposal$pre_acceptance_threshold
+  grid_range <- gp$proposal$grid_range
+  
+  memory_res <- (max(500, ceiling(1 / area)) + 500)
   
   x <- rep(NA, memory_res)
-  s_upper <- rep(NA, memory_res )
-  s_lower <- rep(NA, memory_res )
-  p_a <- rep(NA, memory_res )
+  s_upper <- rep(NA, memory_res)
+  s_lower <- rep(NA, memory_res)
+  p_a <- rep(NA, memory_res)
   s_upper_lower <- rep(NA, memory_res)
   
   
   l <- 0
   
-  i <- memory_res 
+  i <- memory_res
   
   if (mode != lb) {
-    
     x_previous <- mode
     
     f_x_previous <- f(x_previous)
     
     
     while (TRUE) {
-      x_c <- x_previous - a / f_x_previous
+      x_c <- x_previous - area / f_x_previous
       
       
-      if (l >= steps_lim || x_c < lb || (mode_i == 1 && ((f(x_c) / f_x_previous  <= theta) || x_previous < grid_range[1]) ) ) {
+      if (l >= steps_lim ||
+          x_c < lb ||
+          (mode_i == 1 &&
+           ((f(x_c) / f_x_previous  <= theta) ||
+            x_previous < grid_range[1]))) {
         break
       }
       
@@ -410,47 +485,65 @@ find_left_steps <- function(lb, rb, a, mode, mode_i, mode_n, f, steps_lim = Inf,
   }
   
   d <- data.frame(
-    x = x, s_upper = s_upper, p_a = p_a,
+    x = x,
+    s_upper = s_upper,
+    p_a = p_a,
     s_upper_lower = s_upper_lower
   )
   
   d <- subset(d, rowSums(is.na(d)) != ncol(d))
   
-  return(list(d = d, m = l))
+  return(list(data = d, steps = l))
 }
 
 
 
-find_right_steps <- function(lb , rb, a, mode, mode_i, mode_n, f, steps_lim = Inf, theta, grid_range) {
+find_right_steps <- function(gp,
+                             area,
+                             mode_i,
+                             steps_lim = Inf
+                             ) {
   
-  memory_res <- (max(500, ceiling(1 / a)) + 500) 
+  lb <- gp$target$left_bound
+  rb <- gp$target$right_bound
+  mode <- gp$target$modes[mode_i]
+  mode_n <- gp$target$modes_count
+  f <- gp$target$density
+  theta <- gp$proposal$pre_acceptance_threshold
+  grid_range <- gp$proposal$grid_range
+  
+  
+  memory_res <- (max(500, ceiling(1 / area)) + 500)
   
   x <- rep(NA, memory_res)
-  s_upper <- rep(NA, memory_res )
-  s_lower <- rep(NA, memory_res )
-  p_a <- rep(NA, memory_res )
+  s_upper <- rep(NA, memory_res)
+  s_lower <- rep(NA, memory_res)
+  p_a <- rep(NA, memory_res)
   s_upper_lower <- rep(NA, memory_res)
   
   
   r <- 1
-
-
+  
+  
   if (mode != rb) {
     x_c <- mode
-
+    
     f_x <- f(x_c)
-
+    
     while (TRUE) {
-      x_next <- x_c + a / f_x
-
-      if (r > steps_lim || x_next > rb || (mode_i == mode_n && ((f(x_next) / f_x <= theta) || x_c > grid_range[2])) ) {
+      x_next <- x_c + area / f_x
+      
+      if (r > steps_lim ||
+          x_next > rb ||
+          (mode_i == mode_n &&
+           ((f(x_next) / f_x <= theta) || x_c > grid_range[2]))) {
         x[r] <- x_c
         s_upper[r] <- s_lower[r] <- s_upper_lower[r] <- p_a[r] <- NA
         break
       }
-
+      
       f_x_next <- f(x_next)
-
+      # if(x_next > minima_i)
       if (f_x_next > f_x) {
         x[r] <- x_c
         s_upper[r] <- f_x
@@ -459,30 +552,32 @@ find_right_steps <- function(lb , rb, a, mode, mode_i, mode_n, f, steps_lim = In
         
         break
       }
-
-
+      
+      
       x[r] <- x_c
-      s_upper[ r] <- f_x
+      s_upper[r] <- f_x
       s_lower[r] <- f_x_next
-      s_upper_lower[ r] <- s_upper[ r] / s_lower[r]
-      p_a[r] <- s_lower[ r] / s_upper[ r]
-
-
+      s_upper_lower[r] <- s_upper[r] / s_lower[r]
+      p_a[r] <- s_lower[r] / s_upper[r]
+      
+      
       f_x <- f_x_next
       x_c <- x_next
-
+      
       r <- r + 1
     }
   }
   
   d <- data.frame(
-    x = x, s_upper = s_upper, p_a = p_a,
+    x = x,
+    s_upper = s_upper,
+    p_a = p_a,
     s_upper_lower = s_upper_lower
   )
   
   d <- subset(d, rowSums(is.na(d)) != ncol(d))
   
-  return(list(d = d, m = r-1))
+  return(list(data = d, steps = r - 1))
 }
 
 
@@ -494,8 +589,8 @@ h_upper <- function(grid_point, val, h_prime, h) {
 }
 
 
-tails_ars <- function(grid, f, h, h_prime, lb, rb){
-  m = length(grid$x)
+tails_ars <- function(grid, f, h, h_prime, lb, rb) {
+  steps = length(grid$x)
   # left tail
   if (lb == Inf) {
     l_tail_area <- (1 / h_prime(grid$x[1])) * f(grid$x[1])
@@ -505,26 +600,29 @@ tails_ars <- function(grid, f, h, h_prime, lb, rb){
   
   #right tails
   if (rb == Inf) {
-    r_tail_area <- (1 / h_prime(grid$x[m])) * -f(grid$x[m])
+    r_tail_area <- (1 / h_prime(grid$x[steps])) * -f(grid$x[steps])
   } else {
-    r_tail_area <- (1 / h_prime(grid$x[m])) * (exp(h_upper(grid$x[m], rb, h_prime, h)) - f(grid$x[m]))
+    r_tail_area <- (1 / h_prime(grid$x[steps])) * (exp(h_upper(grid$x[steps], rb, h_prime, h)) - f(grid$x[steps]))
   }
   
   return(list(lta = l_tail_area, rta = r_tail_area))
   
 }
 
-stors_prime <-function(mode, h){
 
-    function(x){
-      if(x < mode){
-        x0 = x + 0.0000001
-      }else{
-        x0 = x - 0.0000001
-      }
-      (h(x0) - h(x))/(x0 -x)
+# returns function that estimate slope at point x
+stors_prime <- function(mode, h) {
+  function(x) {
+    if (x < mode[1]) {
+      x0 = x + 0.0000001
+    } else if (x > tail(mode, 1)) {
+      x0 = x - 0.0000001
+    } else{
+      stop("Error: 'store_prime' constructing ARS at non-tail region")
     }
-
+    (h(x0) - h(x)) / (x0 - x)
+  }
+  
 }
 
 
@@ -536,14 +634,29 @@ stors_prime <-function(mode, h){
 #'
 #' @return boolian
 #' @import digest digest
-is_valid_grid = function(grid){
-  
-  stopifnot(" This grid is not optmized using build_grid() " = digest(grid) %in% stors_env$created_girds_Id )
+is_valid_grid = function(grid) {
+  stopifnot(
+    " This grid is not optmized using build_grid() " = digest(grid) %in% stors_env$created_girds_Id
+  )
   
 }
 
 cache_grid_c <- function(Cnum, grid) {
-  .Call(C_cache_grid, Cnum, grid$grid_data$x, grid$grid_data$s_upper, grid$grid_data$p_a, grid$grid_data$s_upper_lower, grid$areas, grid$steps_number, grid$sampling_probabilities, grid$unif_scaler, grid$lt_properties, grid$rt_properties, grid$alpha)
+  .Call(
+    C_cache_grid,
+    Cnum,
+    grid$grid_data$x,
+    grid$grid_data$s_upper,
+    grid$grid_data$p_a,
+    grid$grid_data$s_upper_lower,
+    grid$areas,
+    grid$steps_number,
+    grid$sampling_probabilities,
+    grid$unif_scaler,
+    grid$lt_properties,
+    grid$rt_properties,
+    grid$alpha
+  )
 }
 
 free_cache_cnum_c <- function(Cnum) {
@@ -552,45 +665,89 @@ free_cache_cnum_c <- function(Cnum) {
 
 
 save_builtin_grid <- function(Cnum, grid) {
-  
   grids_file_path <- file.path(stors_env$user_dirs$builtin_dir, paste0(Cnum, ".rds"))
   
   saveRDS(grid, grids_file_path)
 }
 
 
-grid_prob_error_checking = function(steps, grid_range, theta, lb, rb, modes){
+
+#' check build_grid parameters validity
+grid_error_checking_and_preparation = function(gp) {
   
-  if(!is.na(steps) && steps < 1){
-    stop("Error: 'steps' must be greater than or equal to 1.")    
-  }
+  modes <- gp$target$modes
+  f <- gp$target$density
+  between_minima <- gp$target$between_minima
+  steps <- gp$proposal$steps
+  theta <- gp$proposal$pre_acceptance_threshold
+  grid_range <- gp$proposal$grid_range
+  lb <- gp$target$left_bound
+  rb <- gp$target$right_bound
   
-  if ( theta != 0 && !identical(grid_range, c(lb, rb))) {
-    stop("Error: You must provide either a pre-acceptance threshold 'theta' value or a proposal x-axis limit 'grid_range'.")
-  }
-  
-  if ( ( theta != 0 || !identical(grid_range, c(lb, rb)) ) && !is.na(steps)) {
-    warning("Warning: The pre-acceptance threshold 'theta' value and proposal x-axis limit 'grid_range' will not take effect because you are specifying a target 'steps' number.")
-  }
-  
-  
-  if(theta != 0 && (theta < 0 || theta > 1) ){
+    if (is.na(modes)) {
+      stop("Error: 'modes' density modes must be provided.")
+    }
     
-    stopifnot(theta >= 0 && theta <= 1, "Error: 'theta' must be in the range [0,1]")
+    if (!is.function(f)) {
+      stop("Error: 'f' density function must be provided.")
+    }
     
-  }
+    if (!is.null(steps) && steps < 1) {
+      stop("Error: 'steps' must be greater than or equal to 1.")
+    }
+    
+    if (is.null(theta))
+      theta <- 0
+    
+    if (theta != 0 && !is.null(grid_range)) {
+      stop(
+        "Error: You must provide either a pre-acceptance threshold 'theta' value or a proposal x-axis limit 'grid_range'."
+      )
+    }
+    
+    if ((theta != 0 || !is.null(grid_range)) && !is.null(steps)) {
+      warning(
+        "Warning: The pre-acceptance threshold 'theta' value and proposal x-axis limit 'grid_range' will not take effect because you are specifying a target 'steps' number."
+      )
+    }
+    
+    if (theta != 0 && (theta < 0 || theta > 1)) {
+      stopifnot(theta >= 0 && theta <= 1,
+                "Error: 'theta' must be in the range [0,1]")}
+    
+    if (!is.null(grid_range)) {
+      if (length(grid_range) != 2)
+        stop("Error: 'grid_range' must be a vector of two elements.")
+      
+      if (grid_range[1] < lb && grid_range[2] > rb)
+        stop("Error: 'grid_range' must be within the range of distribution bounds.")
+      
+      if (grid_range[1] > modes[1] ||
+          grid_range[2] < modes[length(modes)])
+        stop("Error: 'grid_range' range must include distribution's modes.")
+    } else{
+      grid_range <- gp$grid_range <- c(lb, rb)
+    }
+    
+    if (!is.null(between_minima)) {
+      if (between_minima < lb || between_minima > rb)
+        stop("Error: 'between_minima' must be within the range of distribution bounds.")
+      
+      if (length(between_minima) != (length(modes) - 1))
+        stop("Error: 'between_minima' number of minima oints must be equal to number of modes - 1")
+      
+      minima_len = length(between_minima)
+      
+      for (i in (1:minima_len)) {
+        if (!(between_minima[i] > modes[i] &&
+              between_minima[i] < modes[i + 1]))
+          stop("Error: 'between_minima' must be inbetween the distribution's modes.")
+      }
+    }
+    
+  gp$proposal$grid_range <- grid_range 
+  gp$proposal$pre_acceptance_threshold <- theta
   
-  
-  if(!identical(grid_range, c(lb, rb)) ){
+    return(gp)
     
-    if(grid_range[1] < lb && grid_range[2] > rb)
-      stop("Error: 'grid_range' must be within the range of distribution bounds.")
-    
-    if(grid_range[1] > modes[1] || grid_range[2] < modes[length(modes)])
-      stop("Error: 'grid_range' range must include distribution's modes.")
-    
-  }
-  
 }
-
-

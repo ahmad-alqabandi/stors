@@ -2,15 +2,15 @@
 % Please edit documentation in R/srexp.R
 \name{srexp}
 \alias{srexp}
-\alias{srsexp}
-\alias{truncsrexp}
+\alias{srexp_scaled}
+\alias{srexp_truncate}
 \title{Sampling from Exponential Distribution}
 \usage{
 srexp(n)
 
-srsexp(n, scale = 1)
+srexp_scaled(n, scale = 1)
 
-truncsrexp(xl, xr)
+srexp_truncate(xl, xr)
 }
 \arguments{
 \item{n}{Integer sample size.}
@@ -24,9 +24,9 @@ truncsrexp(xl, xr)
 \value{
 `srexp()` returns a sample of size `n` from a standard exponential distribution.
 
-`srsexp()` returns a sample of size `n` from an exponential distribution with the specified scale parameter.
+`srexp_scaled()` returns a sample of size `n` from an exponential distribution with the specified scale parameter.
 
-`truncsrexp()` returns a function that generates `n` samples from a truncated exponential distribution between `xl` and `xr`.
+`srexp_truncate()` returns a function that generates `n` samples from a truncated exponential distribution between `xl` and `xr`.
 }
 \description{
 Sampling from the exponential distribution using Stors.
@@ -42,7 +42,7 @@ Exponential distribution has the density:
 \deqn{ f(x; \lambda) = \lambda e^{-\lambda x} }
 Where \eqn{\lambda} is the rate parameter.
 
-`truncsrexp()` is used for sampling from a standard exponential distribution truncated within specified bounds.
+`srexp_truncate()` is used for sampling from a standard exponential distribution truncated within specified bounds.
 The function validates the truncation bounds before creating the sampling function.
 }
 \examples{
@@ -57,12 +57,12 @@ print(samples)
 
 # Generating Samples from an Exponential Distribution with a Specific Scale
 # This example demonstrates how to generate 10 samples from an exponential distribution with a scale parameter of 2.
-samples <- srsexp(n = 10, scale = 2)
+samples <- srexp_scaled(n = 10, scale = 2)
 print(samples)
 
 # Generating Samples from a Truncated Exponential Distribution
 # This example demonstrates how to generate 100 samples from an exponential distribution truncated in the range [1, 3].
-exp_trunc <- truncsrexp(xl = 1, xr = 3)
+exp_trunc <- srexp_truncate(xl = 1, xr = 3)
 samples <- exp_trunc(100)
 hist(samples, main = "Histogram of Truncated Exponential Samples", xlab = "Value", breaks = 20)
 
