@@ -24,7 +24,8 @@ print(normal_grid)
 # Then, save this grid in R's internal data directory using `save_grid()` with the name "normal"
 save_grid(normal_grid, "normal")
 
-# Now, in case the R session is restarted and the grid is no longer in memory, it can be loaded from the machine as follows:
+# Now, in case the R session is restarted and the grid is no longer in memory,
+# it can be loaded from the machine as follows:
 loaded_normal_grid <- load_grid("normal")
 print(loaded_normal_grid)
  

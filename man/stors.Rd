@@ -36,13 +36,15 @@ the steps range of the proposal grid, no integration of the density function is 
 \examples{
 
 # Example 1
-# To sample from a standard normal distribution \( f(x) \sim \mathcal{N}(0,1) \), first build the proposal grid using `build_grid()`
+# To sample from a standard normal distribution \( f(x) \sim \mathcal{N}(0,1) \),
+# first build the proposal grid using `build_grid()`
 
 modes_norm = 0
 f_norm <- function(x) { 1 / sqrt(2 * pi) * exp(-0.5 * x^2) }
 h_norm <- function(x) { log(f_norm(x)) }
 h_prime_norm <- function(x) { -x }
-normal_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_norm, f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 1000)
+normal_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_norm,
+ f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 1000)
 
 # Generate samples from the standard normal distribution
 sample_normal <- stors(normal_grid)

@@ -4,17 +4,19 @@
 \alias{plot.grid}
 \title{Plot Method for Grid Objects}
 \usage{
-\method{plot}{grid}(grid, x_min = NA, x_max = NA, ...)
+\method{plot}{grid}(x, x_min = NA, x_max = NA, ...)
 }
 \arguments{
-\item{grid}{A list generated using STORS' `build_grid()` or `grid_optimizer()` functions.}
+\item{x}{A list generated using STORS' `build_grid()` or `grid_optimizer()` functions.}
 
 \item{x_min}{A scalar that represents the left cropping of the chart on the x-axis.}
 
 \item{x_max}{A scalar that represents the right cropping of the chart on the x-axis.}
+
+\item{...}{Additional arguments passed to the `plot` function.}
 }
 \value{
-A plot.
+A plot of the target density and proposal. If `ggplot2` is available, it returns a `ggplot` object representing the plot. otherwise, it uses the base `plot` function.
 }
 \description{
 This function evaluates the properties of the included target and proposal functions to create a plot for both functions. In cases where the
@@ -25,14 +27,16 @@ This method extends the generic `plot` function for objects of class `grid`.
 It offers custom plotting functionality specifically designed for visualizing grid objects.
 }
 \examples{
-# Define the density function, its logarithm, and its derivative for the standard normal distribution
+# Define the density function, its logarithm,
+# and its derivative for the standard normal distribution
 modes_norm = 0
 f_norm <- function(x) { 1 / sqrt(2 * pi) * exp(-0.5 * x^2) }
 h_norm <- function(x) { log(f_norm(x)) }
 h_prime_norm <- function(x) { -x }
 
 # Build a dense grid for the standard normal distribution
-norm_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_norm, f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 4000)
+norm_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_norm,
+ f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 4000)
 
 # Plot the generated grid
 plot(norm_grid)
@@ -40,4 +44,7 @@ plot(norm_grid)
 # To visualize the grid in a cropped area between -0.1 and 0
 plot(norm_grid, x_min = -0.1, x_max = 0)
 
+}
+\seealso{
+\code{\link{print.grid}}
 }

@@ -51,21 +51,23 @@ the truncation bounds before creating the sampling function.
 \examples{
 
 # Optimize the grid for the Laplace distribution
-grid_optimizer("laplace")
+grid_optimizer("srlaplace")
 
 # Generating Samples from a Standard Laplace Distribution
 # This example illustrates how to generate 10 samples from a standard Laplace distribution.
-samples <- laplace(10)
+samples <- srlaplace(10)
 print(samples)
 
 
 # Generating Samples from a Laplace Distribution with Specific Location and Scale
-# This example demonstrates how to generate 10 samples from a Laplace distribution with location = 2 and scale = 3.
+# This example demonstrates how to generate 10,
+# samples from a Laplace distribution with location = 2 and scale = 3.
 samples <- srlaplace_scaled(n = 10, mu = 2, b = 3)
 print(samples)
 
 # Generating Samples from a Truncated Laplace Distribution
-# This example demonstrates how to generate 100 samples from a Laplace distribution truncated in the range [1, 3].
+# This example demonstrates how to generate 100 samples,
+# from a Laplace distribution truncated in the range [1, 3].
 laplace_trunc <- srlaplace_truncate(xl = 1, xr = 3)
 samples <- laplace_trunc(100)
 hist(samples, main = "Histogram of Truncated Laplace Samples", xlab = "Value", breaks = 20)

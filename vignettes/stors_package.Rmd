@@ -37,7 +37,7 @@ norm_grid = grid_optimizer("srnorm")
 ```
 
 
-With the optimized grid ready, sampling from the standard normal distribution can be easily achieved using the `srnorm` function. For more general normal distributions, where the mean and standard deviation are not zero and one respectively, the `srsnorm` function can be used.
+With the optimized grid ready, sampling from the standard normal distribution can be easily achieved using the `srnorm` function. For more general normal distributions, where the mean and standard deviation are not zero and one respectively, the `srnorm_scaled` function can be used.
 
 ```{r , echo = TRUE}
 
@@ -46,16 +46,16 @@ standard_normal_samples = srnorm(10)
 print(standard_normal_samples)
 
 # Generating samples from a normal distribution with mean = 4 and standard deviation = 2
-general_normal_samples = srsnorm(10, mu = 4, sd = 2)
+general_normal_samples = srnorm_scaled(10, mu = 4, sd = 2)
 print(general_normal_samples)
 
 ```
 
 One of the powerful features of the `stors` package is its ability to sample from truncated distributions efficiently. This is particularly useful when the area of interest in a distribution is limited to a specific range, and you want to avoid unnecessary computations outside this range. 
 
-The `stors` package simplifies the process of sampling from truncated distributions. For standard normal distributions, the `truncsrnorm()` function enables this feature. Users just need to provide the truncation bounds, and the function returns a sampler that is confined to these bounds. This means that the sampling is focused only within the specified range, making the process more efficient, especially when the cumulative distribution function (CDF) does not need to be evaluated, which is the case for a grid with wide steps range covering most of the target density domain. 
+The `stors` package simplifies the process of sampling from truncated distributions. For standard normal distributions, the `srnorm_truncate()` function enables this feature. Users just need to provide the truncation bounds, and the function returns a sampler that is confined to these bounds. This means that the sampling is focused only within the specified range, making the process more efficient, especially when the cumulative distribution function (CDF) does not need to be evaluated, which is the case for a grid with wide steps range covering most of the target density domain. 
 
-Here's an example of how to use `truncsrnorm()` to create a sampler for a truncated normal distribution:
+Here's an example of how to use `srnorm_truncate()` to create a sampler for a truncated normal distribution:
 
 ```{r , echo = TRUE}
 
@@ -64,7 +64,7 @@ lower_bound = -1
 upper_bound = 1
 
 # Creating a sampling function for a truncated normal distribution
-truncated_normal_sampler = truncsrnorm(xl = lower_bound, xr = upper_bound)
+truncated_normal_sampler = srnorm_truncate(xl = lower_bound, xr = upper_bound)
 
 # Generating samples from the truncated normal distribution
 truncated_samples = truncated_normal_sampler(100)
@@ -175,7 +175,7 @@ h_prime_bi <- function(x) {
   (-(exp(-1/2 * (-4 + x)^2) * 0.5 * (-4 + x))/sqrt(2 * pi) - (exp(-x^2/2) * 0.5 * x)/sqrt(2 * pi))/((exp(-x^2/2) * 0.5)/sqrt(2 * pi) + (exp(-1/2 * (-4 + x)^2) * 0.5)/sqrt(2 * pi))
 }
 
-bi_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_bi, f = f_bi, h = h_bi, h_prime = h_prime_bi)
+bi_grid = build_grid(lb = -Inf, rb = Inf, modes = modes_bi, f = f_bi, h = h_bi, h_prime = h_prime_bi)
 
 
 ```

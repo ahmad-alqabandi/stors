@@ -37,19 +37,18 @@
 #'
 #' @return
 #' This function generates and stores and return an optimized grid for the specified built-in distribution in R's internal data directory.
-#' \itemize{
-#'   \item{"grid_data"}{A data frame including the created steps information, such as 'x' (the beginning of each step on the x-axis), 's_upper' (the step height on the y-axis), 'p_a' (pre-acceptance probability for each step), and 's_upper_lower' (a vector used to re-scale the uniform random number when the sample is accepted).}
-#'   \item{"areas"}{A vector containing the areas under the left tail bound, the steps in the middle, and the right tail bound.}
-#'   \item{"steps_number"}{A scalar representing the number of steps in the proposal.}
-#'   \item{"sampling_probabilities"}{A vector containing the areas under the left tail and the combined area of the left tail and middle steps.}
-#'   \item{"unif_scaler"}{A scalar representing the inverse probability of sampling from the step part of the proposal, \eqn{\frac{1}{p(lb < x < rb)}}. Similar to 's_upper_lower' in the 'grid_data' data frame, this value is used to scale the uniform random value when sampling from the steps part of the proposal.}
-#'   \item{"lt_properties"}{A vector including 5 values used when sampling under the proposal's left tail using the ARS (Adaptive Rejection Sampling) method.}
-#'   \item{"rt_properties"}{A vector including 6 values used when sampling under the proposal's right tail using the ARS method.}
-#'   \item{"alpha"}{A scalar representing the uniform step area.}
-#'   \item{"tails_method"}{A string representing the tails sampling method, either 'ARS' for Adaptive Rejection Sampling or 'IT' for Inverse Transform.}
-#'   \item{"grid_bounds"}{A vector including the left and right bounds of the target density.}
-#'   \item{"dens_func"}{The function passed by the user for the target density 'f'.}
-#' }
+#'\item{"grid_data"}{A data frame including the created steps information, such as 'x' (the beginning of each step on the x-axis), 's_upper' (the step height on the y-axis), 'p_a' (pre-acceptance probability for each step), and 's_upper_lower' (a vector used to re-scale the uniform random number when the sample is accepted).}
+#'\item{"areas"}{A vector containing the areas under the left tail bound, the steps in the middle, and the right tail bound.}
+#'\item{"steps_number"}{A scalar representing the number of steps in the proposal.}
+#'\item{"sampling_probabilities"}{A vector containing the areas under the left tail and the combined area of the left tail and middle steps.}
+#'\item{"unif_scaler"}{A scalar representing the inverse probability of sampling from the step part of the proposal, \eqn{\frac{1}{p(lb < x < rb)}}. Similar to 's_upper_lower' in the 'grid_data' data frame, this value is used to scale the uniform random value when sampling from the steps part of the proposal.}
+#'\item{"lt_properties"}{A vector including 5 values used when sampling under the proposal's left tail using the ARS (Adaptive Rejection Sampling) method.}
+#'\item{"rt_properties"}{A vector including 6 values used when sampling under the proposal's right tail using the ARS method.}
+#'\item{"alpha"}{A scalar representing the uniform step area.}
+#'\item{"tails_method"}{A string representing the tails sampling method, either 'ARS' for Adaptive Rejection Sampling or 'IT' for Inverse Transform.}
+#'\item{"grid_bounds"}{A vector including the left and right bounds of the target density.}
+#'\item{"dens_func"}{The function passed by the user for the target density 'f'.}
+#' 
 #'
 #' @export
 grid_optimizer <- function(density_name = stors_env$grids$builtin$names,
@@ -67,7 +66,7 @@ grid_optimizer <- function(density_name = stors_env$grids$builtin$names,
     target = list(
       density = dendata$f,
       log_density = NULL,
-      log_target_prime = NULL,
+      log_density_prime = NULL,
       Cumulitive_density = NULL,
       modes = dendata$modes,
       modes_count = length(dendata$modes),
@@ -153,7 +152,7 @@ find_optimal_grid <- function(gp) {
       
       max_right_stps = find_right_steps(
         gp = gp,
-        a = 0.001,
+        area = 0.001,
         mode_i = mode_n,
         steps_lim = Inf
       )$steps
@@ -191,7 +190,7 @@ find_optimal_grid <- function(gp) {
     for (i in (1:length(opt_areas))) {
       area = opt_areas[i]
       
-      if (is.na(rstpsp)) {
+      if (is.null(rstpsp)) {
         step = Inf
       } else{
         step = opt_steps[i]
@@ -228,7 +227,7 @@ find_optimal_grid <- function(gp) {
         })
         free_cache_cnum_c(cnum)
         
-        steps_time = append(steps_time, median(cost$time[cost$expr == "st"]))
+        steps_time = append(steps_time, stats::median(cost$time[cost$expr == "st"]))
         
         
         if (verbose) {
@@ -257,7 +256,7 @@ find_optimal_grid <- function(gp) {
     }
     
     opt_performance = performance[which(performance$time == min(performance$time, na.rm = TRUE))[1], ]
-    print(opt_performance)
+
     gp$proposal$optimal_step_area = opt_performance$area
     gp$proposal$steps = opt_performance$steps
     gp$proposal$left_steps_proportion = lstpsp

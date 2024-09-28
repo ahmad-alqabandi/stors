@@ -8,32 +8,40 @@
 #' This function evaluates the properties of the included target and proposal functions to create a plot for both functions. In cases where the
 #' proposal function's steps part is too dense, `x_min` and `x_max` can be set to crop and scale the chart for better visualization.
 #'
-#' @param grid A list generated using STORS' `build_grid()` or `grid_optimizer()` functions.
+#' @param x A list generated using STORS' `build_grid()` or `grid_optimizer()` functions.
 #' @param x_min A scalar that represents the left cropping of the chart on the x-axis.
 #' @param x_max A scalar that represents the right cropping of the chart on the x-axis.
+#' @param ... Additional arguments passed to the `plot` function.
 #' 
-#' @return A plot.
+#' @return A plot of the target density and proposal. If `ggplot2` is available, it returns a `ggplot` object representing the plot. otherwise, it uses the base `plot` function.
 #'
+#' @seealso
+#' \code{\link{print.grid}}
+#' 
+#' 
 #' @examples
-#' # Define the density function, its logarithm, and its derivative for the standard normal distribution
+#' # Define the density function, its logarithm,
+#' # and its derivative for the standard normal distribution
 #' modes_norm = 0
 #' f_norm <- function(x) { 1 / sqrt(2 * pi) * exp(-0.5 * x^2) }
 #' h_norm <- function(x) { log(f_norm(x)) }
 #' h_prime_norm <- function(x) { -x }
 #'
 #' # Build a dense grid for the standard normal distribution
-#' norm_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_norm, f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 4000)
+#' norm_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_norm,
+#'  f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 4000)
 #'
 #' # Plot the generated grid
 #' plot(norm_grid)
 #'
 #' # To visualize the grid in a cropped area between -0.1 and 0
 #' plot(norm_grid, x_min = -0.1, x_max = 0)
-#'
+#' 
 #'@method plot grid
 #' @export
-plot.grid <- function(grid, x_min = NA, x_max = NA,...){
+plot.grid <- function(x, x_min = NA, x_max = NA,...){
   
+  grid <- x
   
   n = nrow(grid$grid_data)
   
@@ -91,8 +99,8 @@ plot.grid <- function(grid, x_min = NA, x_max = NA,...){
   
   n <- n+1
   
-  if (requireNamespace("ggplot2")) {
-    suppressWarnings({
+  if (requireNamespace("ggplot2", quietly = TRUE)) {
+    #suppressWarnings({
     ggplot2::ggplot() +
       ggplot2::geom_step(ggplot2::aes(grid$grid_data[1:(n),]$x, grid$grid_data[1:(n),]$s_upper), color = "red") +
       ggplot2::geom_step(ggplot2::aes(grid$grid_data[2:(n-1),]$x, grid$grid_data[2:(n-1),]$s_upper * grid$grid_data[2:(n-1),]$p_a), color = "green") +
@@ -103,7 +111,7 @@ plot.grid <- function(grid, x_min = NA, x_max = NA,...){
       ggplot2::xlab("x") +
       ggplot2::ylab("Density") +
       ggplot2::coord_cartesian(xlim = c(x_min, x_max), ylim = c(y_min, y_max))
-    })
+    #})
   } else{
     class(grid) <- "list"
     plot(grid, ...)
@@ -124,26 +132,32 @@ plot.grid <- function(grid, x_min = NA, x_max = NA,...){
 #'  This includes the number of steps within the grid, the range of values covered by the grid, and the grid's sampling efficiency.
 #'   This information is crucial for understanding the structure and performance of the grid in sampling processes.
 #'
-#' @param grid A list generated using STORS' `build_grid()` or `grid_optimizer()` functions.
-#'
+#' @param x A list generated using STORS' `build_grid()` or `grid_optimizer()` functions.
+#' @param ... Additional arguments passed to the `print` function.
+#' 
 #' @return Prints a summary of the grid's properties, but does not return any value.
 #'
 #' @examples
-#' # Define the density function, its logarithm, and its derivative for the standard normal distribution
+#' # Define the density function, its logarithm,
+#' #and its derivative for the standard normal distribution
 #' modes_norm = 0
 #' f_norm <- function(x) { 1 / sqrt(2 * pi) * exp(-0.5 * x^2) }
 #' h_norm <- function(x) { log(f_norm(x)) }
 #' h_prime_norm <- function(x) { -x }
 #'
 #' # Build a dense grid for the standard normal distribution
-#' norm_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_norm, f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 1000)
+#' norm_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_norm,
+#'  f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 1000)
 #'
 #' # Print the properties of the generated grid
 #' print(norm_grid)
 #'
 #' @export
 #' @method print grid
-print.grid <- function(grid, ...) {
+print.grid <- function(x, ...) {
+  
+  grid <- x
+  
   formatted_steps <- format(grid$steps_number, big.mark = ",", scientific = FALSE)
   cat("The grid contains", formatted_steps, "steps within the domain range  [", grid$grid_data$x[1], ",", grid$grid_data$x[grid$steps_number + 1], "].\n")
   cat(sprintf("With a sampling efficiency of %.2f%%", 1 / sum(grid$areas) * 100), "\n")
@@ -165,28 +179,33 @@ print.grid <- function(grid, ...) {
 #' normal_grid = build_grid(f = f_normal, modes = 0, lb = -Inf, rb = Inf, steps = 1000)
 #' print(normal_grid)
 #'
-#' # `print_grids()` prints all grids stored in R's internal data directory. To see this, we first save 'normal_grid' using `save_grid()`
+#' # `print_grids()` prints all grids stored in R's internal data directory.
+#' # To see this, we first save 'normal_grid' using `save_grid()`
 #' save_grid(normal_grid, "normal")
 #'
-#' # Since 'normal_grid' is now stored on this machine, we can confirm this by printing all saved grids
+#' # Since 'normal_grid' is now stored on this machine,
+#' # we can confirm this by printing all saved grids
 #' print_grids()
 #' 
 print_grids <- function( ){
   
-  stopifnot(" there are no grids stored by the user " = nrow(stors_env$grids$user) != 0)
-  
-  grids <- list.files(path = stors_env$user_dirs$data_dir, full.names = TRUE)
-  
-  grids_details <- file.info(grids)
-  
-  grids_sizes <- grids_details[grids_details$isdir == FALSE,]$size
-  
-  print(stors_env$grids$user)
-  
-  grids_sizes <- formatC(sum(as.double(grids_sizes))/1028, format = "f", digits = 2)
-  
-  cat("\n grids_size : ", grids_sizes," KB")
-  
+  if(nrow(stors_env$grids$user) == 0){
+    message("No grids are currently stored.")
+  }else{
+    
+    grids <- list.files(path = stors_env$user_dirs$data_dir, full.names = TRUE)
+    
+    grids_details <- file.info(grids)
+    
+    grids_sizes <- grids_details[grids_details$isdir == FALSE,]$size
+    
+    print(stors_env$grids$user)
+    
+    grids_sizes <- formatC(sum(as.double(grids_sizes))/1028, format = "f", digits = 2)
+    
+    cat("\n grids_size : ", grids_sizes," KB")
+  }
+
 }
 
 
@@ -216,10 +235,12 @@ print_grids <- function( ){
 #' normal_grid = build_grid(f = f_normal, modes = 0, lb = -Inf, rb = Inf, steps = 1000)
 #' print(normal_grid)
 #'
-#' # Then, we can save this grid in R's internal data directory using `save_grid()` with the name "normal"
+#' # Then, we can save this grid in R's internal data directory using `save_grid()`
+#' # with the name "normal"
 #' save_grid(normal_grid, "normal")
 #'
-#' # To make sure the 'normal_grid' has been stored in R's internal data directory, we can print all saved grids using `print_grids()`
+#' # To make sure the 'normal_grid' has been stored in R's internal data directory,
+#' # we can print all saved grids using `print_grids()`
 #' print_grids()
 #' 
 save_grid <- function(grid, grid_name) {
@@ -302,7 +323,8 @@ delete_grid <- function(grid_name){
 #' # Then, save this grid in R's internal data directory using `save_grid()` with the name "normal"
 #' save_grid(normal_grid, "normal")
 #'
-#' # Now, in case the R session is restarted and the grid is no longer in memory, it can be loaded from the machine as follows:
+#' # Now, in case the R session is restarted and the grid is no longer in memory,
+#' # it can be loaded from the machine as follows:
 #' loaded_normal_grid <- load_grid("normal")
 #' print(loaded_normal_grid)
 #'  

@@ -51,17 +51,20 @@ The function validates the truncation bounds before creating the sampling functi
 grid_optimizer("srexp")
 
 # Generating Samples from a Standard Exponential Distribution
-# This example illustrates how to generate 10 samples from a standard exponential distribution.
+# This example illustrates how to generate 10 samples,
+# from a standard exponential distribution.
 samples <- srexp(10)
 print(samples)
 
 # Generating Samples from an Exponential Distribution with a Specific Scale
-# This example demonstrates how to generate 10 samples from an exponential distribution with a scale parameter of 2.
+# This example demonstrates how to generate 10 samples,
+# from an exponential distribution with a scale parameter of 2.
 samples <- srexp_scaled(n = 10, scale = 2)
 print(samples)
 
 # Generating Samples from a Truncated Exponential Distribution
-# This example demonstrates how to generate 100 samples from an exponential distribution truncated in the range [1, 3].
+# This example demonstrates how to generate 100 samples,
+# from an exponential distribution truncated in the range [1, 3].
 exp_trunc <- srexp_truncate(xl = 1, xr = 3)
 samples <- exp_trunc(100)
 hist(samples, main = "Histogram of Truncated Exponential Samples", xlab = "Value", breaks = 20)

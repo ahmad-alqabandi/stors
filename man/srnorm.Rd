@@ -54,7 +54,8 @@ The separation of these functions enhances performance, as the Stors algorithm i
 \examples{
 # Generating Samples from a Standard Normal Distribution
 # This example illustrates how to generate 10 samples from a standard normal distribution.
-# It first optimizes the grid for sampling using `grid_optimizer` and then generates samples using `srnorm`.
+# It first optimizes the grid for sampling using `grid_optimizer`,
+# and then generates samples using `srnorm`.
 
 # Optimize the grid for the standard normal distribution
 grid_optimizer("srnorm")
@@ -65,13 +66,15 @@ print(samples)
 
 
 # Generating Samples from a Normal Distribution with Specific Mean and Standard Deviation
-# This example demonstrates how to generate 10 samples from a normal distribution with a mean of 4 and a standard deviation of 2.
+# This example demonstrates how to generate 10,
+# samples from a normal distribution with a mean of 4 and a standard deviation of 2.
 
 samples <- srnorm_scaled(n = 10, mu = 4, sd = 2)
 print(samples)
 
 # Generating Samples from a Truncated Standard Normal Distribution
-# This example demonstrates how to generate 100 samples from a standard normal distribution truncated in the range [-2, 2].
+# This example demonstrates how to generate 100,
+# samples from a standard normal distribution truncated in the range [-2, 2].
 
 # Create the truncated sampling function
 norm_trunc <- srnorm_truncate(xl = -2, xr = 2)

@@ -27,13 +27,15 @@
 #' @examples
 #' 
 #' # Example 1
-#' # To sample from a standard normal distribution \( f(x) \sim \mathcal{N}(0,1) \), first build the proposal grid using `build_grid()`
+#' # To sample from a standard normal distribution \( f(x) \sim \mathcal{N}(0,1) \),
+#' # first build the proposal grid using `build_grid()`
 #'
 #' modes_norm = 0
 #' f_norm <- function(x) { 1 / sqrt(2 * pi) * exp(-0.5 * x^2) }
 #' h_norm <- function(x) { log(f_norm(x)) }
 #' h_prime_norm <- function(x) { -x }
-#' normal_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_norm, f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 1000)
+#' normal_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_norm,
+#'  f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 1000)
 #'
 #' # Generate samples from the standard normal distribution
 #' sample_normal <- stors(normal_grid)
@@ -89,7 +91,6 @@ stors <- function(grid, xl = grid$grid_bounds[1], xr = grid$grid_bounds[2]) {
   
   rfunc_env <- new.env()
   
-  
   if( xl != grid$grid_bounds[1] || xr != grid$grid_bounds[2]){
 
       stopifnot(
@@ -106,7 +107,7 @@ stors <- function(grid, xl = grid$grid_bounds[1], xr = grid$grid_bounds[2]) {
 
     function_string <- paste0("function(n) { .Call(C_stors, n, ",paste0(Cnum),", dens_func, rfunc_env) }" )
   }
-
+  
   function_expression <- parse(text = function_string)
   
   sampling_function <- eval(function_expression)
@@ -122,18 +123,20 @@ cache_stors_grid <- function(grid){
   
   if(digest(grid) %in% stors_env$user_cached_grids$Id ){
     
-    Cnum = subset(stors_env$user_cached_grids, Id == digest(grid))$Cnum
+    Cnum = stors_env$user_cached_grids[stors_env$user_cached_grids$Id == digest(grid), "Cnum"]
     
   } else{
     
-    n = nrow(stors_env$user_cached_grids) + 5
-    # 5 is padding
+    n <- nrow(stors_env$user_cached_grids) + 1
     
-    stors_env$user_cached_grids[n,]$Id = digest(grid)
+    Cnum <- stors_env$grids$builtin$builtin_num + 100 + n
     
-    Cnum <- stors_env$user_cached_grids[n,]$Cnum <- stors_env$grids$biultin$builtin_num + n
+    new_row <- data.frame(Id = digest(grid), Cnum = Cnum)
+    
+    stors_env$user_cached_grids <- rbind(stors_env$user_cached_grids, new_row)
     
     cache_grid_c(Cnum, grid)
+    
     
   }
   

@@ -9,9 +9,9 @@
 
 #define R_TAIL IT
 
-#define L_ITF(u)(log(2*u))
+#define L_ITF(u)(0.5 * exp(u))
 
-#define R_ITF(u)(-log(2 - 2 * u))
+#define R_ITF(u)(1 - (0.5 * exp(-u)))
 
 #define F(x)(0.5 * exp(-fabs(x)))
 

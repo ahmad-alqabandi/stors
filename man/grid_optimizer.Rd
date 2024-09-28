@@ -28,19 +28,17 @@ grid_optimizer(
 }
 \value{
 This function generates and stores and return an optimized grid for the specified built-in distribution in R's internal data directory.
-\itemize{
-  \item{"grid_data"}{A data frame including the created steps information, such as 'x' (the beginning of each step on the x-axis), 's_upper' (the step height on the y-axis), 'p_a' (pre-acceptance probability for each step), and 's_upper_lower' (a vector used to re-scale the uniform random number when the sample is accepted).}
-  \item{"areas"}{A vector containing the areas under the left tail bound, the steps in the middle, and the right tail bound.}
-  \item{"steps_number"}{A scalar representing the number of steps in the proposal.}
-  \item{"sampling_probabilities"}{A vector containing the areas under the left tail and the combined area of the left tail and middle steps.}
-  \item{"unif_scaler"}{A scalar representing the inverse probability of sampling from the step part of the proposal, \eqn{\frac{1}{p(lb < x < rb)}}. Similar to 's_upper_lower' in the 'grid_data' data frame, this value is used to scale the uniform random value when sampling from the steps part of the proposal.}
-  \item{"lt_properties"}{A vector including 5 values used when sampling under the proposal's left tail using the ARS (Adaptive Rejection Sampling) method.}
-  \item{"rt_properties"}{A vector including 6 values used when sampling under the proposal's right tail using the ARS method.}
-  \item{"alpha"}{A scalar representing the uniform step area.}
-  \item{"tails_method"}{A string representing the tails sampling method, either 'ARS' for Adaptive Rejection Sampling or 'IT' for Inverse Transform.}
-  \item{"grid_bounds"}{A vector including the left and right bounds of the target density.}
-  \item{"dens_func"}{The function passed by the user for the target density 'f'.}
-}
+\item{"grid_data"}{A data frame including the created steps information, such as 'x' (the beginning of each step on the x-axis), 's_upper' (the step height on the y-axis), 'p_a' (pre-acceptance probability for each step), and 's_upper_lower' (a vector used to re-scale the uniform random number when the sample is accepted).}
+\item{"areas"}{A vector containing the areas under the left tail bound, the steps in the middle, and the right tail bound.}
+\item{"steps_number"}{A scalar representing the number of steps in the proposal.}
+\item{"sampling_probabilities"}{A vector containing the areas under the left tail and the combined area of the left tail and middle steps.}
+\item{"unif_scaler"}{A scalar representing the inverse probability of sampling from the step part of the proposal, \eqn{\frac{1}{p(lb < x < rb)}}. Similar to 's_upper_lower' in the 'grid_data' data frame, this value is used to scale the uniform random value when sampling from the steps part of the proposal.}
+\item{"lt_properties"}{A vector including 5 values used when sampling under the proposal's left tail using the ARS (Adaptive Rejection Sampling) method.}
+\item{"rt_properties"}{A vector including 6 values used when sampling under the proposal's right tail using the ARS method.}
+\item{"alpha"}{A scalar representing the uniform step area.}
+\item{"tails_method"}{A string representing the tails sampling method, either 'ARS' for Adaptive Rejection Sampling or 'IT' for Inverse Transform.}
+\item{"grid_bounds"}{A vector including the left and right bounds of the target density.}
+\item{"dens_func"}{The function passed by the user for the target density 'f'.}
 }
 \description{
 This function optimizes and stores the sampling grid for STROS built-in distributions.
@@ -53,7 +51,7 @@ Before sampling from built-in distributions in the STROS package,
  ensuring that the grid is both space-efficient and capable of facilitating fast sampling.
 
 For optimal grid configuration, it is advised that users refrain from manually setting the `Theta`, `steps`, or `grid_range` parameters, as `grid_optimizer()` automatically determines the best settings.
- However, users can provide their own values for these parameters to customize the grid according to specific requirements. For more detailed information about these arguments and optimization process, please refer to the manual page of `grid_builder()`.
+ However, users can provide their own values for these parameters to customize the grid according to specific requirements. For more detailed information about these arguments and optimization process, please refer to the manual page of `build_final_grid()`.
 }
 \examples{
 # Optimize grid for sampling from the normal distribution

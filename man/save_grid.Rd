@@ -23,10 +23,12 @@ f_normal <- function(x) { 0.3989423 * exp(-0.5 * x^2) }
 normal_grid = build_grid(f = f_normal, modes = 0, lb = -Inf, rb = Inf, steps = 1000)
 print(normal_grid)
 
-# Then, we can save this grid in R's internal data directory using `save_grid()` with the name "normal"
+# Then, we can save this grid in R's internal data directory using `save_grid()`
+# with the name "normal"
 save_grid(normal_grid, "normal")
 
-# To make sure the 'normal_grid' has been stored in R's internal data directory, we can print all saved grids using `print_grids()`
+# To make sure the 'normal_grid' has been stored in R's internal data directory,
+# we can print all saved grids using `print_grids()`
 print_grids()
 
 }

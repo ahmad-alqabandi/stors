@@ -4,10 +4,12 @@
 \alias{print.grid}
 \title{Print Method for Grid Objects}
 \usage{
-\method{print}{grid}(grid, ...)
+\method{print}{grid}(x, ...)
 }
 \arguments{
-\item{grid}{A list generated using STORS' `build_grid()` or `grid_optimizer()` functions.}
+\item{x}{A list generated using STORS' `build_grid()` or `grid_optimizer()` functions.}
+
+\item{...}{Additional arguments passed to the `print` function.}
 }
 \value{
 Prints a summary of the grid's properties, but does not return any value.
@@ -22,14 +24,16 @@ This method extends the generic `print` function for objects of class `grid`.
 It prints the provided grid's features such as the number of steps, steps limit, and efficiency.
 }
 \examples{
-# Define the density function, its logarithm, and its derivative for the standard normal distribution
+# Define the density function, its logarithm,
+#and its derivative for the standard normal distribution
 modes_norm = 0
 f_norm <- function(x) { 1 / sqrt(2 * pi) * exp(-0.5 * x^2) }
 h_norm <- function(x) { log(f_norm(x)) }
 h_prime_norm <- function(x) { -x }
 
 # Build a dense grid for the standard normal distribution
-norm_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_norm, f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 1000)
+norm_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_norm,
+ f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 1000)
 
 # Print the properties of the generated grid
 print(norm_grid)

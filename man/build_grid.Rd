@@ -7,7 +7,7 @@
 build_grid(
   lb = -Inf,
   rb = Inf,
-  modes = NA,
+  modes = NULL,
   between_minima = NULL,
   f = NA,
   h = NULL,
@@ -26,7 +26,8 @@ build_grid(
 
 \item{modes}{Vector indicating the modes of the density function.}
 
-\item{between_minima}{Optional vector indicating the minima located between the modes of the density function. If not provided, the approximate locations of these minima will be estimated.}
+\item{between_minima}{Optional vector indicating the minima located between the modes of the density function.
+If not provided, the approximate locations of these minima will be estimated.}
 
 \item{f}{Function accepting a single argument, returning the probability density of the target.}
 
@@ -38,78 +39,96 @@ build_grid(
 
 \item{grid_range}{Optional Vector of two elements specifying the start and end points for constructing steps along the x-axis.}
 
-\item{theta}{Optional Scalar defining the pre-acceptance threshold, dictating when the proposal steps constructing break based on the probability of pre-acceptance.}
+\item{theta}{Optional Scalar defining the pre-acceptance threshold,
+dictating when the proposal steps constructing break based on the probability of pre-acceptance.}
 
 \item{target_sample_size}{Scalar integer indicating the target sample size. The grid optimization process will take this number into account.}
 
 \item{verbose}{Boolean if set to True, a table detailing the optimization areas and steps will be displayed during grid optimization.}
 }
 \value{
-Returns a list containing the following elements related to the proposal distribution:
-\itemize{
-  \item{"grid_data"}{A data frame including the created steps information, such as 'x' (the beginning of each step on the x-axis), 's_upper' (the step height on the y-axis), 'p_a' (pre-acceptance probability for each step), and 's_upper_lower' (a vector used to re-scale the uniform random number when the sample is accepted).}
-  \item{"areas"}{A vector containing the areas under the left tail bound, the steps in the middle, and the right tail bound.}
-  \item{"steps_number"}{A scalar representing the number of steps in the proposal.}
-  \item{"sampling_probabilities"}{A vector containing the areas under the left tail and the combined area of the left tail and middle steps.}
-  \item{"unif_scaler"}{A scalar representing the inverse probability of sampling from the step part of the proposal, \eqn{\frac{1}{p(lb < x < rb)}}. Similar to 's_upper_lower' in the 'grid_data' data frame, this value is used to scale the uniform random value when sampling from the steps part of the proposal.}
-  \item{"lt_properties"}{A vector including 5 values used when sampling under the proposal's left tail using the ARS (Adaptive Rejection Sampling) method.}
-  \item{"rt_properties"}{A vector including 6 values used when sampling under the proposal's right tail using the ARS method.}
-  \item{"alpha"}{A scalar representing the uniform step area.}
-  \item{"tails_method"}{A string representing the tails sampling method, either 'ARS' for Adaptive Rejection Sampling or 'IT' for Inverse Transform.}
-  \item{"grid_bounds"}{A vector including the left and right bounds of the target density.}
-  \item{"dens_func"}{The function passed by the user for the target density 'f'.}
-}
+A list containing the following elements related to the proposal distribution:
+\item{grid_data}{A data frame including the created steps information, such as 'x' (the beginning of each step on the x-axis),
+ 's_upper' (the step height on the y-axis), 'p_a' (pre-acceptance probability for each step), and 's_upper_lower' (a vector used to re-scale the uniform random number when the sample is accepted).}
+\item{areas}{A vector containing the areas under the left tail bound, the steps in the middle, and the right tail bound.}
+\item{steps_number}{A scalar representing the number of steps in the proposal.}
+\item{sampling_probabilities}{A vector containing the areas under the left tail and the combined area of the left tail and middle steps.}
+\item{unif_scaler}{A scalar representing the inverse probability of sampling from the step part of the proposal, \eqn{\frac{1}{p(lb < x < rb)}}.
+ Similar to 's_upper_lower' in the 'grid_data' data frame, this value is used to scale the uniform random value when sampling from the steps part of the proposal.}
+\item{lt_properties}{A vector including 5 values used when sampling under the proposal's left tail using the ARS (Adaptive Rejection Sampling) method.}
+\item{rt_properties}{A vector including 6 values used when sampling under the proposal's right tail using the ARS method.}
+\item{alpha}{A scalar representing the uniform step area.}
+\item{tails_method}{A string representing the tails sampling method, either 'ARS' for Adaptive Rejection Sampling or 'IT' for Inverse Transform.}
+\item{grid_bounds}{A vector including the left and right bounds of the target density.}
+\item{dens_func}{The function passed by the user for the target density 'f'.}
 }
 \description{
-This function is essential for sampling from any uni-modal or multi-modal log-concave density function. It generates a proposal grid
-that can be utilized for this purpose. Simply provide the density function 'f' and its modes. For enhanced accuracy, include
-the log-transform 'h' of the density and its first derivative 'h_prime'. The grid optimization is pre-configured for efficiency,
+This function is essential for sampling from any uni-modal or multi-modal log-concave density function.
+ It generates a proposal grid that can be utilized for this purpose.
+ Simply provide the density function 'f' and its modes. For enhanced accuracy, include
+the log-transform 'h' of the density and its first derivative 'h_prime'.
+ The grid optimization is pre-configured for efficiency,
 but you can customize the grid-building process through various parameters to suit your specific needs.
 }
 \details{
-The grid building process is executed through the construction of constant area rectangles, starting from the modes of the target distribution.
-For each mode, rectangles are formed as steps around it, with a width defined by \eqn{(x_i - x_{i-1})} and a height determined by \eqn{\max(f(x_{i-1}), f(x_i))}.
+The grid building process is executed through the construction of constant area rectangles,
+ starting from the modes of the target distribution.
+For each mode, rectangles are formed as steps around it,
+ with a width defined by \eqn{(x_i - x_{i-1})} and a height determined by \eqn{\max(f(x_{i-1}), f(x_i))}.
 This method effectively covers the target distribution in a stepped pattern.
 
 
-The function `grid_builder()` manages the construction of these steps and calculates values critical for the sampling process. When the resultant grid is used with the `stors()` function, these values are cached,
-significantly enhancing the computational efficiency and hence improving sampling speed. During the optimization process, we aim for a certain grid
-size based on L1-3 memory cache size. Therefore, we test the speed of grids of sizes \eqn{2^m} Kb. To achieve this, we estimate the uniform step area
-based on a certain steps number that leads to the target cache size, \eqn{ \alpha = \frac{1}{\text{number of steps}} }.
+The function `build_final_grid()` manages the construction of these steps and calculates values critical for the sampling process.
+ When the resultant grid is used with the `stors()` function, these values are cached,
+significantly enhancing the computational efficiency and hence improving sampling speed.
+ During the optimization process, we aim for a certain grid
+size based on L1-3 memory cache size. Therefore, we test the speed of grids of sizes \eqn{2^m} Kb.
+ To achieve this, we estimate the uniform step area
+based on a certain steps number that leads to the target cache size,
+ \eqn{ \alpha = \frac{1}{\text{number of steps}} }.
 
 
-The speed testing for each possible grid is initially based on a sample size of 1000. However, if the user wishes to optimize the grid for a different sample size, they can do so
+The speed testing for each possible grid is initially based on a sample size of 1000.
+ However, if the user wishes to optimize the grid for a different sample size, they can do so
 by specifying the desired sample size using the 'target_sample_size' argument.
 
 
 In case the user wants to select a specific number of steps for the proposal grid
-and bypass the optimization process, this can be done by specifying a steps number greater than the number of modes by 2 using the 'steps' argument. If the target
-density is heavy-tailed, and the user wishes to stop the grid building process at a certain pre-acceptance threshold, this can be achieved by setting
-the acceptance probability threshold 'theta' \eqn{\theta}. Once the steps reach this level of pre-acceptance probability, the step construction will end \eqn{ \frac{\min(f(x_i), f(x_{i+1}))}{\max(f(x_i), f(x_{i+1}))} < \theta }.
+and bypass the optimization process, this can be done by specifying a steps number greater than the number of modes by 2 using the 'steps' argument.
+ If the target density is heavy-tailed,
+  and the user wishes to stop the grid building process at a certain pre-acceptance threshold, this can be achieved by setting
+the acceptance probability threshold 'theta' \eqn{\theta}.
+ Once the steps reach this level of pre-acceptance probability,
+  the step construction will end \eqn{ \frac{\min(f(x_i), f(x_{i+1}))}{\max(f(x_i), f(x_{i+1}))} < \theta }.
 Alternatively, if the user wishes to create the steps within certain limits on the
 x-axis, they can do so by specifying the proposal grid limits using the 'grid_range' argument.
 }
 \examples{
 
 # Example 1: Building a Grid for Standard Normal Distribution
-# This example demonstrates constructing a grid for a standard normal distribution \( f(x) \sim \mathcal{N}(0,1) \),
+# This example demonstrates constructing a grid for a standard normal distribution
+# \( f(x) \sim \mathcal{N}(0,1) \),
 # and shows the optimization table by setting `verbose` to `TRUE`.
 
-# Define the density function, its logarithm, and its derivative for the standard normal distribution
+# Define the density function, its logarithm,
+# and its derivative for the standard normal distribution
 modes_norm = 0
 f_norm <- function(x) { 1 / sqrt(2 * pi) * exp(-0.5 * x^2) }
 h_norm <- function(x) { log(f_norm(x)) }
 h_prime_norm <- function(x) { -x }
 
 # Build the proposal grid for the standard normal distribution
-norm_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_norm, f = f_norm, h = h_norm, h_prime = h_prime_norm, verbose = TRUE)
+norm_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_norm,
+ f = f_norm, h = h_norm, h_prime = h_prime_norm, verbose = TRUE)
 
 # Plot the generated grid
 plot(norm_grid)
 
 # Example 2: Grid for a Bimodal Distribution
-# This example shows how to build a grid for sampling from a bimodal distribution, combining two normal distributions
-# \( f(x) = 0.5 \cdot w_1(x) + 0.5 \cdot w_2(x) \), where \( w_1(x) \sim \mathcal{N}(0, 1) \) and \( w_2(x) \sim \mathcal{N}(4, 1) \).
+# This example shows how to build a grid for sampling from a bimodal distribution,
+#combining two normal distributions
+# \( f(x) = 0.5 \cdot w_1(x) + 0.5 \cdot w_2(x) \),
+# where \( w_1(x) \sim \mathcal{N}(0, 1) \) and \( w_2(x) \sim \mathcal{N}(4, 1) \).
 
 # Define the bimodal density function
 f_bimodal <- function(x) {
@@ -125,7 +144,8 @@ print(bimodal_grid)
 plot(bimodal_grid)
 
 # Example 3: Grid with 500 Steps for Bimodal Distribution
-# This example demonstrates constructing a grid with 500 steps for the bimodal distribution used in Example 2.
+# This example demonstrates constructing a grid with 500 steps,
+# for the bimodal distribution used in Example 2.
 
 bimodal_grid_500 = build_grid(lb = -Inf, rb = Inf, mode = modes_bimodal, f = f_bimodal, steps = 500)
 

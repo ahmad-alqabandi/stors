@@ -49,11 +49,11 @@ norm_sampler = stors(norm_grid)
 
 hist(norm_sampler(1000000))
 
-norm_trunc = trunc(norm_grid, -2,2)
+norm_trunc = stors(norm_grid, -2,2)
 
 hist(norm_trunc(10000))
 
-#=======================
+#======================= Built-in densities
 
 modes_multi = c(0.00134865,3.99865)
 
@@ -115,9 +115,9 @@ n = 10000
 
 hist(srnorm(n))
 
-trunc_srnorm = truncsrnorm(-1,3)
+ts = srnorm_truncate(-1,3)
 
-trunc_sample = trunc_srnorm(n)
+trunc_sample = ts(n)
 
 hist(trunc_sample)
 
@@ -138,17 +138,15 @@ microbenchmark::microbenchmark(
 
 ##    laplace
 
-laplace_grid = grid_optimizer("laplace")
+laplace_grid = grid_optimizer("srlaplace")
 
 plot(laplace_grid)
 
-plot(laplace_grid)
+hist(srlaplace(n))
 
-hist(laplace(n))
+tl = srlaplace_truncate(-2,3.3)
 
-trunc_laplace = trunclaplace(-2,3.3)
-
-trunc_sample = trunc_laplace(n)
+trunc_sample = tl(n)
   
 hist(trunc_sample)
 
@@ -158,7 +156,7 @@ library(LaplacesDemon)
 m=10000
 
 microbenchmark::microbenchmark(
-  laplace(m),
+  srlaplace(m),
   LaplacesDemon::ralaplace(m),
   rexp(m),
   times = 100
@@ -174,9 +172,9 @@ plot(srexp_grid)
 
 hist(srexp(n))
 
-trunc_srexp=truncsrexp(2,5)
+te=srexp_truncate(2,5)
 
-trunc_sample = trunc_srexp(n)
+trunc_sample = te(n)
 
 hist(trunc_sample)
 
@@ -191,13 +189,6 @@ microbenchmark::microbenchmark(
   rexp(m),
   times = 100
 )
-
-
-##    srcauchy
-
-sampe_size = 1
-
-times = ceiling( 100000 / sampe_size)
 
 
 
