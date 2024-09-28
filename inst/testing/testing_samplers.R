@@ -1,5 +1,60 @@
 
-##    STORS
+##    STORS uni modal
+
+
+modes = 0
+
+f_norm = function(x) {
+  0.3989423 * exp(-0.5 * x * x)
+}
+
+h_norm = function(x) {
+  log(0.3989423) - (x * x) * (1 / 2)
+}
+
+h_prime_norm = function(x) {
+  -x
+}
+
+norm_grid = build_grid(lb = -Inf, rb = Inf, modes , f = f_norm, h = h_norm, h_prime = h_prime_norm,
+                       steps = 1000, verbose = TRUE,  target_sample_size = 10000)
+
+plot(norm_grid)
+
+? save_grid
+
+? print_grids
+
+? delete_grid
+
+? load_grid
+
+norm_grid
+
+save_grid(norm_grid, "normal")
+
+print_grids()
+
+steps = 2000
+
+norm_grid = build_grid(lb = -Inf, rb = Inf, modes , f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = steps)
+
+norm_grid
+
+plot(norm_grid)
+
+norm_grid
+
+norm_sampler = stors(norm_grid)
+
+hist(norm_sampler(1000000))
+
+norm_trunc = stors(norm_grid, -2,2)
+
+hist(norm_trunc(10000))
+
+
+##    STORS multi modal
 
 modes_multi = c(0.00134865,3.99865)
 
@@ -21,8 +76,6 @@ h_prime_multi <- function(x) {
 
 multi_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_multi, f = f_multi, h = h_multi, h_prime = h_prime_multi)
 
-multi_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_multi, f = f_multi, a = 0.01, th = 0.001*2*2*2)
-
 plot(multi_grid)
 
 multi_grid
@@ -42,21 +95,25 @@ hist(multi_sampler(1000000))
 delete_grid("multi_grid")
 
 
-##  prebuilt dists
+#======================= Built-in densities
 
-n = 10000
+
 
 ##    srnorm
 
-srnorm_grid = stors::grid_optimizer("srnorm")
+srnorm_grid = grid_optimizer("srnorm" , verbose = TRUE)
 
-plot(srnorm_grid)
+print(srnorm_grid)
+
+plot(srnorm_grid, x_min = -4 ,x_max =4 )
+
+n = 10000
 
 hist(srnorm(n))
 
-trunc_srnorm = truncsrnorm(-1,3)
+ts = srnorm_truncate(-1,3)
 
-trunc_sample = trunc_srnorm(n)
+trunc_sample = ts(n)
 
 hist(trunc_sample)
 
@@ -66,7 +123,7 @@ max(trunc_sample)
 
 library(RcppZiggurat)
 
-m=10000
+m=100
 
 microbenchmark::microbenchmark(
   rnorm(m),
@@ -75,31 +132,29 @@ microbenchmark::microbenchmark(
   times = 100
 )
 
-##    srnorm
+##    laplace
 
-laplace_grid = grid_optimizer("laplace")
+laplace_grid = grid_optimizer("srlaplace")
 
 plot(laplace_grid)
 
-hist(laplace(n))
+hist(srlaplace(n))
 
-trunc_laplace = trunclaplace(-2,3.3)
+tl = srlaplace_truncate(-2,3.3)
 
-trunc_sample = trunc_laplace(n)
+trunc_sample = tl(n)
   
 hist(trunc_sample)
 
-min(trunc_sample)
-
-max(trunc_sample)
 
 library(LaplacesDemon)
 
 m=10000
 
 microbenchmark::microbenchmark(
-  laplace(m),
+  srlaplace(m),
   LaplacesDemon::ralaplace(m),
+  rexp(m),
   times = 100
 )
 
@@ -113,9 +168,9 @@ plot(srexp_grid)
 
 hist(srexp(n))
 
-trunc_srexp=truncsrexp(1.0009846662,5.87)
+te=srexp_truncate(2,5)
 
-trunc_sample = trunc_srexp(n)
+trunc_sample = te(n)
 
 hist(trunc_sample)
 
@@ -131,7 +186,5 @@ microbenchmark::microbenchmark(
   times = 100
 )
 
-
-##    srcauchy
 
 
