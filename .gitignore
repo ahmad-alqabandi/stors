@@ -5,6 +5,7 @@
 /src/*.o
 /src/*.o-*
 /src/*.d
+/src/*.dll
 /src/*.so
 inst/doc
 /doc/
