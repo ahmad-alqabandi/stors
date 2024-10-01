@@ -15,21 +15,23 @@ SEXP DEN_TRUNC(NAME)(SEXP s_size, SEXP Rxl, SEXP Rxr , SEXP Rcsl, SEXP Rcsr,  SE
 
     
     int j, sample_size = asInteger(s_size);
-    double csl = asReal(Rcsl), csr = asReal(Rcsr), xl = asReal(Rxl), xr = asReal(Rxr), tmpxl, tempxr ;
-    int il = asInteger(Ril), ir = asInteger(Rir);
+    double csl = asReal(Rcsl), csr = asReal(Rcsr), xr = asReal(Rxr), tempxr ;
+    int ir = asInteger(Rir);
       
-      if(grids.grid[CNUM].x == NULL){
-        REprintf("you need to optimize your destribution grid first");
-        R_RETURN_NULL
-      }
+    if(grids.grid[CNUM].x == NULL){
+      REprintf("you need to optimize your destribution grid first");
+      R_RETURN_NULL
+    }
       
-      struct grid g = grids.grid[CNUM];
+    struct grid g = grids.grid[CNUM];
       
-#ifdef L_TAIL 
-      if(il != -1){
-        tmpxl = g.x[il];
-        g.x[il] = xl;
-      }
+#ifdef L_TAIL
+    int il = asInteger(Ril);
+    double tmpxl;
+    if(il != -1){
+      tmpxl = g.x[il];
+      g.x[il] = asReal(Rxl);
+    }
 #endif      
 
 #ifdef R_TAIL 
@@ -208,4 +210,3 @@ SEXP DEN_TRUNC(NAME)(SEXP s_size, SEXP Rxl, SEXP Rxr , SEXP Rcsl, SEXP Rcsr,  SE
   
   
 #endif
-  

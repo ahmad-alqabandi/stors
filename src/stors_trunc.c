@@ -187,4 +187,3 @@ SEXP DEN_TRUNC(NAME)(SEXP s_size, SEXP Rcsl, SEXP Rcsr){
   
   
 #endif
-  
