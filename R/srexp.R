@@ -6,7 +6,7 @@
 #' Sampling from the exponential distribution using Stors.
 #'
 #' @details
-#' The function `srexp()` is used for sampling from a standard exponential distribution with a rate parameter of 1.
+#' The function \code{srexp()} is used for sampling from a standard exponential distribution with a rate parameter of 1.
 #'
 #' Exponential distribution has the density:
 #' \deqn{ f(x; \lambda) = \lambda e^{-\lambda x} }
@@ -15,7 +15,7 @@
 #' @param n Integer sample size.
 #'
 #' @return
-#' `srexp()` returns a sample of size `n` from a standard exponential distribution.
+#' \code{srexp()} returns a sample of size \code{n} from a standard exponential distribution.
 #'
 #' @examples
 #' 
@@ -44,7 +44,7 @@ srexp <- function(n) {
 #' @param scale Scalar scale parameter.
 #'
 #' @return
-#' `srexp_scaled()` returns a sample of size `n` from an exponential distribution with the specified scale parameter.
+#' \code{srexp_scaled()} returns a sample of size \code{n} from an exponential distribution with the specified scale parameter.
 #'
 #' @examples
 #' # Generating Samples from an Exponential Distribution with a Specific Scale
@@ -67,14 +67,14 @@ srexp_scaled <- function(n, scale = 1) {
 #' Creating a sampling function for a truncated exponential distribution.
 #'
 #' @details
-#' `srexp_truncate()` is used for sampling from a standard exponential distribution truncated within specified bounds.
+#' \code{srexp_truncate()} is used for sampling from a standard exponential distribution truncated within specified bounds.
 #' The function validates the truncation bounds before creating the sampling function.
 #'
 #' @param xl Lower bound for truncation.
 #' @param xr Upper bound for truncation.
 #'
 #' @return
-#' `srexp_truncate()` returns a function that generates `n` samples from a truncated exponential distribution between `xl` and `xr`.
+#' \code{srexp_truncate()} returns a function that generates \code{n} samples from a truncated exponential distribution between \code{xl} and \code{xr}.
 #'
 #' @examples
 #' # Generating Samples from a Truncated Exponential Distribution
@@ -87,11 +87,7 @@ srexp_scaled <- function(n, scale = 1) {
 #' @export
 srexp_truncate = function(xl, xr){
   
-  stopifnot(
-    "xl must be smaller that xr" = xl < xr,
-    "xl must be greater than the density lower bound" = xl >=  pbgrids$srexp$lb,
-    "xr must be smaller than the density upper bound" = xr <= pbgrids$srexp$rb
-  )
+  truncate_error_checking(xl, xr, pbgrids$srexp$lb, pbgrids$srexp$rb)
   
   Upper_cumsum = .Call(C_srexp_trunc_nav, xl, xr)
   

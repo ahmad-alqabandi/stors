@@ -7,20 +7,20 @@
 \method{print}{grid}(x, ...)
 }
 \arguments{
-\item{x}{A list generated using STORS' `build_grid()` or `grid_optimizer()` functions.}
+\item{x}{A list generated using STORS' \code{build_grid()} or \code{grid_optimizer()} functions.}
 
-\item{...}{Additional arguments passed to the `print` function.}
+\item{...}{Additional arguments passed to the \code{print} function.}
 }
 \value{
 Prints a summary of the grid's properties, but does not return any value.
 }
 \description{
-The function displays detailed information about the grid object created by STORS' `build_grid()` or `grid_optimizer()` functions.
+The function displays detailed information about the grid object created by STORS' \code{build_grid()} or \code{grid_optimizer()} functions.
  This includes the number of steps within the grid, the range of values covered by the grid, and the grid's sampling efficiency.
   This information is crucial for understanding the structure and performance of the grid in sampling processes.
 }
 \details{
-This method extends the generic `print` function for objects of class `grid`.
+This method extends the generic \code{print} function for objects of class \code{grid}.
 It prints the provided grid's features such as the number of steps, steps limit, and efficiency.
 }
 \examples{
@@ -36,6 +36,6 @@ norm_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_norm,
  f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 1000)
 
 # Print the properties of the generated grid
-print(norm_grid)
 
+print(norm_grid)
 }

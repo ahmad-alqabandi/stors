@@ -24,17 +24,17 @@ srnorm_truncate(xl = -Inf, xr = Inf)
 \item{xr}{Upper bound for truncation.}
 }
 \value{
-`srnorm()` returns a sample of size `n` from a standard normal distribution.
+\code{srnorm()} returns a sample of size \code{n} from a standard normal distribution.
 
-`srnorm_scaled()` returns a sample of size `n` from a normal distribution with mean \eqn{\mu} and standard deviation \eqn{\sigma}.
+\code{srnorm_scaled()} returns a sample of size \code{n} from a normal distribution with mean \eqn{\mu} and standard deviation \eqn{\sigma}.
 
-`srnorm_truncate()` returns a function that, when called with a sample size `n`, generates `n` samples from a normal distribution truncated between `xl` and `xr`.
+\code{srnorm_truncate()} returns a function that, when called with a sample size \code{n}, generates \code{n} samples from a normal distribution truncated between \code{xl} and \code{xr}.
 }
 \description{
 Sampling from the Normal distribution using Stors.
 }
 \details{
-The function `srnorm()` is used for sampling from a standard Normal distribution (mean = 0, standard deviation = 1).
+The function \code{srnorm()} is used for sampling from a standard Normal distribution (mean = 0, standard deviation = 1).
 
 
 
@@ -44,18 +44,18 @@ Normal distribution has the density:
 
 Where \eqn{\mu} is the mean and \eqn{\sigma} is the standard deviation.
 
-`srnorm_scaled()` allows sampling from any Normal distribution by specifying the mean and standard deviation.
+\code{srnorm_scaled()} allows sampling from any Normal distribution by specifying the mean and standard deviation.
 The separation of these functions enhances performance, as the Stors algorithm is highly efficient, and even simple arithmetic can impact its speed.
 
-'srnorm_truncate()', this function allows sampling from a standard normal distribution that is truncated within specified bounds.
+\code{srnorm_truncate()}, this function allows sampling from a standard normal distribution that is truncated within specified bounds.
  It is particularly useful when the area of interest in a normal distribution is limited to a specific range.
  The function first validates the truncation bounds to ensure they are within the allowable range of the distribution and then creates a tailored sampling function based on these bounds.
 }
 \examples{
 # Generating Samples from a Standard Normal Distribution
 # This example illustrates how to generate 10 samples from a standard normal distribution.
-# It first optimizes the grid for sampling using `grid_optimizer`,
-# and then generates samples using `srnorm`.
+# It first optimizes the grid for sampling using \code{grid_optimizer},
+# and then generates samples using \code{srnorm}.
 
 # Optimize the grid for the standard normal distribution
 grid_optimizer("srnorm")

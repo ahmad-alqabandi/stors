@@ -28,7 +28,7 @@ grid_optimizer(
 }
 \value{
 This function generates and stores and return an optimized grid for the specified built-in distribution in R's internal data directory.
-\item{"grid_data"}{A data frame including the created steps information, such as 'x' (the beginning of each step on the x-axis), 's_upper' (the step height on the y-axis), 'p_a' (pre-acceptance probability for each step), and 's_upper_lower' (a vector used to re-scale the uniform random number when the sample is accepted).}
+\item{"grid_data"}{A data frame including the created steps information, such as \code{x} (the beginning of each step on the x-axis), \code{s_upper} (the step height on the y-axis), \code{p_a} (pre-acceptance probability for each step), and \code{s_upper_lower} (a vector used to re-scale the uniform random number when the sample is accepted).}
 \item{"areas"}{A vector containing the areas under the left tail bound, the steps in the middle, and the right tail bound.}
 \item{"steps_number"}{A scalar representing the number of steps in the proposal.}
 \item{"sampling_probabilities"}{A vector containing the areas under the left tail and the combined area of the left tail and middle steps.}
@@ -38,20 +38,20 @@ This function generates and stores and return an optimized grid for the specifie
 \item{"alpha"}{A scalar representing the uniform step area.}
 \item{"tails_method"}{A string representing the tails sampling method, either 'ARS' for Adaptive Rejection Sampling or 'IT' for Inverse Transform.}
 \item{"grid_bounds"}{A vector including the left and right bounds of the target density.}
-\item{"dens_func"}{The function passed by the user for the target density 'f'.}
+\item{"dens_func"}{The function passed by the user for the target density \code{f}.}
 }
 \description{
 This function optimizes and stores the sampling grid for STROS built-in distributions.
 }
 \details{
 Before sampling from built-in distributions in the STROS package,
- it is necessary to first optimize the sampling grid for the specific distribution using `grid_optimizer()`.
+ it is necessary to first optimize the sampling grid for the specific distribution using \code{grid_optimizer()}.
  This function calculates and stores an optimized grid based on the given parameters or defaults.
  The optimization primarily focuses on balancing memory usage and computational efficiency,
  ensuring that the grid is both space-efficient and capable of facilitating fast sampling.
 
-For optimal grid configuration, it is advised that users refrain from manually setting the `Theta`, `steps`, or `grid_range` parameters, as `grid_optimizer()` automatically determines the best settings.
- However, users can provide their own values for these parameters to customize the grid according to specific requirements. For more detailed information about these arguments and optimization process, please refer to the manual page of `build_final_grid()`.
+For optimal grid configuration, it is advised that users refrain from manually setting the \code{Theta}, \code{steps}, or \code{grid_range} parameters, as \code{grid_optimizer()} automatically determines the best settings.
+ However, users can provide their own values for these parameters to customize the grid according to specific requirements. For more detailed information about these arguments and optimization process, please refer to the manual page of \code{build_final_grid()}.
 }
 \examples{
 # Optimize grid for sampling from the normal distribution

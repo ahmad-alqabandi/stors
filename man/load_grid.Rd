@@ -10,10 +10,10 @@ load_grid(grid_name)
 \item{grid_name}{A string specifying the name of the grid to be loaded.}
 }
 \value{
-Returns a list representing the grid stored under `grid_name` in R's internal data directory. If the grid corresponding to the specified name does not exist, an error message is displayed.
+Returns a list representing the grid stored under \code{grid_name} in R's internal data directory. If the grid corresponding to the specified name does not exist, an error message is displayed.
 }
 \description{
-This function loads a grid into memory that was previously saved using the `save_grid()` function. It is useful for retrieving saved grids for further analysis or processing.
+This function loads a grid into memory that was previously saved using the \code{save_grid()} function. It is useful for retrieving saved grids for further analysis or processing.
 }
 \examples{
 # First, let's create a grid to sample from a standard normal distribution

@@ -1,19 +1,19 @@
 
 #' Plot Method for Grid Objects
 #'
-#' This method extends the generic `plot` function for objects of class `grid`.
+#' This method extends the generic \code{plot()} function for objects of class \code{grid}.
 #' It offers custom plotting functionality specifically designed for visualizing grid objects.
 #'
 #' @description
 #' This function evaluates the properties of the included target and proposal functions to create a plot for both functions. In cases where the
-#' proposal function's steps part is too dense, `x_min` and `x_max` can be set to crop and scale the chart for better visualization.
+#' proposal function's steps part is too dense, \code{x_min} and \code{x_max} can be set to crop and scale the chart for better visualization.
 #'
-#' @param x A list generated using STORS' `build_grid()` or `grid_optimizer()` functions.
+#' @param x A list generated using STORS' \code{build_grid()} or \code{grid_optimizer()} functions.
 #' @param x_min A scalar that represents the left cropping of the chart on the x-axis.
 #' @param x_max A scalar that represents the right cropping of the chart on the x-axis.
-#' @param ... Additional arguments passed to the `plot` function.
+#' @param ... Additional arguments passed to the \code{plot} function.
 #' 
-#' @return A plot of the target density and proposal. If `ggplot2` is available, it returns a `ggplot` object representing the plot. otherwise, it uses the base `plot` function.
+#' @return A plot of the target density and proposal. If \code{ggplot2} is available, it returns a \code{ggplot} object representing the plot. otherwise, it uses the base \code{plot()} function.
 #'
 #' @seealso
 #' \code{\link{print.grid}}
@@ -124,16 +124,16 @@ plot.grid <- function(x, x_min = NA, x_max = NA,...){
 
 #' Print Method for Grid Objects
 #'
-#' This method extends the generic `print` function for objects of class `grid`.
+#' This method extends the generic \code{print} function for objects of class \code{grid}.
 #' It prints the provided grid's features such as the number of steps, steps limit, and efficiency.
 #'
 #' @description
-#' The function displays detailed information about the grid object created by STORS' `build_grid()` or `grid_optimizer()` functions.
+#' The function displays detailed information about the grid object created by STORS' \code{build_grid()} or \code{grid_optimizer()} functions.
 #'  This includes the number of steps within the grid, the range of values covered by the grid, and the grid's sampling efficiency.
 #'   This information is crucial for understanding the structure and performance of the grid in sampling processes.
 #'
-#' @param x A list generated using STORS' `build_grid()` or `grid_optimizer()` functions.
-#' @param ... Additional arguments passed to the `print` function.
+#' @param x A list generated using STORS' \code{build_grid()} or \code{grid_optimizer()} functions.
+#' @param ... Additional arguments passed to the \code{print} function.
 #' 
 #' @return Prints a summary of the grid's properties, but does not return any value.
 #'
@@ -150,9 +150,8 @@ plot.grid <- function(x, x_min = NA, x_max = NA,...){
 #'  f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 1000)
 #'
 #' # Print the properties of the generated grid
-#' print(norm_grid)
 #'
-#' @export
+#' print(norm_grid)
 #' @method print grid
 print.grid <- function(x, ...) {
   
@@ -160,6 +159,7 @@ print.grid <- function(x, ...) {
   
   formatted_steps <- format(grid$steps_number, big.mark = ",", scientific = FALSE)
   cat("The grid contains", formatted_steps, "steps within the domain range  [", grid$grid_data$x[1], ",", grid$grid_data$x[grid$steps_number + 1], "].\n")
+#' @export
   cat(sprintf("With a sampling efficiency of %.2f%%", 1 / sum(grid$areas) * 100), "\n")
 }
 
@@ -171,7 +171,7 @@ print.grid <- function(x, ...) {
 #' @description
 #' This function prints details of all grids stored by the user. It provides information on each grid, including the grid name, size, efficiency, and other relevant details.
 #'
-#' @export
+#'
 #'
 #' @examples
 #' # First, let's create a grid to sample from a standard normal distribution
@@ -180,13 +180,27 @@ print.grid <- function(x, ...) {
 #' print(normal_grid)
 #'
 #' # `print_grids()` prints all grids stored in R's internal data directory.
-#' # To see this, we first save 'normal_grid' using `save_grid()`
+#' # To see this, we first save `normal_grid` using `save_grid()`
 #' save_grid(normal_grid, "normal")
 #'
-#' # Since 'normal_grid' is now stored on this machine,
+#' # Since `normal_grid` is now stored on this machine,
 #' # we can confirm this by printing all saved grids
 #' print_grids()
+#'
+#' # Example 2: Create and Save a Grid for a Bimodal Distribution
+#' f_bimodal <- function(x) {
+#'   0.5 * (1 / sqrt(2 * pi)) * exp(-(x^2) / 2) + 
+#'   0.5 * (1 / sqrt(2 * pi)) * exp(-((x - 4)^2) / 2)
+#' }
+#' modes_bimodal = c(0, 4)
+#' bimodal_grid = build_grid(f = f_bimodal, modes = modes_bimodal, lb = -Inf, rb = Inf, steps = 1000)
+#' save_grid(bimodal_grid, "bimodal")
+#' print(bimodal_grid)
+#'
+#' # To print all stored grids after saving bimodal_grid
+#' print_grids()
 #' 
+#' @export
 print_grids <- function( ){
   
   if(nrow(stors_env$grids$user) == 0){
@@ -217,13 +231,13 @@ print_grids <- function( ){
 #' Save User Grid
 #'
 #' @description
-#' This function stores grids generated by the `build_grid()` function in R's internal data directory. It is useful when users want to reuse a grid across multiple R sessions.
+#' This function stores grids generated by the \code{build_grid()} function in R's internal data directory. It is useful when users want to reuse a grid across multiple R sessions.
 #'
-#' @param grid list representing an optimized grid generated using the `build_grid()` function.
+#' @param grid list representing an optimized grid generated using the \code{build_grid()} function.
 #' @param grid_name string specifying the name under which the grid will be saved.
 #'
 #' @return
-#' This function will produce an error if the grid is not generated by the `build_grid()` function. Otherwise, it successfully saves the grid without returning any value upon completion.
+#' This function will produce an error if the grid is not generated by the \code{build_grid()} function. Otherwise, it successfully saves the grid without returning any value upon completion.
 #' @export
 #' 
 #' 
@@ -231,7 +245,7 @@ print_grids <- function( ){
 #' 
 #' @examples
 #' # First, let's create a grid to sample from a standard normal distribution
-#' f_normal <- function(x) { 0.3989423 * exp(-0.5 * x^2) }
+#' f_normal <- function(x) { 0.3989423 * exp( -0.5 * x^2) }
 #' normal_grid = build_grid(f = f_normal, modes = 0, lb = -Inf, rb = Inf, steps = 1000)
 #' print(normal_grid)
 #'
@@ -239,7 +253,7 @@ print_grids <- function( ){
 #' # with the name "normal"
 #' save_grid(normal_grid, "normal")
 #'
-#' # To make sure the 'normal_grid' has been stored in R's internal data directory,
+#' # To make sure the `normal_grid` has been stored in R's internal data directory,
 #' # we can print all saved grids using `print_grids()`
 #' print_grids()
 #' 
@@ -262,12 +276,12 @@ save_grid <- function(grid, grid_name) {
 #' Delete Grid
 #'
 #' @description
-#' This function deletes a grid that was previously stored by the user using the `save_grid()` function. It is useful for managing stored grids and freeing up space.
+#' This function deletes a grid that was previously stored by the user using the \code{save_grid()} function. It is useful for managing stored grids and freeing up space.
 #'
 #' @param grid_name A string specifying the name of the grid to be deleted.
 #'
 #' @return
-#' If `grid_name` does not exist, the function returns an error message. If the grid exists and is successfully deleted, a message confirming its successful removal will be displayed.
+#' If \code{grid_name} does not exist, the function returns an error message. If the grid exists and is successfully deleted, a message confirming its successful removal will be displayed.
 #'
 #' @export
 #'
@@ -283,7 +297,7 @@ save_grid <- function(grid, grid_name) {
 #' # Now, we can print all grids stored on this machine using `print_grids()`
 #' print_grids()
 #'
-#' # The list will include the 'normal_grid' stored under the name "normal"
+#' # The list will include the `normal_grid` stored under the name "normal"
 #'
 #' # To delete the "normal" grid from the machine, pass its name to `delete_grid`
 #' delete_grid("normal")
@@ -305,12 +319,12 @@ delete_grid <- function(grid_name){
 #' Load Stored Grid
 #'
 #' @description
-#' This function loads a grid into memory that was previously saved using the `save_grid()` function. It is useful for retrieving saved grids for further analysis or processing.
+#' This function loads a grid into memory that was previously saved using the \code{save_grid()} function. It is useful for retrieving saved grids for further analysis or processing.
 #'
 #' @param grid_name A string specifying the name of the grid to be loaded.
 #'
 #' @return
-#' Returns a list representing the grid stored under `grid_name` in R's internal data directory. If the grid corresponding to the specified name does not exist, an error message is displayed.
+#' Returns a list representing the grid stored under \code{grid_name} in R's internal data directory. If the grid corresponding to the specified name does not exist, an error message is displayed.
 #'
 #' @export
 #'

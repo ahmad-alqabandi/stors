@@ -17,7 +17,7 @@ m=10
 times = 10000
 
 
-# on.load opt steps = 65531 , size = 256
+# on.load opt steps = 65531, size = 256
 
 microbenchmark::microbenchmark(
   srnorm(m),

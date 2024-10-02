@@ -16,11 +16,24 @@ normal_grid = build_grid(f = f_normal, modes = 0, lb = -Inf, rb = Inf, steps = 1
 print(normal_grid)
 
 # `print_grids()` prints all grids stored in R's internal data directory.
-# To see this, we first save 'normal_grid' using `save_grid()`
+# To see this, we first save `normal_grid` using `save_grid()`
 save_grid(normal_grid, "normal")
 
-# Since 'normal_grid' is now stored on this machine,
+# Since `normal_grid` is now stored on this machine,
 # we can confirm this by printing all saved grids
+print_grids()
+
+# Example 2: Create and Save a Grid for a Bimodal Distribution
+f_bimodal <- function(x) {
+  0.5 * (1 / sqrt(2 * pi)) * exp(-(x^2) / 2) + 
+  0.5 * (1 / sqrt(2 * pi)) * exp(-((x - 4)^2) / 2)
+}
+modes_bimodal = c(0, 4)
+bimodal_grid = build_grid(f = f_bimodal, modes = modes_bimodal, lb = -Inf, rb = Inf, steps = 1000)
+save_grid(bimodal_grid, "bimodal")
+print(bimodal_grid)
+
+# To print all stored grids after saving bimodal_grid
 print_grids()
 
 }

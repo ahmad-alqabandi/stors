@@ -24,11 +24,11 @@ srlaplace_truncate(xl, xr)
 \item{xr}{Upper bound for truncation.}
 }
 \value{
-`srlaplace()` returns a sample of size `n` from a standard Laplace distribution.
+\code{srlaplace()} returns a sample of size \code{n} from a standard Laplace distribution.
 
-`srlaplace_scaled()` returns a sample of size `n` from a Laplace distribution with location \eqn{\mu} and scale \eqn{b}.
+\code{srlaplace_scaled()} returns a sample of size \code{n} from a Laplace distribution with location \eqn{\mu} and scale \eqn{b}.
 
-`srlaplace_truncate()` returns a function that generates `n` samples from a truncated Laplace distribution between `xl` and `xr`.
+\code{srlaplace_truncate()} returns a function that generates \code{n} samples from a truncated Laplace distribution between \code{xl} and \code{xr}.
 }
 \description{
 Sampling from the Laplace distribution using Stors.
@@ -38,13 +38,13 @@ Sampling from any Laplace distribution specifying the location and scale.
 Creating a sampling function for a truncated Laplace distribution.
 }
 \details{
-The function `srlaplace()` is used for sampling from a standard Laplace distribution (location = 0, scale = 1).
+The function \code{srlaplace()} is used for sampling from a standard Laplace distribution (location = 0, scale = 1).
 
 Laplace distribution has the density:
 \deqn{ f(x | \mu, b) = \frac{1}{2b} \exp\left(-\frac{|x - \mu|}{b}\right) }
 Where \eqn{\mu} is the location parameter and \eqn{b} is the scale parameter.
 
-`srlaplace_truncate()` is used for sampling from a standard Laplace distribution truncated within specified bounds. 
+\code{srlaplace_truncate()} is used for sampling from a standard Laplace distribution truncated within specified bounds. 
 It is beneficial when the area of interest in a Laplace distribution is limited to a specific range. The function validates 
 the truncation bounds before creating the sampling function.
 }
@@ -59,8 +59,8 @@ samples <- srlaplace(10)
 print(samples)
 
 
-# Generating Samples from a Laplace Distribution with Specific Location and Scale
 # This example demonstrates how to generate 10,
+# Generating Samples from a Laplace Distribution with Specific Location and Scale
 # samples from a Laplace distribution with location = 2 and scale = 3.
 samples <- srlaplace_scaled(n = 10, mu = 2, b = 3)
 print(samples)

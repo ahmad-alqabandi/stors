@@ -22,11 +22,11 @@ srexp_truncate(xl, xr)
 \item{xr}{Upper bound for truncation.}
 }
 \value{
-`srexp()` returns a sample of size `n` from a standard exponential distribution.
+\code{srexp()} returns a sample of size \code{n} from a standard exponential distribution.
 
-`srexp_scaled()` returns a sample of size `n` from an exponential distribution with the specified scale parameter.
+\code{srexp_scaled()} returns a sample of size \code{n} from an exponential distribution with the specified scale parameter.
 
-`srexp_truncate()` returns a function that generates `n` samples from a truncated exponential distribution between `xl` and `xr`.
+\code{srexp_truncate()} returns a function that generates \code{n} samples from a truncated exponential distribution between \code{xl} and \code{xr}.
 }
 \description{
 Sampling from the exponential distribution using Stors.
@@ -36,13 +36,13 @@ Sampling from any exponential distribution by specifying the scale parameter.
 Creating a sampling function for a truncated exponential distribution.
 }
 \details{
-The function `srexp()` is used for sampling from a standard exponential distribution with a rate parameter of 1.
+The function \code{srexp()} is used for sampling from a standard exponential distribution with a rate parameter of 1.
 
 Exponential distribution has the density:
 \deqn{ f(x; \lambda) = \lambda e^{-\lambda x} }
 Where \eqn{\lambda} is the rate parameter.
 
-`srexp_truncate()` is used for sampling from a standard exponential distribution truncated within specified bounds.
+\code{srexp_truncate()} is used for sampling from a standard exponential distribution truncated within specified bounds.
 The function validates the truncation bounds before creating the sampling function.
 }
 \examples{

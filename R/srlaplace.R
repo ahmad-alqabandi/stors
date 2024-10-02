@@ -8,7 +8,7 @@
 #' Sampling from the Laplace distribution using Stors.
 #'
 #' @details
-#' The function `srlaplace()` is used for sampling from a standard Laplace distribution (location = 0, scale = 1).
+#' The function \code{srlaplace()} is used for sampling from a standard Laplace distribution (location = 0, scale = 1).
 #'
 #' Laplace distribution has the density:
 #' \deqn{ f(x | \mu, b) = \frac{1}{2b} \exp\left(-\frac{|x - \mu|}{b}\right) }
@@ -17,7 +17,7 @@
 #' @param n Integer sample size.
 #'
 #' @return
-#' `srlaplace()` returns a sample of size `n` from a standard Laplace distribution.
+#' \code{srlaplace()} returns a sample of size \code{n} from a standard Laplace distribution.
 #'
 #' @examples
 #' 
@@ -47,11 +47,11 @@ srlaplace <- function(n) {
 #' @param b Scalar scale parameter.
 #'
 #' @return
-#' `srlaplace_scaled()` returns a sample of size `n` from a Laplace distribution with location \eqn{\mu} and scale \eqn{b}.
+#' \code{srlaplace_scaled()} returns a sample of size \code{n} from a Laplace distribution with location \eqn{\mu} and scale \eqn{b}.
 #'
 #' @examples
-#' # Generating Samples from a Laplace Distribution with Specific Location and Scale
 #' # This example demonstrates how to generate 10,
+#' # Generating Samples from a Laplace Distribution with Specific Location and Scale
 #' # samples from a Laplace distribution with location = 2 and scale = 3.
 #' samples <- srlaplace_scaled(n = 10, mu = 2, b = 3)
 #' print(samples)
@@ -70,7 +70,7 @@ srlaplace_scaled <- function(n, mu = 0, b = 1) {
 #' Creating a sampling function for a truncated Laplace distribution.
 #'
 #' @details
-#' `srlaplace_truncate()` is used for sampling from a standard Laplace distribution truncated within specified bounds. 
+#' \code{srlaplace_truncate()} is used for sampling from a standard Laplace distribution truncated within specified bounds. 
 #' It is beneficial when the area of interest in a Laplace distribution is limited to a specific range. The function validates 
 #' the truncation bounds before creating the sampling function.
 #'
@@ -78,7 +78,7 @@ srlaplace_scaled <- function(n, mu = 0, b = 1) {
 #' @param xr Upper bound for truncation.
 #'
 #' @return
-#' `srlaplace_truncate()` returns a function that generates `n` samples from a truncated Laplace distribution between `xl` and `xr`.
+#' \code{srlaplace_truncate()} returns a function that generates \code{n} samples from a truncated Laplace distribution between \code{xl} and \code{xr}.
 #'
 #' @examples
 #' # Generating Samples from a Truncated Laplace Distribution
@@ -91,11 +91,7 @@ srlaplace_scaled <- function(n, mu = 0, b = 1) {
 #' @export
 srlaplace_truncate = function(xl, xr){
   
-  stopifnot(
-    "xl must be smaller that xr" = xl < xr,
-    "xl must be greater than the density lower bound" = xl >=  pbgrids$laplace$lb,
-    "xr must be smaller than the density upper bound" = xr <= pbgrids$laplace$rb
-  )
+  truncate_error_checking(xl, xr, pbgrids$srlaplace$lb, pbgrids$srlaplace$rb)
   
   Upper_cumsum = .Call(C_laplace_trunc_nav, xl, xr)
   

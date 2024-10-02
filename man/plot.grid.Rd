@@ -7,23 +7,23 @@
 \method{plot}{grid}(x, x_min = NA, x_max = NA, ...)
 }
 \arguments{
-\item{x}{A list generated using STORS' `build_grid()` or `grid_optimizer()` functions.}
+\item{x}{A list generated using STORS' \code{build_grid()} or \code{grid_optimizer()} functions.}
 
 \item{x_min}{A scalar that represents the left cropping of the chart on the x-axis.}
 
 \item{x_max}{A scalar that represents the right cropping of the chart on the x-axis.}
 
-\item{...}{Additional arguments passed to the `plot` function.}
+\item{...}{Additional arguments passed to the \code{plot} function.}
 }
 \value{
-A plot of the target density and proposal. If `ggplot2` is available, it returns a `ggplot` object representing the plot. otherwise, it uses the base `plot` function.
+A plot of the target density and proposal. If \code{ggplot2} is available, it returns a \code{ggplot} object representing the plot. otherwise, it uses the base \code{plot()} function.
 }
 \description{
 This function evaluates the properties of the included target and proposal functions to create a plot for both functions. In cases where the
-proposal function's steps part is too dense, `x_min` and `x_max` can be set to crop and scale the chart for better visualization.
+proposal function's steps part is too dense, \code{x_min} and \code{x_max} can be set to crop and scale the chart for better visualization.
 }
 \details{
-This method extends the generic `plot` function for objects of class `grid`.
+This method extends the generic \code{plot()} function for objects of class \code{grid}.
 It offers custom plotting functionality specifically designed for visualizing grid objects.
 }
 \examples{

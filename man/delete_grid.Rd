@@ -10,10 +10,10 @@ delete_grid(grid_name)
 \item{grid_name}{A string specifying the name of the grid to be deleted.}
 }
 \value{
-If `grid_name` does not exist, the function returns an error message. If the grid exists and is successfully deleted, a message confirming its successful removal will be displayed.
+If \code{grid_name} does not exist, the function returns an error message. If the grid exists and is successfully deleted, a message confirming its successful removal will be displayed.
 }
 \description{
-This function deletes a grid that was previously stored by the user using the `save_grid()` function. It is useful for managing stored grids and freeing up space.
+This function deletes a grid that was previously stored by the user using the \code{save_grid()} function. It is useful for managing stored grids and freeing up space.
 }
 \examples{
 # First, let's create a grid to sample from a standard normal distribution
@@ -27,7 +27,7 @@ save_grid(normal_grid, "normal")
 # Now, we can print all grids stored on this machine using `print_grids()`
 print_grids()
 
-# The list will include the 'normal_grid' stored under the name "normal"
+# The list will include the `normal_grid` stored under the name "normal"
 
 # To delete the "normal" grid from the machine, pass its name to `delete_grid`
 delete_grid("normal")

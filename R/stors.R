@@ -1,34 +1,34 @@
 #' Sampling Function for Users' Grid
 #'
 #' @description
-#' This function generates a sampling function based on a grid created by the user using the `build_grid()` function. 
+#' This function generates a sampling function based on a grid created by the user using the \code{build_grid()} function. 
 #' The resulting sampling function can then be used to produce samples, including those from truncated distributions.
 #'
-#' @param grid The sampling grid created using the `build_grid()` function.
+#' @param grid The sampling grid created using the \code{build_grid()} function.
 #' @param xl The lower bound for truncation. Default is the left bound of the grid.
 #' @param xr The upper bound for truncation. Default is the right bound of the grid.
 #'
 #' @return 
-#' Returns a function that can be used to generate samples from the specified `grid`. If `xl` and `xr` are provided, 
+#' Returns a function that can be used to generate samples from the specified \code{grid}. If \code{xl} and \code{xr} are provided, 
 #' the samples are drawn from the truncated distribution within these bounds.
 #'
 #' @details
-#' After a user creates a proposal grid for their desired sampling function using `build_grid()`,
-#' this grid must be passed to `stors()` to create a sampling function for the target distribution. 
-#' `stors()` first checks whether the grid was indeed created using `build_grid()`. If the user has altered 
-#' or modified the grid returned from `build_grid()`, `stors()` will reject the altered grid; therefore, 
-#' no changes should be made to the grid after its creation. Once the grid is accepted by `stors()`, it is 
+#' After a user creates a proposal grid for their desired sampling function using \code{build_grid()},
+#' this grid must be passed to \code{stors()} to create a sampling function for the target distribution. 
+#' \code{stors()} first checks whether the grid was indeed created using \code{build_grid()}. If the user has altered 
+#' or modified the grid returned from \code{build_grid()}, \code{stors()} will reject the altered grid; therefore, 
+#' no changes should be made to the grid after its creation. Once the grid is accepted by \code{stors()}, it is 
 #' cached in memory, allowing fast access to grid data for the compiled C code and reducing memory access latency. 
-#' Subsequently, `stors()` returns a function that can be utilized to generate samples from the target distribution,
-#' optionally truncated between `xl` and `xr`. The truncation in `stors` is achieved by truncating the proposal grid itself,
-#' ensuring that samples are always produced within the truncation range [xl, xr]. Therefore, if the truncation values fall within
+#' Subsequently, \code{stors()} returns a function that can be utilized to generate samples from the target distribution,
+#' optionally truncated between \code{xl} and \code{xr}. The truncation in \code{stors()} is achieved by truncating the proposal grid itself,
+#' ensuring that samples are always produced within the truncation range [\code{xl}, \code{xr}]. Therefore, if the truncation values fall within
 #' the steps range of the proposal grid, no integration of the density function is required.
 #'
 #' @examples
 #' 
 #' # Example 1
 #' # To sample from a standard normal distribution \( f(x) \sim \mathcal{N}(0,1) \),
-#' # first build the proposal grid using `build_grid()`
+#' # first build the proposal grid using \code{build_grid()}
 #'
 #' modes_norm = 0
 #' f_norm <- function(x) { 1 / sqrt(2 * pi) * exp(-0.5 * x^2) }
@@ -48,8 +48,8 @@
 #'
 #' # Example 2
 #' # Let's consider a bimodal distribution composed of two normal distributions:
-#' #The first normal distribution N(0,1) with weight p = 0.3,
-#' #and the second normal distribution N(4,1) with weight q = 0.7.
+#' # The first normal distribution N(0,1) with weight p = 0.3,
+#' # and the second normal distribution N(4,1) with weight q = 0.7.
 #' 
 #' f_bimodal <- function(x) {
 #'  0.3 * (1 / sqrt(2 * pi) * exp(-0.5 * (x - 0)^2)) +
@@ -62,14 +62,14 @@
 #' # Build the proposal grid for the bimodal distribution
 #' bimodal_grid = build_grid(f = f_bimodal, modes = modes_bimodal, lb = -Inf, rb = Inf, steps = 1000)
 #' 
-#' # Create the sampling function using `stors()`
+#' # Create the sampling function using \code{stors()}
 #' sample_bimodal <- stors(bimodal_grid)
 #' 
 #' # Generate and plot samples from the bimodal distribution
 #' bimodal_samples <- sample_bimodal(1000)
 #' hist(bimodal_samples, breaks = 30, main = "Bimodal Distribution Samples")
 #' 
-#' # Create the truncated sampling function using `stors()` with truncation bounds [0.5, 6]
+#' # Create the truncated sampling function using \code{stors()} with truncation bounds [0.5, 6]
 #' sample_truncated_bimodal <- stors(bimodal_grid, xl = 0.5, xr = 6)
 #'
 #' # Generate and plot samples from the truncated bimodal distribution
@@ -93,11 +93,13 @@ stors <- function(grid, xl = grid$grid_bounds[1], xr = grid$grid_bounds[2]) {
   
   if( xl != grid$grid_bounds[1] || xr != grid$grid_bounds[2]){
 
-      stopifnot(
-        "xl must be smaller that xr" = xl < xr,
-        "xl must be greater than or equal the density lower bound" = xl >  grid$grid_bounds[1],
-        "xr must be smaller than or equal the density upper bound" = xr <  grid$grid_bounds[2]
-      )
+    stopifnot(
+      "xl must be a scaler" = (is.numeric(xl) && length(xl) == 1),
+      "xr must be a scaler" = (is.numeric(xr) && length(xr) == 1),
+      "xl must be smaller that xr" = xl < xr,
+      "xl must be greater than or equal the density lower bound" = xl >  grid$grid_bounds[1],
+      "xr must be smaller than or equal the density upper bound" = xr <  grid$grid_bounds[2]
+    )
 
     Upper_cumsum = .Call(C_stors_trunc_nav,Cnum, xl, xr)
 
