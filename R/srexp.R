@@ -87,13 +87,16 @@ srexp_scaled <- function(n, scale = 1) {
 #' @export
 srexp_truncate = function(xl, xr){
   
-  truncate_error_checking(xl, xr, pbgrids$srexp$lb, pbgrids$srexp$rb)
+  res <- truncate_error_checking(xl, xr, pbgrids$srexp)
+  xl <- res[[1]]
+  xr <- res[[2]]
+  
+  print(paste0(" \n xl = ",xl,"\n xr = ",xr))
   
   Upper_cumsum = .Call(C_srexp_trunc_nav, xl, xr)
   
   function_string <- paste0("function(n) { .Call(C_srexp_trunc, n, ", paste0(xl), ", ", paste0(xr), ", ", paste0(Upper_cumsum[1]), ", ", paste0(Upper_cumsum[2]), ", ", paste0(as.integer(Upper_cumsum[3])), ", ", paste0(as.integer(Upper_cumsum[4])), ")}")
   function_expression <- parse(text = function_string)
   sampling_function <- eval(function_expression)
-  
   
 }

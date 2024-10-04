@@ -2,14 +2,22 @@
 
 
 #' @noRd
-truncate_error_checking <- function(xl, xr, lb, rb) {
+truncate_error_checking <- function(xl, xr, density) {
+  
+  xl <- ifelse( xl < density$is.lb, density$lb, xl)
+  xr <- ifelse( xr > density$is.rb, density$rb, xr)
+  
   stopifnot(
+    "xl is has a CDF close to 1" = (xl < density$is.rb),
+    "xr is has a CDF close to 0" = (xr > density$is.lb),
     "xl must be a scaler" = (is.numeric(xl) && length(xl) == 1),
     "xr must be a scaler" = (is.numeric(xr) && length(xr) == 1),
     "xl must be smaller that xr" = (xl < xr),
-    "xl must be greater than the density lower bound" = (xl >=  lb),
-    "xr must be smaller than the density upper bound" = (xr <= rb)
+    "xl must be greater than the density lower bound" = (xl >=  density$lb),
+    "xr must be smaller than the density upper bound" = (xr <= density$rb)
   )
+  
+  return(c(xl, xr))
   
 }
 

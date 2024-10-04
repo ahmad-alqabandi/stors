@@ -62,7 +62,7 @@ for( int j = 0; j < 2; j++){
 #elif R_TAIL == IT
 
     
-    cdf = R_ITF(xlr[j]) - R_ITF(g.x[g.steps_number]);
+    cdf = CDF(xlr[j]) - CDF(g.x[g.steps_number]);
 
     results[j] =  ( g.areas[0] + g.areas[1] + cdf)/ total_area;
     

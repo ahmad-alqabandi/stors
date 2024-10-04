@@ -17,7 +17,9 @@ pbgrids <- list(
     },
     modes = 0,
     lb = -Inf,
-    rb = Inf
+    rb = Inf,
+    is.lb = -8.125891,
+    is.rb = 8.125891
   ),
   srlaplace = list(
     Cnum = 2,
@@ -34,7 +36,9 @@ pbgrids <- list(
     },
     modes = 0,
     lb = -Inf,
-    rb = Inf
+    rb = Inf,
+    is.lb = -16,
+    is.rb = 16
   ),
   srexp = list(
     Cnum = 3,
@@ -47,7 +51,9 @@ pbgrids <- list(
     },
     modes = 0,
     lb = 0,
-    rb = Inf
+    rb = Inf,
+    is.lb = 0,
+    is.rb = 36.04365
   )
   
 )

@@ -91,7 +91,9 @@ srlaplace_scaled <- function(n, mu = 0, b = 1) {
 #' @export
 srlaplace_truncate = function(xl, xr){
   
-  truncate_error_checking(xl, xr, pbgrids$srlaplace$lb, pbgrids$srlaplace$rb)
+  res <- truncate_error_checking(xl, xr, pbgrids$srlaplace)
+  xl <- res[[1]]
+  xr <- res[[2]]
   
   Upper_cumsum = .Call(C_laplace_trunc_nav, xl, xr)
   

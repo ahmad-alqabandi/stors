@@ -7,9 +7,12 @@
 
 #define R_TAIL IT
 
-#define R_ITF(u)(1-exp(-u))
+#define R_ITF(u)(-log(1 - u))
 
 #define F(x)(exp(-x))
+
+#define CDF(x)(1 - exp(-x))
+
 
 // =================================
 

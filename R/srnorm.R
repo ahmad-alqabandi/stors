@@ -100,7 +100,10 @@ srnorm_scaled <- function(n, mu = 0, sd = 1) {
 #' @export
 srnorm_truncate <- function(xl = -Inf, xr = Inf) {
   
-  truncate_error_checking(xl, xr, pbgrids$srnomr$lb, pbgrids$srnorm$rb)
+  
+  res <- truncate_error_checking(xl, xr, pbgrids$srnorm)
+  xl <- res[[1]]
+  xr <- res[[2]]
   
   Upper_cumsum = .Call(C_srnorm_trunc_nav, xl, xr)
   
