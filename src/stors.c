@@ -223,7 +223,7 @@ SEXP stors_trunc(SEXP s_size, SEXP Rcnum, SEXP Rxl, SEXP Rxr , SEXP Rcsl, SEXP R
   int j, sample_size = asInteger(s_size);
   double csl = asReal(Rcsl), csr = asReal(Rcsr), xl = asReal(Rxl), xr = asReal(Rxr), tmpxl, tempxr ;
   int il = asInteger(Ril), ir = asInteger(Rir);
-  
+  int check_lower = 0, check_upper =0;
   int Cnum = asInteger(Rcnum);
   
   
@@ -238,11 +238,13 @@ SEXP stors_trunc(SEXP s_size, SEXP Rcnum, SEXP Rxl, SEXP Rxr , SEXP Rcsl, SEXP R
   if(il != -1){
     tmpxl = g.x[il];
     g.x[il] = xl;
+    if(csl == 0) check_lower = 1;
   }
   
   if(ir != -1){
     tempxr =g.x[ir];
     g.x[ir] = xr;
+    if(csr == 1) check_upper = 1;
   }
   
   
@@ -274,8 +276,16 @@ SEXP stors_trunc(SEXP s_size, SEXP Rcnum, SEXP Rxl, SEXP Rxr , SEXP Rcsl, SEXP R
       if (u < f(sample, Rf, Renv) / exp(h_upper))
       {
         results[i] = sample;
-        i++;
+      
+        if( check_lower ) {
+          if(results[i] >=  xl) i++;
+        }else{
+          i++;
+        }
+        
       }
+      
+      
       u1 = unif_rand();
       
       u1 = csl + u1 * (csr-csl);
@@ -295,8 +305,14 @@ SEXP stors_trunc(SEXP s_size, SEXP Rcnum, SEXP Rxl, SEXP Rxr , SEXP Rcsl, SEXP R
       if (u < f(sample, Rf, Renv) / exp(h_upper))
       {
         results[i] = sample;
-        i++;
-      }
+        
+        if(check_upper){
+          if(results[i] <=  xr) i++;
+        }else{
+          i++;
+        }
+        
+        }
       
       u1 = unif_rand();
       u1 = csl + u1 * (csr-csl);

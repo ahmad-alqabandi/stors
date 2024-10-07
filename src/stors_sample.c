@@ -131,8 +131,8 @@ if(u1 > g.sampling_probabilities[1]){
         if (i < sample_size)
         {
           u1 = unif_rand();
-          
         }
+        
       }
       else
       {

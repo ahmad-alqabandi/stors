@@ -74,7 +74,7 @@ h_prime_multi <- function(x) {
   (-(exp(-1/2 * (-4 + x)^2) * q * (-4 + x))/sqrt(2 * pi) - (exp(-x^2/2) * p * x)/sqrt(2 * pi))/((exp(-x^2/2) * p)/sqrt(2 * pi) + (exp(-1/2 * (-4 + x)^2) * q)/sqrt(2 * pi))
 }
 
-multi_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_multi, f = f_multi, h = h_multi, h_prime = h_prime_multi)
+multi_grid = build_grid(lb = -Inf, rb = Inf,verbose = T, mode = modes_multi, f = f_multi, h = h_multi, h_prime = h_prime_multi)
 
 plot(multi_grid)
 

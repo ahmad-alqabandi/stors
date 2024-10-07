@@ -92,12 +92,18 @@ srlaplace_scaled <- function(n, mu = 0, b = 1) {
 srlaplace_truncate = function(xl, xr){
   
   res <- truncate_error_checking(xl, xr, pbgrids$srlaplace)
-  xl <- res[[1]]
-  xr <- res[[2]]
+  xl <- res$xl; xr <- res$xr
+  
   
   Upper_cumsum = .Call(C_laplace_trunc_nav, xl, xr)
   
-  function_string <- paste0("function(n) { .Call(C_laplace_trunc, n, ", paste0(xl), ", ", paste0(xr), ", ", paste0(Upper_cumsum[1]), ", ", paste0(Upper_cumsum[2]), ", ", paste0(as.integer(Upper_cumsum[3])), ", ", paste0(as.integer(Upper_cumsum[4])), ")}")
+  stopifnot(
+    "xl is has a CDF close to 1" = (Upper_cumsum[1] != 1),
+    "xr is has a CDF close to 0" = (Upper_cumsum[2] != 0)
+  )
+  
+  function_string <- paste0("function(n) { .Call(C_laplace_trunc, n, ", paste0(xl), ", ", paste0(xr), ", ", paste0(Upper_cumsum[1]),
+                            ", ", paste0(Upper_cumsum[2]), ", ", paste0(as.integer(Upper_cumsum[3])), ", ", paste0(as.integer(Upper_cumsum[4])), ")}")
   function_expression <- parse(text = function_string)
   sampling_function <- eval(function_expression)
   

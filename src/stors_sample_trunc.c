@@ -9,15 +9,17 @@
 
 #if defined(CNUM) && defined(NAME)
 
+#define IN_LEFT_TAIL -1
+#define IN_RIGHT_TAIL -1
 
 
 SEXP DEN_TRUNC(NAME)(SEXP s_size, SEXP Rxl, SEXP Rxr , SEXP Rcsl, SEXP Rcsr,  SEXP Ril, SEXP Rir){
 
     
-    int j, sample_size = asInteger(s_size);
-    double csl = asReal(Rcsl), csr = asReal(Rcsr), xr = asReal(Rxr), tempxr ;
-    int ir = asInteger(Rir);
-      
+    int j, sample_size = asInteger(s_size), il = asInteger(Ril), ir = asInteger(Rir);
+    double csl = asReal(Rcsl), csr = asReal(Rcsr), tempxl, tempxr;
+    double xl = asReal(Rxl), xr = asReal(Rxr);
+    
     if(grids.grid[CNUM].x == NULL){
       REprintf("you need to optimize your destribution grid first");
       R_RETURN_NULL
@@ -26,20 +28,34 @@ SEXP DEN_TRUNC(NAME)(SEXP s_size, SEXP Rxl, SEXP Rxr , SEXP Rcsl, SEXP Rcsr,  SE
     struct grid g = grids.grid[CNUM];
       
 #ifdef L_TAIL
-    int il = asInteger(Ril);
-    double tmpxl;
-    if(il != -1){
-      tmpxl = g.x[il];
-      g.x[il] = asReal(Rxl);
-    }
-#endif      
+    int check_lower = 0;
 
-#ifdef R_TAIL 
-      if(ir != -1){
+    if(il != IN_LEFT_TAIL){
+      tempxl = g.x[il];
+        g.x[il] = xl;
+    }else{
+      if(csl == 0) check_lower = 1;
+    }
+    
+#else
+    tempxl = g.x[il];
+    g.x[il] = xl;
+
+#endif
+
+#ifdef R_TAIL
+    int check_upper = 0;
+
+      if(ir != IN_RIGHT_TAIL){
         tempxr = g.x[ir];
-        g.x[ir] = xr;
-      }
-#endif      
+          g.x[ir] = xr;
+          }else{
+            if(csr == 1) check_upper = 1;
+          }
+#else
+          tempxr = g.x[ir];
+          g.x[ir] = xr;
+#endif
 
       
 #if L_TAIL == ARS || R_TAIL == ARS 
@@ -71,7 +87,13 @@ SEXP DEN_TRUNC(NAME)(SEXP s_size, SEXP Rxl, SEXP Rxr , SEXP Rcsl, SEXP Rcsr,  SE
 #if L_TAIL == IT
           
           results[i] = L_ITF(u1);
-          i++;
+          
+          if(check_lower){
+            if(results[i] >=  xl) i++;
+          }else{
+            i++;
+          }
+          
           u1 = unif_rand();
           u1 = csl + u1 * (csr-csl);
 
@@ -80,17 +102,25 @@ SEXP DEN_TRUNC(NAME)(SEXP s_size, SEXP Rxl, SEXP Rxr , SEXP Rcsl, SEXP Rcsr,  SE
           sample = g.x[0] + (log( g.lt_properties[0] + u1 * g.lt_properties[1]) - g.lt_properties[2]) * g.lt_properties[3];
           h_upper = g.lt_properties[4] * (sample - g.x[0]) + g.lt_properties[2];
           u = unif_rand();
+          
           if (u < F(sample) / exp(h_upper))
           {
             results[i] = sample;
-            i++;
+            
+            if(check_lower){
+              if(results[i] >=  xl) i++;
+            }else{
+              i++;
+            }
           }
+          
           u1 = unif_rand();
           
           u1 = csl + u1 * (csr-csl);
 
 #endif
           
+
           
         }else
           
@@ -104,9 +134,16 @@ SEXP DEN_TRUNC(NAME)(SEXP s_size, SEXP Rxl, SEXP Rxr , SEXP Rcsl, SEXP Rcsr,  SE
 #if R_TAIL == IT
             
             results[i] = R_ITF(u1);
-            i++;
+            
+            if(check_upper){
+              if(results[i] <=  xr) i++;
+            }else{
+              i++;
+            }
+            
             u1 = unif_rand();
             u1 = csl + u1 * (csr-csl);
+            
 
 
 #elif R_TAIL == ARS
@@ -120,15 +157,21 @@ SEXP DEN_TRUNC(NAME)(SEXP s_size, SEXP Rxl, SEXP Rxr , SEXP Rcsl, SEXP Rcsr,  SE
             if (u < F(sample) / exp(h_upper))
             {
               results[i] = sample;
-              i++;
+              
+              if(check_upper){
+                if(results[i] <=  xr) i++;
+              }else{
+                i++;
+              }
+              
             }
             
             u1 = unif_rand();
             u1 = csl + u1 * (csr-csl);
 
 #endif
-            
-          }else
+
+            }else
             
 #endif
             
@@ -186,19 +229,14 @@ SEXP DEN_TRUNC(NAME)(SEXP s_size, SEXP Rxl, SEXP Rxr , SEXP Rcsl, SEXP Rcsr,  SE
       }
       
       
-#ifdef L_TAIL 
-      if(il != -1){
-        g.x[il] = tmpxl;
+      if(il != IN_LEFT_TAIL){
+        g.x[il] = tempxl;
       }
-#endif
 
-      
-#ifdef R_TAIL 
-      if(ir != -1){
+      if(ir != IN_RIGHT_TAIL){
         g.x[ir] = tempxr;
       }
-#endif
-      
+
       
       PutRNGstate();
       

@@ -137,6 +137,10 @@ build_grid <- function(lb = -Inf,
                        target_sample_size = 1000,
                        verbose = FALSE) {
   
+  if (!is.function(f)) {
+    stop("Error: 'f' density function must be provided.")
+  }
+  
   if (is.null(h)) {
     h <- function(x) {
       log(f(x))
@@ -218,7 +222,8 @@ build_final_grid <- function(gp, opt_area = NULL) {
   h <- gp$target$log_density
   h_prime <- gp$target$log_density_prime
   cdf <- gp$target$Cumulitive_density
-  
+  tails_method <- gp$proposal$tails_method
+    
   grid_bounds <- rep(NA, 2)
   
   final_grid <- data.frame(
@@ -353,7 +358,8 @@ build_final_grid <- function(gp, opt_area = NULL) {
     xm <- final_grid$x[steps_number + 1]
     
     
-    if (is.function(h)) {
+    if (identical(tails_method,"ARS")) {
+      
       tails_area = tails_ars(final_grid, f, h, h_prime, lb, rb)
       
       proposal_areas[1] <- tails_area$lta
@@ -439,6 +445,9 @@ find_left_steps <- function(gp,
   theta <- gp$proposal$pre_acceptance_threshold
   grid_range <- gp$proposal$grid_range
   
+  # to check if we x_c get less than mode_previous due to low density value compared to area 
+  mode_previous <- ifelse( mode_i == 1, NA,  gp$target$modes[mode_i - 1])
+  
   memory_res <- (max(500, ceiling(1 / area)) + 500)
   
   x <- rep(NA, memory_res)
@@ -472,7 +481,9 @@ find_left_steps <- function(gp,
       
       f_x <- f(x_c)
       
-      if (f(x_c) > f_x_previous) {
+
+      if (f(x_c) > f_x_previous || 
+          ( !is.na(mode_previous) && x_c <  mode_previous )) {
         break
       }
       
@@ -519,6 +530,8 @@ find_right_steps <- function(gp,
   theta <- gp$proposal$pre_acceptance_threshold
   grid_range <- gp$proposal$grid_range
   
+  # to check if we x_next exceed mode_previous due to low density value compared to area 
+  mode_next <- ifelse( mode_i == mode_n, NA,  gp$target$modes[mode_i + 1])
   
   memory_res <- (max(500, ceiling(1 / area)) + 500)
   
@@ -550,8 +563,8 @@ find_right_steps <- function(gp,
       }
       
       f_x_next <- f(x_next)
-      # if(x_next > minima_i)
-      if (f_x_next > f_x) {
+      
+      if ((f_x_next > f_x) || ( !is.na(mode_next) && x_next >  mode_next ) ) {
         x[r] <- x_c
         s_upper[r] <- f_x
         r_tail_area <- 0
@@ -604,16 +617,16 @@ tails_ars <- function(grid, f, h, h_prime, lb, rb) {
   } else {
     l_tail_area <- (1 / h_prime(grid$x[1])) * (f(grid$x[1]) - exp(h_upper(grid$x[1], lb, h_prime, h)))
   }
-  
+
   #right tails
   if (rb == Inf) {
     r_tail_area <- (1 / h_prime(grid$x[steps])) * -f(grid$x[steps])
   } else {
     r_tail_area <- (1 / h_prime(grid$x[steps])) * (exp(h_upper(grid$x[steps], rb, h_prime, h)) - f(grid$x[steps]))
   }
-  
+
   return(list(lta = l_tail_area, rta = r_tail_area))
-  
+
 }
 
 

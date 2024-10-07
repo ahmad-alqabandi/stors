@@ -1,0 +1,104 @@
+---
+title: "Sampling from User-Defined Distributions using STORS"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Sampling_user_distributions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+
+The `stors` package is designed to generate samples from uni- and multimodal distributions using Rejection Sampling techniques. While it provides optimized sampling functions for built-in distributions, STORS also offers flexibility for users to define their own distributions and create custom grids for efficient sampling.
+
+In this vignette, we focus on how to use the `stors` package to sample from user-defined distributions. We will demonstrate how to build custom grids for distributions not covered by the built-in functions and how to utilize the package's functions to sample efficiently from these distributions.
+
+To sample from user-defined distributions, you can create custom grids using the `build_grid()` function and then use the `stors()` function to create a sampler based on the custom grid.
+
+## Sampling from User-Defined Distributions
+
+For distributions not covered by the built-in functions and that satisfy the log-concavity condition, users have the flexibility to create their own grids using the `build_grid()` function. This function is designed to handle a variety of distributions by accepting a range of parameters tailored to the specific needs of the distribution being sampled from.
+
+The following example demonstrates the process of sampling from a bimodal normal distribution. Let's assume that you want to sample from a bimodal distribution, which is a combination of two normal distributions \( f(x) = 0.5 w_1(x) + 0.5 w_2(x) \), where \( w_1(x) \sim N(0, 1) \) and \( w_2(x) \sim N(4, 1) \):
+
+\[
+f(x) =  0.5 \frac{1}{\sqrt{2 \pi}}  \exp\left(-\frac{x^2}{2}\right) + 0.5  \frac{1}{\sqrt{2 \pi}} \exp\left(-\frac{(x - 4)^2}{2}\right)
+\]
+
+To sample from the tails of \( f(x) \) using ARS, we need the log transformation of \( f(x) \), \( h(x) = \log(f(x)) \), and its first derivative \( h_{\text{prime}}(x) = \frac{d}{dx} h(x) \). Also, the modes of \( f(x) \) are required to build the steps part of the proposal distribution, which in this case are approximately at \( x = 0 \) and \( x = 4 \).
+
+```{r , echo = TRUE}
+library(stors)
+
+modes_bi = c(0, 4)
+
+f_bi <- function(x) {
+  0.5 * dnorm(x, mean = 0, sd = 1) + 0.5 * dnorm(x, mean = 4, sd = 1)
+}
+
+h_bi <- function(x) log(f_bi(x))
+
+h_prime_bi <- function(x) {
+  num = -0.5 * x * dnorm(x, mean = 0, sd = 1) - 0.5 * (x - 4) * dnorm(x, mean = 4, sd = 1)
+  den = f_bi(x)
+  num / den
+}
+
+bi_grid = build_grid(lb = -Inf, rb = Inf, modes = modes_bi, f =f_bi, h = h_bi, h_prime = h_prime_bi)
+```
+
+After building the desired grid with `build_grid()`, you can explore its properties using the `print()` function and visualize its structure using the `plot()` function. This step is similar to what was done previously with the built-in grid and helps in understanding the grid's configuration and ensuring that it aligns with the requirements of the target distribution.
+
+```{r , echo = TRUE}
+# Printing the properties of the custom grid
+print(bi_grid)
+
+# Visualizing the custom grid
+plot(bi_grid)
+```
+
+Once the grid is configured and validated, it can be passed to the `stors()` function. `stors()` caches the grid in memory, providing fast access for sampling, and returns a sampler function for the target distribution. This sampler function can then be used to generate samples as needed.
+
+```{r , echo = TRUE}
+# Creating a sampler function using the custom grid
+bi_sampler = stors(bi_grid)
+
+# Generating samples from the target distribution
+samples = bi_sampler(1000)
+hist(samples)
+```
+
+## Saving, Loading, and Deleting User Grids
+
+The grid stored in `bi_grid` will not be preserved across sessions. Therefore, if you are satisfied with the sampling results and wish to store the grid for future use, you should save the grid using the `save_grid()` function. This function takes the optimized grid and a filename you choose to save the grid in the internal R data directory on your machine. This is recommended if you plan to use the grid frequently across sessions, to avoid re-optimizing the grid in future sessions.
+
+```{r , echo = TRUE}
+save_grid(bi_grid, "bimodal_grid")
+```
+
+To load and use the grid in future sessions, you only need to use the `load_grid()` function.
+
+```{r , echo = TRUE}
+bi_grid = load_grid("bimodal_grid")
+```
+
+In case you want to view a list of all previously stored grids, the `print_grids()` function will provide you with all stored grids.
+
+```{r , echo = TRUE}
+print_grids()
+```
+
+Be aware that the saved grid can be quite large in size, depending on your system. Therefore, if you want to delete a grid, the `delete_grid()` function can be used by providing the grid's name.
+
+```{r , echo = TRUE}
+delete_grid("bimodal_grid")
+
+print_grids()
+```

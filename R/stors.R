@@ -102,8 +102,15 @@ stors <- function(grid, xl = grid$grid_bounds[1], xr = grid$grid_bounds[2]) {
     )
 
     Upper_cumsum = .Call(C_stors_trunc_nav,Cnum, xl, xr)
+    
+    stopifnot(
+      "xl is has a CDF close to 1" = (Upper_cumsum[1] != 1),
+      "xr is has a CDF close to 0" = (Upper_cumsum[2] != 0)
+    )
 
-    function_string <- paste0("function(n) { .Call(C_stors_trunc, n, ",paste0(Cnum),", ",paste0(xl),", ",paste0(xr),", ",paste0(Upper_cumsum[1]),",", paste0(Upper_cumsum[2]),", ", paste0(as.integer(Upper_cumsum[3])),", ", paste0(as.integer(Upper_cumsum[4]))," , dens_func, rfunc_env) }")
+    function_string <- paste0("function(n) { .Call(C_stors_trunc, n, ",paste0(Cnum),", ",paste0(xl),", ",paste0(xr),", ",paste0(Upper_cumsum[1]),
+                              ",", paste0(Upper_cumsum[2]),", ", paste0(as.integer(Upper_cumsum[3])),", ", paste0(as.integer(Upper_cumsum[4])),
+                              " , dens_func, rfunc_env) }")
     
   }else{
 

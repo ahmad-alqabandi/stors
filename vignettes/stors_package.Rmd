@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 
 The aim of the [stors] package is to generate samples from uni- and multimodal distributions using the Rejection Sampling technique. Stors stands out for its ability to leverage the system's capabilities to optimize the sampling process.
 
-Stors maximizes the sampling speed from the proposal distribution by constructing steps with uniform areas that cover the target distribution from which sampling is needed. To address potential efficiency issues in heavy and light-tailed distributions, we switch to Adaptive Rejection Sampling (ARS) for the tails, specifically for the grids created by the user. Fortunately, since ARS is used only for the tails, it eliminates the requirement for log concavity in most distributions, allowing us to cover a wide range of distributions.
+Stors maximizes the sampling speed from the proposal distribution by constructing steps with uniform areas that cover the target distribution from which sampling is needed. To address potential efficiency issues in heavy and light-tailed distributions, we switch to Adaptive Rejection Sampling (ARS) for the tails, specifically for the grids created by the user. Fortunately, since ARS is used only for the tails, it eliminates the requirement for log concavity in most distributions, allowing us to cover a wide range of distributions that have log-concave tails such as normal multimodal distrebutions.
 
 To use the [stors] package, we need to differentiate between two phases. The first phase involves building the grid for the proposal distribution. The second step is caching this grid in memory for sampling. This ensures optimum speed performance, as the proposal data is constructed independently from the sampling process. Most R base sampling functions are already covered in the stors package, making sampling straightforward.
 
@@ -67,7 +67,7 @@ upper_bound = 1
 truncated_normal_sampler = srnorm_truncate(xl = lower_bound, xr = upper_bound)
 
 # Generating samples from the truncated normal distribution
-truncated_samples = truncated_normal_sampler(100)
+truncated_samples = truncated_normal_sampler(1000)
 hist(truncated_samples)
 
 ```
@@ -150,7 +150,7 @@ for( name in stors:::stors_env$grids$biultin$names){
 
 ## Sampling from Users' Distributions
 
-For distributions not covered by the built-in functions and that satisfy the log concavity condition, users have the flexibility to create their own grids using the `grid_builder()` function. This function is designed to handle a variety of distributions by accepting a range of parameters tailored to the specific needs of the distribution being sampled from.
+For distributions not covered by the built-in functions and that satisfy the log concavity condition, users have the flexibility to create their own grids using the `build_grid()` function. This function is designed to handle a variety of distributions by accepting a range of parameters tailored to the specific needs of the distribution being sampled from.
 
 The following example demonstrates the process of sampling from a bimodal normal distribution. Let's assume that the user wants to sample from a bimodal distribution, which is a combination of two normal distributions $f(x) = 0.5 w_1(x) + 0.5 w_2(x)$, where $w_1(x) \sim N(0, 1)$ and $w_2(x) \sim N(4, 1)$:
 
@@ -180,7 +180,7 @@ bi_grid = build_grid(lb = -Inf, rb = Inf, modes = modes_bi, f = f_bi, h = h_bi, 
 
 ```
 
-After building the desired grid with `grid_builder()`, users can explore its properties using the `print()` function and visualize its structure using the `plot()` function. This step is similar to what was done previously with the built-in grid and helps in understanding the grid's configuration and ensuring that it aligns with the requirements of the target distribution.
+After building the desired grid with `build_grid()`, users can explore its properties using the `print()` function and visualize its structure using the `plot()` function. This step is similar to what was done previously with the built-in grid and helps in understanding the grid's configuration and ensuring that it aligns with the requirements of the target distribution.
 
 ```{r , echo = TRUE}
 

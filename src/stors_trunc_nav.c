@@ -29,7 +29,7 @@ double hu_x;
 
 #elif R_TAIL == IT
 
-double cdf;
+// double cdf;
 // SEXP fcall, result, foo, val;
 // double res;
 
@@ -62,9 +62,12 @@ for( int j = 0; j < 2; j++){
 #elif R_TAIL == IT
 
     
-    cdf = CDF(xlr[j]) - CDF(g.x[g.steps_number]);
+    //cdf = CDF(xlr[j]) - CDF(g.x[g.steps_number]);
 
-    results[j] =  ( g.areas[0] + g.areas[1] + cdf)/ total_area;
+    //results[j] =  ( g.areas[0] + g.areas[1] + cdf)/ total_area;
+    
+    // added line _ this is because in tails we use IT ( the target IT function)
+    results[j]  = CDF(xlr[j]); 
     
     ixlr[j] = -1;
     
@@ -93,9 +96,13 @@ for( int j = 0; j < 2; j++){
 #elif L_TAIL == IT
           
           
-          cdf = CDF(xlr[j]);
+          //cdf = CDF(xlr[j]);
           
-          results[j] =  cdf / total_area;
+          //results[j] =  cdf / total_area;
+          
+          // added line
+          results[j] = CDF(xlr[j]);
+            
           ixlr[j] = -1;
 #endif
           
