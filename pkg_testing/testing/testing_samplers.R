@@ -158,7 +158,10 @@ microbenchmark::microbenchmark(
   times = 100
 )
 
-
+microbenchmark::microbenchmark(
+  srnorm_optimize(),
+  times = 10
+)
 
 ##    srexp
 

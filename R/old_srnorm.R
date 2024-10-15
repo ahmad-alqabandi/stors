@@ -37,8 +37,8 @@
 #'
 #'
 #' @export
-srnorm <- function(n, mean = 0, stddev = 1) {
-  .Call(C_srnorm, n, c(mean, stddev))
+old_srnorm <- function(n) {
+  .Call(C_old_srnorm, n)
 }
 
 #' @rdname srnorm
@@ -64,8 +64,8 @@ srnorm <- function(n, mean = 0, stddev = 1) {
 #' print(samples)
 #' 
 #' @export
-srnorm_scaled <- function(n, mu = 0, sd = 1) {
-  .Call(C_srnorm, n) * sd + mu
+old_srnorm_scaled <- function(n, mu = 0, sd = 1) {
+  .Call(C_old_srnorm, n) * sd + mu
 }
 
 #' @rdname srnorm
@@ -98,13 +98,13 @@ srnorm_scaled <- function(n, mu = 0, sd = 1) {
 #' hist(sample, main = "Histogram of Truncated Normal Samples", xlab = "Value", breaks = 20)
 #' 
 #' @export
-srnorm_truncate <- function(xl = -Inf, xr = Inf) {
+old_srnorm_truncate <- function(xl = -Inf, xr = Inf) {
   
   
   res <- truncate_error_checking(xl, xr, pbgrids$srnorm)
   xl <- res$xl; xr <- res$xr
   
-  Upper_cumsum = .Call(C_srnorm_trunc_nav, xl, xr)
+  Upper_cumsum = .Call(C_old_srnorm_trunc_nav, xl, xr)
   
   stopifnot(
     "xl is has a CDF close to 1" = (Upper_cumsum[1] != 1),
@@ -122,34 +122,28 @@ srnorm_truncate <- function(xl = -Inf, xr = Inf) {
 
 
 #' @export
-srnorm_optimize = function(
-  mu = 0,
-  sd = 1,
+old_srnorm_optimize = function(
   steps = 4091,
   grid_range = NULL,
   theta = NULL,
   target_sample_size = 1000,
   verbose = FALSE
 ) {
+  mu <- 0; sd <- 1
   
-  density_name <- 'srnorm'
+  density_name <- 'old_srnorm'
   
   dendata <- pbgrids[[density_name]]
   
-  f_params <- c(mu, sd, 1.0 / (sd * 2.50662827463), -0.5/sd) # F L
+  f_params <- c(mu, sd) # F L
   
-  modes <- dendata$set_modes(mu)
+  modes <- mu
   
-  f <- dendata$create_f(mu, sd)
+  f <- dendata$f
   
-  if( identical(dendata$tails_method,"ARS") ){
-    h <- function(x)
-      log(f(x))
+  h <- dendata$h
     
-    h_prime <- stors_prime(modes, h)
-  }else{
-    cdf <- dendata$create_cdf(mu, sd)
-  }  
+  h_prime <- dendata$h_prime
   
   grid_optimizer(dendata, density_name, f, cdf, h,
                  h_prime, modes, f_params, steps,

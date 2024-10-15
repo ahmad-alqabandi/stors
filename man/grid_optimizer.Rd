@@ -5,17 +5,22 @@
 \title{Optimize Built-in Grid}
 \usage{
 grid_optimizer(
-  density_name = stors_env$grids$builtin$names,
+  dendata,
+  density_name,
+  f,
+  cdf = NULL,
+  h = NULL,
+  h_prime = NULL,
+  modes,
+  f_params = NULL,
   steps = NULL,
   grid_range = NULL,
   theta = NULL,
-  target_sample_size = 1000,
+  target_sample_size = NULL,
   verbose = FALSE
 )
 }
 \arguments{
-\item{density_name}{string specifying the name of the distribution.}
-
 \item{steps}{Optional Scalar integer indicating the number of steps in the proposal distribution.}
 
 \item{grid_range}{Optional Vector of two elements specifying the start and end points for constructing steps along the x-axis.}

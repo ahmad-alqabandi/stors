@@ -6,4 +6,9 @@
 
 #define ARS 1
 
+#define TRUE 1
+
+#define FALSE 0
+
+
 #endif

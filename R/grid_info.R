@@ -39,79 +39,110 @@
 #' 
 #'@method plot grid
 #' @export
-plot.grid <- function(x, x_min = NA, x_max = NA,...){
-  
+plot.grid <- function(x,
+                      x_min = NA,
+                      x_max = NA,
+                      ...) {
   grid <- x
-  
   n = nrow(grid$grid_data)
+  #f <- eval(parse(text = grid$dens_func))
+  f <-  grid$dens_func
   
-  f <- eval(parse(text = grid$dens_func))
+  lf <- f
+  rf <- f
   
-  if(grid$tails_method == "ARS"){
-    lf  <- function(x) exp( grid$lt_properties[5] * (x - grid$grid_data$x[1]) + grid$lt_properties[3] )
+  if (grid$tails_method == "ARS") {
+    if (!all(grid$lt_properties == 0)) {
+      lf  <- function(x)
+        exp(grid$lt_properties[5] * (x - grid$grid_data$x[1]) + grid$lt_properties[3])
+    }
     
-    rf  <- function(x) exp( grid$rt_properties[5] * (x - grid$grid_data$x[n]) + grid$rt_properties[6] )
+    if (!all(grid$rt_properties == 0)) {
+      rf  <- function(x)
+        exp(grid$rt_properties[5] * (x - grid$grid_data$x[n]) + grid$rt_properties[6])
+    }
   } else {
-    
     lf <- f
     rf <- f
   }
   
-  if(is.finite(grid$grid_bounds[1])){
-    l_limit = 0
-  }else{
-    l_limit = 1
+  if (is.finite(grid$grid_bounds[1])) {
+    x_from <- grid$grid_bounds[1]
+  } else{
+    x_from <- grid$grid_data$x[1] - 5
   }
   
-  if(is.finite(grid$grid_bounds[2])){
-    r_limit = 0
-  }else{
-    r_limit = 1
+  if (is.finite(grid$grid_bounds[2])) {
+    x_to <- grid$grid_bounds[2]
+  } else{
+   x_to <- grid$grid_data$x[n] + 5
   }
-    
-  
-  xx <- seq(from = grid$grid_data$x[1]-l_limit, to = grid$grid_data$x[n]+r_limit, by = min(0.01,grid$alpha))
-  
-  xl <- seq( from = grid$grid_data$x[1]-l_limit , to= grid$grid_data$x[1], by = 0.01)
-  
-  xr <- seq( from = grid$grid_data$x[n] , to= grid$grid_data$x[n]+r_limit, by = 0.01)
-  
-  xs = c(xl, xx,xr)
+
+  xx <- seq(
+    from = x_from,
+    to = x_to,
+    by = min(0.01, grid$alpha)
+  )
+  xl <- seq(
+    from = x_from ,
+    to = grid$grid_data$x[1],
+    by = 0.01
+  )
+  xr <- seq(
+    from = grid$grid_data$x[n] ,
+    to = x_to,
+    by = 0.01
+  )
+  xs = c(xl, xx, xr)
   
   yy <- f(xx)
-  
   yl <- lf(xl)
-  
   yr <- rf(xr)
-  
   ys = c(yl, yy, yr)
   
-
-  if(is.na(x_max))  x_max = xr[length(xr)]
-  if(is.na(x_min))  x_min = xl[1]
+  if (is.na(x_max))
+    x_max = xr[length(xr)]
   
-  y_max = max(ys[ x_min <= xs &  xs <= x_max ])
+  if (is.na(x_min))
+    x_min = xl[1]
+  
+  y_max = max(ys[x_min <= xs &  xs <= x_max])
   y_min = min(ys[x_min <= xs &  xs <= x_max])
   
   grid$grid_data$s_upper[n] = yr[1]
+  grid$grid_data = rbind(c(grid$grid_data$x[1], yl[length(yl)], NA, NA), grid$grid_data)
   
-  grid$grid_data = rbind( c(grid$grid_data$x[1], yl[length(yl)], NA, NA), grid$grid_data)
-  
-  n <- n+1
+  n <- n + 1
   
   if (requireNamespace("ggplot2", quietly = TRUE)) {
-    #suppressWarnings({
+    suppressWarnings({
     ggplot2::ggplot() +
-      ggplot2::geom_step(ggplot2::aes(grid$grid_data[1:(n),]$x, grid$grid_data[1:(n),]$s_upper), color = "red") +
-      ggplot2::geom_step(ggplot2::aes(grid$grid_data[2:(n-1),]$x, grid$grid_data[2:(n-1),]$s_upper * grid$grid_data[2:(n-1),]$p_a), color = "green") +
+      ggplot2::geom_step(ggplot2::aes(grid$grid_data[1:(n), ]$x, grid$grid_data[1:(n), ]$s_upper),
+                         color = "red") +
+      ggplot2::geom_step(
+        ggplot2::aes(
+          grid$grid_data[2:(n - 1), ]$x,
+          grid$grid_data[2:(n - 1), ]$s_upper * grid$grid_data[2:(n - 1), ]$p_a
+        ),
+        color = "green"
+      ) +
       ggplot2::geom_line(ggplot2::aes(x = xx, y = yy), color = "black")  +
-      ggplot2::geom_line(ggplot2::aes(x = xl, y = yl), color = "red") +
-      ggplot2::geom_line(ggplot2::aes(x = xr, y = yr), color = "red") +
-      ggplot2::geom_segment(ggplot2::aes(x=grid$grid_data$x[(n-1)], y=grid$grid_data$s_upper[(n-1)] * grid$grid_data$p_a[(n-1)], xend = grid$grid_data$x[(n)], yend = grid$grid_data$s_upper[(n-1)] * grid$grid_data$p_a[(n-1)]), color="green")+
+      ggplot2::geom_line(ggplot2::aes(x = xl, y = yl), color = "red", linetype="dotted") +
+      ggplot2::geom_line(ggplot2::aes(x = xr, y = yr), color = "red", linetype="dotted") +
+      ggplot2::geom_segment(
+        ggplot2::aes(
+          x = grid$grid_data$x[(n - 1)],
+          y = grid$grid_data$s_upper[(n - 1)] * grid$grid_data$p_a[(n - 1)],
+          xend = grid$grid_data$x[(n)],
+          yend = grid$grid_data$s_upper[(n - 1)] * grid$grid_data$p_a[(n - 1)]
+        ),
+        color = "green"
+      ) +
       ggplot2::xlab("x") +
       ggplot2::ylab("Density") +
-      ggplot2::coord_cartesian(xlim = c(x_min, x_max), ylim = c(y_min, y_max))
-    #})
+      ggplot2::coord_cartesian(xlim = c(x_min, x_max),
+                               ylim = c(y_min, y_max))
+    })
   } else{
     class(grid) <- "list"
     plot(grid, ...)
@@ -152,16 +183,31 @@ plot.grid <- function(x, x_min = NA, x_max = NA,...){
 #' # Print the properties of the generated grid
 #'
 #' print(norm_grid)
+#' @export
 #' @method print grid
 print.grid <- function(x, ...) {
-  
   grid <- x
   
+  # Format the number of steps with commas and without scientific notation
   formatted_steps <- format(grid$steps_number, big.mark = ",", scientific = FALSE)
-  cat("The grid contains", formatted_steps, "steps within the domain range  [", grid$grid_data$x[1], ",", grid$grid_data$x[grid$steps_number + 1], "].\n")
-#' @export
-  cat(sprintf("With a sampling efficiency of %.2f%%", 1 / sum(grid$areas) * 100), "\n")
+  
+  # Calculate the domain range
+  domain_start <- grid$grid_data$x[1]
+  domain_end <- grid$grid_data$x[grid$steps_number + 1]
+  
+  # Calculate sampling efficiency
+  sampling_efficiency <- (1 / sum(grid$areas)) * 100
+  
+  # Improved printing with clearer structure
+  cat("\n=========================================\n")
+  cat("Grid Summary\n")
+  cat("-----------------------------------------\n")
+  cat("Total steps:      ", formatted_steps, "\n")
+  cat("Domain range:     [", sprintf("%.6f", domain_start), ", ", sprintf("%.6f", domain_end), "]\n")
+  cat(sprintf("Sampling efficiency: %.2f%%", sampling_efficiency), "\n")
+  cat("=========================================\n\n")
 }
+
 
 
 
@@ -201,25 +247,21 @@ print.grid <- function(x, ...) {
 #' print_grids()
 #' 
 #' @export
-print_grids <- function( ){
-  
-  if(nrow(stors_env$grids$user) == 0){
+print_grids <- function() {
+  if (nrow(stors_env$grids$user) == 0) {
     message("No grids are currently stored.")
-  }else{
-    
-    grids <- list.files(path = stors_env$user_dirs$data_dir, full.names = TRUE)
-    
+  } else{
+    grids <- list.files(path = stors_env$user_dirs$data_dir,
+                        full.names = TRUE)
     grids_details <- file.info(grids)
-    
-    grids_sizes <- grids_details[grids_details$isdir == FALSE,]$size
-    
+    grids_sizes <- grids_details[grids_details$isdir == FALSE, ]$size
     print(stors_env$grids$user)
-    
-    grids_sizes <- formatC(sum(as.double(grids_sizes))/1028, format = "f", digits = 2)
-    
-    cat("\n grids_size : ", grids_sizes," KB")
+    grids_sizes <- formatC(sum(as.double(grids_sizes)) / 1028,
+                           format = "f",
+                           digits = 2)
+    cat("\n grids_size : ", grids_sizes, " KB")
   }
-
+  
 }
 
 
@@ -258,18 +300,15 @@ print_grids <- function( ){
 #' print_grids()
 #' 
 save_grid <- function(grid, grid_name) {
-  
   is_valid_grid(grid)
   
-  if(grid_name %in% stors_env$grids$user$name) invisible(delete_grid(grid_name))
+  if (grid_name %in% stors_env$grids$user$name)
+    invisible(delete_grid(grid_name))
   
   grids_file_path <- file.path(stors_env$user_dirs$data_dir, paste0(grid_name, ".rds"))
-  
   saveRDS(grid, grids_file_path)
-  
-  efficiency <- (1/sum(grid$areas))
-  
-  stors_env$grids$user[ nrow(stors_env$grids$user) + 1 ,] = list( grid_name, efficiency)
+  efficiency <- (1 / sum(grid$areas))
+  stors_env$grids$user[nrow(stors_env$grids$user) + 1 , ] = list(grid_name, efficiency)
 }
 
 
@@ -305,12 +344,11 @@ save_grid <- function(grid, grid_name) {
 #' # Now, when we print all stored grids, the "normal" grid will no longer be listed
 #' print_grids()
 #' 
-delete_grid <- function(grid_name){
-  
+delete_grid <- function(grid_name) {
   stopifnot("This grid does not exist." = grid_name %in% stors_env$grids$user$name)
   
-  file.remove(file.path( stors_env$user_dirs$data_dir, paste0(grid_name,".rds") ))
-  stors_env$grids$user = stors_env$grids$user[stors_env$grids$user$name != grid_name,]
+  file.remove(file.path(stors_env$user_dirs$data_dir, paste0(grid_name, ".rds")))
+  stors_env$grids$user = stors_env$grids$user[stors_env$grids$user$name != grid_name, ]
   cat(grid_name, "grid has been deleted successfully")
   
 }
@@ -343,15 +381,14 @@ delete_grid <- function(grid_name){
 #' print(loaded_normal_grid)
 #'  
 load_grid <- function(grid_name) {
-  
   if (!(grid_name %in% stors_env$grids$user$name)) {
-    stop("There is no grid named '", grid_name, "' stored on your machine.")
+    stop("There is no grid named '",
+         grid_name,
+         "' stored on your machine.")
   }
   
   grids_file_path <- file.path(stors_env$user_dirs$data_dir, paste0(grid_name, ".rds"))
-  
   grid <- readRDS(grids_file_path)
-  
   stors_env$created_girds_Id  = append(stors_env$created_girds_Id , digest(grid))
   
   return(grid)

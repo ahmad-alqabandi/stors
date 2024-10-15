@@ -4,7 +4,6 @@
 #' @noRd
 truncate_error_checking <- function(xl, xr, density) {
   
-  
   stopifnot(
     "xl must be a scaler" = (is.numeric(xl) && length(xl) == 1),
     "xr must be a scaler" = (is.numeric(xr) && length(xr) == 1),
@@ -21,6 +20,7 @@ truncate_error_checking <- function(xl, xr, density) {
 
 #' @noRd
 grid_error_checking_and_preparation = function(gp) {
+  
   modes <- gp$target$modes
   f <- gp$target$density
   between_minima <- gp$target$between_minima
@@ -110,6 +110,9 @@ is_valid_grid = function(grid) {
 
 #' @noRd
 cache_grid_c <- function(Cnum, grid) {
+  
+  n_params <- length(grid$density_parameters)
+  
   .Call(
     C_cache_grid,
     Cnum,
@@ -123,7 +126,10 @@ cache_grid_c <- function(Cnum, grid) {
     grid$unif_scaler,
     grid$lt_properties,
     grid$rt_properties,
-    grid$alpha
+    grid$alpha,
+    grid$symmetric,
+    grid$density_parameters,
+    n_params
   )
 }
 

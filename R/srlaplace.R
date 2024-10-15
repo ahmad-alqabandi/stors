@@ -111,3 +111,41 @@ srlaplace_truncate = function(xl, xr){
 }
 
 
+
+
+
+#' @export
+srlaplace_optimize = function(
+    mu = 0,
+    b = 1,
+    steps = 4091,
+    grid_range = NULL,
+    theta = NULL,
+    target_sample_size = 1000,
+    verbose = FALSE
+) {
+  
+  density_name <- 'srlaplace'
+  
+  dendata <- pbgrids[[density_name]]
+  
+  f_params <- c(mu, b) # F L
+  
+  modes <- dendata$set_modes(mu)
+  
+  f <- dendata$create_f(mu, b)
+  
+  if( identical(dendata$tails_method,"ARS") ){
+    h <- function(x)
+      log(f(x))
+    
+    h_prime <- stors_prime(modes, h)
+  }else{
+    cdf <- dendata$create_cdf(mu, b)
+  }
+  
+  grid_optimizer(dendata, density_name, f, cdf, h,
+                 h_prime, modes, f_params, steps,
+                 grid_range, theta, target_sample_size, verbose)
+  
+}

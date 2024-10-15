@@ -1,20 +1,21 @@
-#include "srexp.h"
+#include "snorm.h"
 #include "macro_var.h"
 
-#define NAME srexp
+#define NAME old_srnorm
 
 #define CNUM 3
 
-#define R_TAIL IT
+#define L_TAIL ARS
+
+#define R_TAIL ARS
 
 #define SYMMETRIC FALSE
 
-#define R_ITF(u)(-log(1 - u))
+// #define L_ITF(u)(log(2*u))
 
-#define F(x)(exp(-x))
+// #define R_ITF(u)(-log(2 - 2 * u))
 
-#define CDF(x)(1 - exp(-x))
-
+#define F(sample)(0.3989423 * exp(-0.5 * sample * sample))
 
 // =================================
 
@@ -26,11 +27,15 @@
 
 // =================================
 
+
 #include "stors_sample_trunc.c"
+
 
 // =================================
 
 
 #undef CNUM
+
+#undef L_TAIL
 
 #undef R_TAIL

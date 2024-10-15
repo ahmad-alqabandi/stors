@@ -1,9 +1,10 @@
-#include "snorm.h"
+#include "srchisq.h"
 #include "macro_var.h"
+#include "math.h"
 
-#define NAME srnorm
+#define NAME srchisq
 
-#define CNUM 1
+#define CNUM 5
 
 #define L_TAIL ARS
 
@@ -11,12 +12,8 @@
 
 #define SYMMETRIC FALSE
 
-// #define L_ITF(u)(log(2*u))
-
-// #define R_ITF(u)(-log(2 - 2 * u))
-
-//#define F(sample)(0.3989423 * exp(-0.5 * sample * sample))
-#define F(sample) (1.0 / (g.params[1] * 2.50662827463) * exp(-0.5 * ((sample - g.params[0]) / g.params[1]) * ((sample - g.params[0]) / g.params[1])))
+#define F(sample) ( (1.0 / ( pow(2.0, ((double)(g.params[0])/2.0)) * tgamma((double)(g.params[0])/2.0) )) \
+* pow( (sample), ((double)(g.params[0])/2.0 - 1.0) ) * exp( - (sample)/2.0 ) )
 
 // =================================
 
@@ -34,9 +31,15 @@
 
 // =================================
 
+#undef NAME
 
 #undef CNUM
 
 #undef L_TAIL
 
 #undef R_TAIL
+
+#undef SYMMETRIC
+
+#undef F
+

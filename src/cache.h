@@ -13,6 +13,8 @@ struct grid {
   double lt_properties[5];
   double rt_properties[6];
   double alpha;
+  int symmetric;
+  double params[10];
   int exist;
 };
 

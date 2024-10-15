@@ -7,6 +7,7 @@
 
 #include "cache.h"
 
+
 #if defined(CNUM) && defined(NAME)
 
 SEXP DEN_SAMPLE(NAME)(SEXP s_size){
@@ -14,7 +15,7 @@ SEXP DEN_SAMPLE(NAME)(SEXP s_size){
   int j, sample_size = asInteger(s_size);
 
   if(grids.grid[CNUM].x == NULL){
-    REprintf("you need to optimize your destribution grid first");
+    REprintf("you need to optimize your destribution's grid first");
     R_RETURN_NULL
   }
   
@@ -25,6 +26,11 @@ SEXP DEN_SAMPLE(NAME)(SEXP s_size){
   double h_upper, u;
   
 #endif
+  
+#if SYMMETRIC == TRUE
+  int flip;
+#endif
+  
   
   double  u1, sample, f_sample;
   
@@ -40,6 +46,17 @@ SEXP DEN_SAMPLE(NAME)(SEXP s_size){
   for (int i = 0; i < sample_size;)
   {
     
+#if SYMMETRIC == TRUE
+    
+    if(u1 > 0.5){
+      u1 = 1-u1;
+      flip = TRUE; 
+    }else{
+      flip = FALSE;
+    }
+    
+#endif
+    
 
 #ifdef L_TAIL    
     
@@ -48,7 +65,14 @@ SEXP DEN_SAMPLE(NAME)(SEXP s_size){
       
 #if L_TAIL == IT
       
-      results[i] = L_ITF(u1);
+      //results[i] = L_ITF(u1);
+      
+#if SYMMETRIC == TRUE
+      results[i] = FLIP_SAMPLE(L_ITF(u1),flip);
+#else
+        results[i] = L_ITF(u1);    
+#endif
+      
       i++;
       u1 = unif_rand();
       
@@ -60,14 +84,18 @@ SEXP DEN_SAMPLE(NAME)(SEXP s_size){
       u = unif_rand();
       if (u < F(sample) / exp(h_upper))
       {
-        results[i] = sample;
+        //results[i] = sample;
+#if SYMMETRIC == TRUE
+        results[i] = FLIP_SAMPLE(sample,flip);
+#else
+          results[i] = sample;    
+#endif
         i++;
       }
       u1 = unif_rand();
       
       
 #endif
-      
       
     }else
       
@@ -124,7 +152,15 @@ if(u1 > g.sampling_probabilities[1]){
         
         sample = g.x[j] + u1 * (g.x[j + 1] - g.x[j]);
         
-        results[i] = sample;
+        //results[i] = sample;
+#if SYMMETRIC == TRUE
+        //Rprintf("\n\n BEFORE : results[%d] = %f\n", i, sample);
+        results[i] = FLIP_SAMPLE(sample,flip);
+        //Rprintf(" AFTER : results[%d] = %f", i, results[i]);
+        //Rprintf("\n flip = %d \n", flip);
+#else
+          results[i] = sample;    
+#endif
         
         i++;
         
@@ -148,7 +184,12 @@ if(u1 > g.sampling_probabilities[1]){
         if (u1 < uf)
         {
           
-          results[i] = sample;
+//results[i] = sample;
+#if SYMMETRIC == TRUE
+          results[i] = FLIP_SAMPLE(sample,flip);
+#else
+          results[i] = sample;    
+#endif
           i++;
         }
         

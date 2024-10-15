@@ -5,12 +5,23 @@
 struct grids grids = {{0}};
 
 
-SEXP cache_grid(SEXP R_Cnum, SEXP R_x, SEXP R_s_upper, SEXP R_p_a, SEXP R_s_upper_lower, SEXP R_areas, SEXP R_steps_number, SEXP R_sampling_probabilities, SEXP R_unif_scaler, SEXP R_lt_properties, SEXP R_rt_properties, SEXP Ralpha){
+SEXP cache_grid(SEXP R_Cnum, SEXP R_x, SEXP R_s_upper,
+                SEXP R_p_a, SEXP R_s_upper_lower,
+                SEXP R_areas, SEXP R_steps_number,
+                SEXP R_sampling_probabilities, SEXP R_unif_scaler,
+                SEXP R_lt_properties, SEXP R_rt_properties,
+                SEXP Ralpha, SEXP Rsymmetric, SEXP Rparams, SEXP Rn_params){
   
-  int j = asInteger(R_Cnum), m = asInteger(R_steps_number);
+  int j = asInteger(R_Cnum), m = asInteger(R_steps_number),
+    symmetric = asInteger(Rsymmetric), n_params = asInteger(Rn_params);
+  
   double unif_scaler = asReal(R_unif_scaler), alpha = asReal(Ralpha);
-  double *x = REAL(R_x), *S_upper = REAL(R_s_upper), *p_a = REAL(R_p_a), *s_upper_lower = REAL(R_s_upper_lower),
-    *areas = REAL(R_areas), *sampling_probabilities = REAL(R_sampling_probabilities), *lt_properties = REAL(R_lt_properties), *rt_properties = REAL(R_rt_properties);
+  
+  double *x = REAL(R_x), *S_upper = REAL(R_s_upper), *p_a = REAL(R_p_a),
+    *s_upper_lower = REAL(R_s_upper_lower), *areas = REAL(R_areas),
+    *sampling_probabilities = REAL(R_sampling_probabilities),
+    *lt_properties = REAL(R_lt_properties), *rt_properties = REAL(R_rt_properties),
+    *params = REAL(Rparams);
   
   grids.grid[j].x =  calloc( (m + 1) , sizeof(double) );
   grids.grid[j].p_a = calloc( (m + 1) , sizeof(double) );
@@ -20,7 +31,8 @@ SEXP cache_grid(SEXP R_Cnum, SEXP R_x, SEXP R_s_upper, SEXP R_p_a, SEXP R_s_uppe
   grids.grid[j].steps_number = m;
   grids.grid[j].unif_scaler = unif_scaler;
   grids.grid[j].alpha = alpha;
-
+  grids.grid[j].symmetric = symmetric;
+  
   for( size_t i = 0; i < (m + 1); i++){
     grids.grid[j].x[i] = x[i];
     grids.grid[j].p_a[i] = p_a[i];
@@ -46,6 +58,10 @@ SEXP cache_grid(SEXP R_Cnum, SEXP R_x, SEXP R_s_upper, SEXP R_p_a, SEXP R_s_uppe
   
   for( size_t i = 0; i < 6; i++){
     grids.grid[j].rt_properties[i] = rt_properties[i];
+  }
+  
+  for( size_t i = 0; i < n_params; i++){
+    grids.grid[j].params[i] = params[i];
   }
   
   grids.grid[j].exist = 1;

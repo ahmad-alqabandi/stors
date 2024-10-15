@@ -22,7 +22,6 @@ test_that("Built_in smpling functions returns a sample of correct size and seeds
   
 })
 
-name <- 'srexp'
 
 test_that("Built_in sampling functions, samples properties tests", {
   for (name in stors:::stors_env$grids$builtin$names) {

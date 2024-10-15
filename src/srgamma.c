@@ -1,9 +1,10 @@
-#include "snorm.h"
+#include "srgamma.h"
 #include "macro_var.h"
+#include "math.h"
 
-#define NAME srnorm
+#define NAME srgamma
 
-#define CNUM 1
+#define CNUM 6
 
 #define L_TAIL ARS
 
@@ -11,12 +12,7 @@
 
 #define SYMMETRIC FALSE
 
-// #define L_ITF(u)(log(2*u))
-
-// #define R_ITF(u)(-log(2 - 2 * u))
-
-//#define F(sample)(0.3989423 * exp(-0.5 * sample * sample))
-#define F(sample) (1.0 / (g.params[1] * 2.50662827463) * exp(-0.5 * ((sample - g.params[0]) / g.params[1]) * ((sample - g.params[0]) / g.params[1])))
+#define F(x) (1.0 / (tgamma(g.params[0]) * pow(g.params[1], g.params[0]))) * pow((x), (g.params[0]) - 1.0) * exp(-(x) / (g.params[1]))
 
 // =================================
 
@@ -34,9 +30,15 @@
 
 // =================================
 
+#undef NAME
 
 #undef CNUM
 
 #undef L_TAIL
 
 #undef R_TAIL
+
+#undef SYMMETRIC
+
+#undef F
+

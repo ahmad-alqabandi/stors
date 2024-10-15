@@ -9,13 +9,15 @@
 
 #define R_TAIL IT
 
-#define L_ITF(u) (log(2 * (u)))
+#define SYMMETRIC FALSE
 
-#define R_ITF(u) (-log(2 - 2 * (u)))
+#define L_ITF(u) (g.params[0] + g.params[1] * log(2 * (u)))
 
-#define F(x)(0.5 * exp(-fabs(x)))
+#define R_ITF(u) (g.params[0] - g.params[1] * log(2 - 2 * (u)))
 
-#define CDF(x) ( (x <= 0) ? (0.5 * exp(x)) : (1 - 0.5 * exp(-x)) )
+#define F(x) (1.0 / (2.0 * g.params[1]) * exp(-fabs((x) - (g.params[0])) / (g.params[1])))
+
+#define CDF(x) (((x) <= (g.params[0])) ? (0.5 * exp((x - g.params[0]) / g.params[1])) : (1 - 0.5 * exp(-(x - g.params[0]) / g.params[1])))
 
 #include "stors_sample.c"
 

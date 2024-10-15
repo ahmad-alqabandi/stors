@@ -79,20 +79,17 @@
 #' @import digest digest
 #' @export
 stors <- function(grid, xl = grid$grid_bounds[1], xr = grid$grid_bounds[2]) {
-  
 
   force(grid)
   
   is_valid_grid(grid)
-
   Cnum <- cache_stors_grid(grid)
   
-  dens_func <- eval(parse(text = grid$dens_func))
-  
+  #dens_func <- eval(parse(text = grid$dens_func))
+  dens_func <- grid$dens_func
   rfunc_env <- new.env()
   
   if( xl != grid$grid_bounds[1] || xr != grid$grid_bounds[2]){
-
     stopifnot(
       "xl must be a scaler" = (is.numeric(xl) && length(xl) == 1),
       "xr must be a scaler" = (is.numeric(xr) && length(xr) == 1),
@@ -100,53 +97,37 @@ stors <- function(grid, xl = grid$grid_bounds[1], xr = grid$grid_bounds[2]) {
       "xl must be greater than or equal the density lower bound" = xl >  grid$grid_bounds[1],
       "xr must be smaller than or equal the density upper bound" = xr <  grid$grid_bounds[2]
     )
-
     Upper_cumsum = .Call(C_stors_trunc_nav,Cnum, xl, xr)
-    
     stopifnot(
       "xl is has a CDF close to 1" = (Upper_cumsum[1] != 1),
       "xr is has a CDF close to 0" = (Upper_cumsum[2] != 0)
     )
-
     function_string <- paste0("function(n) { .Call(C_stors_trunc, n, ",paste0(Cnum),", ",paste0(xl),", ",paste0(xr),", ",paste0(Upper_cumsum[1]),
                               ",", paste0(Upper_cumsum[2]),", ", paste0(as.integer(Upper_cumsum[3])),", ", paste0(as.integer(Upper_cumsum[4])),
                               " , dens_func, rfunc_env) }")
-    
   }else{
-
     function_string <- paste0("function(n) { .Call(C_stors, n, ",paste0(Cnum),", dens_func, rfunc_env) }" )
   }
   
   function_expression <- parse(text = function_string)
-  
   sampling_function <- eval(function_expression)
   
   rm(grid)
   
   return(sampling_function)
+  
 }
-
-
 
 cache_stors_grid <- function(grid){
   
   if(digest(grid) %in% stors_env$user_cached_grids$Id ){
-    
     Cnum = stors_env$user_cached_grids[stors_env$user_cached_grids$Id == digest(grid), "Cnum"]
-    
   } else{
-    
     n <- nrow(stors_env$user_cached_grids) + 1
-    
     Cnum <- stors_env$grids$builtin$builtin_num + 100 + n
-    
     new_row <- data.frame(Id = digest(grid), Cnum = Cnum)
-    
     stors_env$user_cached_grids <- rbind(stors_env$user_cached_grids, new_row)
-    
     cache_grid_c(Cnum, grid)
-    
-    
   }
   
   return(Cnum)
