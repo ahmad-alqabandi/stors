@@ -85,7 +85,6 @@ stors <- function(grid, xl = grid$grid_bounds[1], xr = grid$grid_bounds[2]) {
   is_valid_grid(grid)
   Cnum <- cache_stors_grid(grid)
   
-  #dens_func <- eval(parse(text = grid$dens_func))
   dens_func <- grid$dens_func
   rfunc_env <- new.env()
   

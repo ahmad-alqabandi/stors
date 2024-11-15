@@ -10,27 +10,65 @@
 
 #if defined(CNUM) && defined(NAME)
 
-SEXP DEN_SAMPLE(NAME)(SEXP s_size){
+SEXP DEN_SAMPLE(NAME)(SEXP s_size, SEXP Rpassed_params){
 
-  int j, sample_size = asInteger(s_size);
+  int j, sample_size = asInteger(s_size),
+    match = TRUE, scale_at_end = FALSE;
 
   if(grids.grid[CNUM].x == NULL){
     REprintf("you need to optimize your destribution's grid first");
     R_RETURN_NULL
   }
   
+  int n_param = grids.grid[CNUM].n_params;
+  
   struct grid g = grids.grid[CNUM];
+
+#ifdef SCALABLE
+
+  double *pp = REAL(Rpassed_params);
+  
+  for(int i = 0; i < n_param; i++){
+    if(g.params[i] != pp[i]) {match = FALSE; break;}
+  }
+  
+  if(match == FALSE){
+    
+    match = TRUE;
+    
+    if(grids.grid[CNUM_SCALED].x != NULL){
+      
+      g = grids.grid[CNUM_SCALED];
+      
+      for(int i = 0; i < n_param; i++){
+        if(g.params[i] != pp[i]) {match = FALSE; break;}
+      }
+      
+      if(match == FALSE){
+        scale_at_end = TRUE;
+        g = grids.grid[CNUM];
+      }
+      
+    }else{
+      
+      scale_at_end = TRUE;
+      g = grids.grid[CNUM];
+    }
+
+  }
+
+#endif
+  
+
+  
   
 #if L_TAIL == ARS || R_TAIL == ARS 
   
   double h_upper, u;
-  
+ 
 #endif
-  
-#if SYMMETRIC == TRUE
-  int flip;
-#endif
-  
+
+  int flip = 9999;
   
   double  u1, sample, f_sample;
   
@@ -38,23 +76,28 @@ SEXP DEN_SAMPLE(NAME)(SEXP s_size){
   
   double *results = REAL(Rresults);
   
+  
+#ifdef SPECIAL_FUNCTION
+  SPECIAL_FUNCTION(sample_size)
+#endif
+  
   GetRNGstate();
   
   u1 = unif_rand();
   
-  
   for (int i = 0; i < sample_size;)
   {
     
-#if SYMMETRIC == TRUE
-    
-    if(u1 > 0.5){
-      u1 = 1-u1;
-      flip = TRUE; 
-    }else{
-      flip = FALSE;
+
+#ifdef FLIP_SAMPLE
+    if(g.is_symmetric == 1){
+      if(u1 > 0.5){
+         u1 = 1-u1;
+        flip = TRUE; 
+      }else{
+        flip = FALSE;
+      }
     }
-    
 #endif
     
 
@@ -65,14 +108,19 @@ SEXP DEN_SAMPLE(NAME)(SEXP s_size){
       
 #if L_TAIL == IT
       
-      //results[i] = L_ITF(u1);
-      
-#if SYMMETRIC == TRUE
-      results[i] = FLIP_SAMPLE(L_ITF(u1),flip);
-#else
+#ifdef FLIP_SAMPLE
+      if(g.is_symmetric == 1){
+        results[i] = FLIP_SAMPLE(L_ITF(u1) ,flip);
+        
+      }else{
         results[i] = L_ITF(u1);    
-#endif
+      }
       
+#else
+      results[i] = L_ITF(u1);
+      
+#endif
+
       i++;
       u1 = unif_rand();
       
@@ -84,14 +132,20 @@ SEXP DEN_SAMPLE(NAME)(SEXP s_size){
       u = unif_rand();
       if (u < F(sample) / exp(h_upper))
       {
-        //results[i] = sample;
-#if SYMMETRIC == TRUE
-        results[i] = FLIP_SAMPLE(sample,flip);
-#else
+
+#ifdef FLIP_SAMPLE
+        if(g.is_symmetric == 1){
+          results[i] = FLIP_SAMPLE(sample, flip);
+        }else{
           results[i] = sample;    
+        }
+#else
+        results[i] = sample;
 #endif
+        
         i++;
       }
+      
       u1 = unif_rand();
       
       
@@ -152,14 +206,15 @@ if(u1 > g.sampling_probabilities[1]){
         
         sample = g.x[j] + u1 * (g.x[j + 1] - g.x[j]);
         
-        //results[i] = sample;
-#if SYMMETRIC == TRUE
-        //Rprintf("\n\n BEFORE : results[%d] = %f\n", i, sample);
-        results[i] = FLIP_SAMPLE(sample,flip);
-        //Rprintf(" AFTER : results[%d] = %f", i, results[i]);
-        //Rprintf("\n flip = %d \n", flip);
-#else
+#ifdef FLIP_SAMPLE
+
+        if(g.is_symmetric == 1){
+          results[i] = FLIP_SAMPLE(sample,flip);
+        }else{
           results[i] = sample;    
+        }
+#else
+        results[i] = sample;    
 #endif
         
         i++;
@@ -184,12 +239,17 @@ if(u1 > g.sampling_probabilities[1]){
         if (u1 < uf)
         {
           
-//results[i] = sample;
-#if SYMMETRIC == TRUE
-          results[i] = FLIP_SAMPLE(sample,flip);
+#ifdef FLIP_SAMPLE
+
+          if(g.is_symmetric == 1){
+            results[i] = FLIP_SAMPLE(sample,flip);
+          }else{
+            results[i] = sample;    
+          }
 #else
           results[i] = sample;    
 #endif
+          
           i++;
         }
         
@@ -200,6 +260,15 @@ if(u1 > g.sampling_probabilities[1]){
     }
     
   }
+  
+  
+#ifdef SCALE
+  if(scale_at_end){
+    for(int i=0;i < sample_size; i++ ){
+      results[i] = SCALE(results[i]);
+    }
+  }
+#endif
   
   PutRNGstate();
   

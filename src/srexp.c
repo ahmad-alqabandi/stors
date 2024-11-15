@@ -3,18 +3,21 @@
 
 #define NAME srexp
 
-#define CNUM 3
+#define CNUM 5
+
+#define CNUM_SCALED 6
 
 #define R_TAIL IT
 
-#define SYMMETRIC FALSE
+#define R_ITF(u)(-(1.0 / (g.params[0])) * log(1 - (u)))
 
-#define R_ITF(u)(-log(1 - u))
+#define F(x)(g.params[0] * exp(-x * g.params[0]))
 
-#define F(x)(exp(-x))
+#define CDF(x)(1 - exp(-x * g.params[0]))
 
-#define CDF(x)(1 - exp(-x))
+#define SCALABLE
 
+#define SCALE(sample) sample / pp[0]
 
 // =================================
 

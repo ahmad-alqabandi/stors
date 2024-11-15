@@ -9,7 +9,7 @@
 
 #if defined(CNUM) && defined(NAME)
 
-#define IN_LEFT_TAIL -1
+#define IN_LEFT_TAIL -2
 #define IN_RIGHT_TAIL -1
 
 
@@ -29,14 +29,14 @@ SEXP DEN_TRUNC(NAME)(SEXP s_size, SEXP Rxl, SEXP Rxr , SEXP Rcsl, SEXP Rcsr,  SE
       
 #ifdef L_TAIL
     int check_lower = 0;
-
-    if(il != IN_LEFT_TAIL){
-      tempxl = g.x[il];
-        g.x[il] = xl;
-    }else{
-      if(csl == 0) check_lower = 1;
-    }
     
+    if(il == IN_LEFT_TAIL){
+      if(csl == 0) check_lower = 1;
+    } else if(il != IN_RIGHT_TAIL){
+      tempxl = g.x[il];
+      g.x[il] = xl;
+    }
+
 #else
     tempxl = g.x[il];
     g.x[il] = xl;
@@ -46,11 +46,12 @@ SEXP DEN_TRUNC(NAME)(SEXP s_size, SEXP Rxl, SEXP Rxr , SEXP Rcsl, SEXP Rcsr,  SE
 #ifdef R_TAIL
     int check_upper = 0;
 
-      if(ir != IN_RIGHT_TAIL){
-        tempxr = g.x[ir];
-          g.x[ir] = xr;
+      if(ir == IN_RIGHT_TAIL){
+        if(csr == 1) check_upper = 1;
           }else{
-            if(csr == 1) check_upper = 1;
+            tempxr = g.x[ir];
+            g.x[ir] = xr;
+            
           }
 #else
           tempxr = g.x[ir];
@@ -96,7 +97,7 @@ SEXP DEN_TRUNC(NAME)(SEXP s_size, SEXP Rxl, SEXP Rxr , SEXP Rcsl, SEXP Rcsr,  SE
           
           u1 = unif_rand();
           u1 = csl + u1 * (csr-csl);
-
+          
 #elif L_TAIL == ARS
           
           sample = g.x[0] + (log( g.lt_properties[0] + u1 * g.lt_properties[1]) - g.lt_properties[2]) * g.lt_properties[3];
@@ -134,7 +135,7 @@ SEXP DEN_TRUNC(NAME)(SEXP s_size, SEXP Rxl, SEXP Rxr , SEXP Rcsl, SEXP Rcsr,  SE
 #if R_TAIL == IT
             
             results[i] = R_ITF(u1);
-            
+
             if(check_upper){
               if(results[i] <=  xr) i++;
             }else{
@@ -143,9 +144,8 @@ SEXP DEN_TRUNC(NAME)(SEXP s_size, SEXP Rxl, SEXP Rxr , SEXP Rcsl, SEXP Rcsr,  SE
             
             u1 = unif_rand();
             u1 = csl + u1 * (csr-csl);
+
             
-
-
 #elif R_TAIL == ARS
             
             sample = g.x[g.steps_number] + log1p((u1 * g.rt_properties[0] - g.rt_properties[1]) * g.rt_properties[2]) * g.rt_properties[3];
@@ -180,7 +180,7 @@ SEXP DEN_TRUNC(NAME)(SEXP s_size, SEXP Rxl, SEXP Rxr , SEXP Rcsl, SEXP Rcsr,  SE
   u1 = (u1 - g.sampling_probabilities[0]) * g.unif_scaler;
   
   u1 *= g.steps_number;
-  
+
   j = (int)u1;
   
   u1 -= j;
@@ -190,7 +190,7 @@ SEXP DEN_TRUNC(NAME)(SEXP s_size, SEXP Rxl, SEXP Rxr , SEXP Rcsl, SEXP Rcsr,  SE
     u1 = u1 * g.s_upper_lower[j];
     
     sample = g.x[j] + u1 * (g.x[j + 1] - g.x[j]);
-    
+
     results[i] = sample;
     
     i++;
@@ -198,7 +198,6 @@ SEXP DEN_TRUNC(NAME)(SEXP s_size, SEXP Rxl, SEXP Rxr , SEXP Rcsl, SEXP Rcsr,  SE
     if (i < sample_size)
     {
       u1 = unif_rand();
-      
       u1 = csl + u1 * (csr-csl);
     }
   }
@@ -208,7 +207,7 @@ SEXP DEN_TRUNC(NAME)(SEXP s_size, SEXP Rxl, SEXP Rxr , SEXP Rcsl, SEXP Rcsr,  SE
     double u0 = unif_rand();
     
     sample = g.x[j] + u0 * (g.x[j + 1] - g.x[j]);
-    
+
     f_sample = F(sample);
     
     double uf = f_sample /g.s_upper[j];
@@ -226,7 +225,8 @@ SEXP DEN_TRUNC(NAME)(SEXP s_size, SEXP Rxl, SEXP Rxr , SEXP Rcsl, SEXP Rcsr,  SE
   
 }
 
-      }
+
+}
       
       
       if(il != IN_LEFT_TAIL){

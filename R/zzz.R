@@ -5,7 +5,6 @@ pbgrids <- list(
   srnorm = list(
     Cnum = 1,
     tails_method = "ARS",
-    symmetric = FALSE,
     create_f = function(mu, sd) {
       function(x)
         ((1.0 / (sd * 2.50662827463) *
@@ -22,8 +21,7 @@ pbgrids <- list(
     rb = Inf
   ),
   srlaplace = list(
-    Cnum = 2,
-    symmetric = FALSE,
+    Cnum = 3,
     tails_method = "IT",
     create_f = function(mu, b) {
       function(x) {
@@ -44,49 +42,35 @@ pbgrids <- list(
     lb = -Inf,
     rb = Inf
   ),
-  old_srnorm = list(
-    Cnum = 3,
-    tails_method = "ARS",
-    symmetric = FALSE,
-    f = function(x) {
-      0.3989423 * exp(-0.5 * x * x)
-    },
-    h = function(x) {
-      log(0.3989423) - (x * x) * (1 / 2)
-    },
-    h_prime = function(x) {
-      -x
-    },
-    modes = 0,
-    lb = -Inf,
-    rb = Inf
-  ),
-  srnorm_symmetric = list(
-    Cnum = 4,
-    tails_method = "ARS",
-    symmetric = TRUE,
-    f = function(x) {
-      0.3989423 * exp(-0.5 * x * x)
-    },
-    h = function(x) {
-      log(0.3989423) - (x * x) * (1 / 2)
-    },
-    h_prime = function(x) {
-      -x
-    },
-    modes = 0,
-    lb = -Inf,
-    rb = Inf
-  ),
-  srchisq = list(
+  srexp = list(
     Cnum = 5,
+    tails_method = "IT",
+    create_f = function(rate) {
+      function(x)
+      {
+        fx <- rate * exp(-rate * x)
+        fx <- ifelse(is.nan(fx), 0, fx)
+        return(fx)
+      }
+    },
+    create_cdf = function(rate) {
+      function(x) {
+        return(1 - exp(- rate * x))
+      }
+      },
+    lb = 0,
+    rb = Inf
+  )
+  ,
+  srchisq = list(
+    Cnum = 7,
     tails_method = "ARS",
-    symmetric = FALSE,
     create_f = function(df) {
       function(x)
       {
         fx <- (1 / (2 ^ (df / 2) * gamma(df / 2))) * x ^ (df / 2 - 1) * exp(-x / 2)
-        if(is.nan(fx)) return(0) else return(fx) # NOTE: this precision issue is not solved for in the C code
+        fx <- ifelse(is.nan(fx), 0, fx)
+        return(fx)
       }
     },
     set_modes = function(df = 1) {
@@ -95,9 +79,8 @@ pbgrids <- list(
     lb = 0,
     rb = Inf
   ), srgamma = list(
-    Cnum = 6,
+    Cnum = 9,
     tails_method = "ARS",
-    symmetric = FALSE,
     create_f = function(shape = 1, rate = 1, scale = 1/rate) {
       function(x)
       {
@@ -105,8 +88,8 @@ pbgrids <- list(
           return(0)
         }
         fx <- (1 / (gamma(shape) * scale ^ shape) * x ^ (shape - 1) * exp(-x / scale))
-        if(is.nan(fx)) return(0) else return(fx) # NOTE: this precision issue is not solved for in the C code
-        
+        fx <- ifelse(is.nan(fx), 0, fx)
+        return(fx)
       }
     },
     set_modes = function(shape, scale) {
@@ -175,11 +158,11 @@ stors_env <- new.env(parent = emptyenv())
   
   
   if (first_time_load) {
-    for (name in names(pbgrids)) {
+     for (name in names(pbgrids)) {
       fun_text <- paste0(name,'_optimize()')
       fun_parse <- parse(text = fun_text)
       eval(fun_parse)
-    }
+     }
   }
   
 }

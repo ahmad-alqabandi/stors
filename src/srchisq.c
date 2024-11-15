@@ -4,16 +4,16 @@
 
 #define NAME srchisq
 
-#define CNUM 5
+#define CNUM 7
 
 #define L_TAIL ARS
 
 #define R_TAIL ARS
 
-#define SYMMETRIC FALSE
-
 #define F(sample) ( (1.0 / ( pow(2.0, ((double)(g.params[0])/2.0)) * tgamma((double)(g.params[0])/2.0) )) \
-* pow( (sample), ((double)(g.params[0])/2.0 - 1.0) ) * exp( - (sample)/2.0 ) )
+* pow( (sample), ((double)(g.params[0])/2.0 - 1.0) ) * exp( - (sample)/2.0 ) )                                                \
+
+
 
 // =================================
 

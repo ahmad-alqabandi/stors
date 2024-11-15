@@ -20,7 +20,7 @@ struct grid g = grids.grid[CNUM];
 
 int i=0;
 
-double xlr[2], total_area = g.areas[0]+ g.areas[1]+ g.areas[2], ixlr[2];
+double xlr[2], total_area = g.areas[0] + g.areas[1]+ g.areas[2], ixlr[2];
 
 
 #if R_TAIL == ARS
@@ -29,9 +29,6 @@ double hu_x;
 
 #elif R_TAIL == IT
 
-// double cdf;
-// SEXP fcall, result, foo, val;
-// double res;
 
 #endif
 
@@ -92,18 +89,12 @@ for( int j = 0; j < 2; j++){
           hu_x =  g.lt_properties[4] * (xlr[j] - g.x[0]) + g.lt_properties[2];
           
           results[j] = (g.lt_properties[3] * (exp(hu_x) - g.lt_properties[0])) / total_area;
-          ixlr[j] = -1;
+          ixlr[j] = -2;
 #elif L_TAIL == IT
           
-          
-          //cdf = CDF(xlr[j]);
-          
-          //results[j] =  cdf / total_area;
-          
-          // added line
           results[j] = CDF(xlr[j]);
             
-          ixlr[j] = -1;
+          ixlr[j] = -2;
 #endif
           
         }else

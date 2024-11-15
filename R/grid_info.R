@@ -193,17 +193,21 @@ print.grid <- function(x, ...) {
   
   # Calculate the domain range
   domain_start <- grid$grid_data$x[1]
-  domain_end <- grid$grid_data$x[grid$steps_number + 1]
+  n <- length(grid$grid_data$x)
+  domain_end <- grid$grid_data$x[n]
+  
+  
+  if(!is.null(grid$symmetric)) mul = 2 else mul = 1
   
   # Calculate sampling efficiency
-  sampling_efficiency <- (1 / sum(grid$areas)) * 100
+  sampling_efficiency <- (1 / (sum(grid$areas) * mul)) * 100
   
   # Improved printing with clearer structure
   cat("\n=========================================\n")
   cat("Grid Summary\n")
   cat("-----------------------------------------\n")
   cat("Total steps:      ", formatted_steps, "\n")
-  cat("Domain range:     [", sprintf("%.6f", domain_start), ", ", sprintf("%.6f", domain_end), "]\n")
+  cat("Steps range:     [", sprintf("%.6f", domain_start), ", ", sprintf("%.6f", domain_end), "]\n")
   cat(sprintf("Sampling efficiency: %.2f%%", sampling_efficiency), "\n")
   cat("=========================================\n\n")
 }

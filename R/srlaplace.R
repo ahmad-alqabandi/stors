@@ -31,8 +31,8 @@
 #' 
 #'
 #' @export
-srlaplace <- function(n) {
-  .Call(C_laplace, n)
+srlaplace <- function(n, mu = 0, b = 1) {
+  .Call(C_laplace, n, c(mu, b))
 }
 
 
@@ -98,8 +98,8 @@ srlaplace_truncate = function(xl, xr){
   Upper_cumsum = .Call(C_laplace_trunc_nav, xl, xr)
   
   stopifnot(
-    "xl is has a CDF close to 1" = (Upper_cumsum[1] != 1),
-    "xr is has a CDF close to 0" = (Upper_cumsum[2] != 0)
+    "xl has a CDF close to 1" = (Upper_cumsum[1] != 1),
+    "xr has a CDF close to 0" = (Upper_cumsum[2] != 0)
   )
   
   function_string <- paste0("function(n) { .Call(C_laplace_trunc, n, ", paste0(xl), ", ", paste0(xr), ", ", paste0(Upper_cumsum[1]),
@@ -122,14 +122,17 @@ srlaplace_optimize = function(
     grid_range = NULL,
     theta = NULL,
     target_sample_size = 1000,
-    verbose = FALSE
+    verbose = FALSE,
+    symmetric = NULL
 ) {
   
   density_name <- 'srlaplace'
   
   dendata <- pbgrids[[density_name]]
   
-  f_params <- c(mu, b) # F L
+  if(mu == 0 && b == 1) cnum <- dendata$Cnum else cnum <- dendata$Cnum + 1
+  
+  f_params <- list(mu = mu, b = b) # F L
   
   modes <- dendata$set_modes(mu)
   
@@ -146,6 +149,7 @@ srlaplace_optimize = function(
   
   grid_optimizer(dendata, density_name, f, cdf, h,
                  h_prime, modes, f_params, steps,
-                 grid_range, theta, target_sample_size, verbose)
+                 grid_range, theta, target_sample_size, symmetric,
+                 cnum, verbose)
   
 }

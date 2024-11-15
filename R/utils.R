@@ -1,6 +1,5 @@
 
 
-
 #' @noRd
 truncate_error_checking <- function(xl, xr, density) {
   
@@ -99,6 +98,8 @@ grid_error_checking_and_preparation = function(gp) {
   
 }
 
+
+
 #' @import digest digest
 #' @noRd
 is_valid_grid = function(grid) {
@@ -109,9 +110,76 @@ is_valid_grid = function(grid) {
 }
 
 #' @noRd
+grid_check_symmetric <- function(gp){
+  
+  if(!is.null( gp$target$symmetric)){
+
+    # if( is.null(gp$target$symmetric_around_value) ){
+    #   if(gp$target$modes_count > 1){
+    #     stop("you need to provide symmetric_around_value to build symmetric grid.")
+    #   }
+    #   warning("symmetric_around_value has been set equale to the distrebution's mode.")
+    #   gp$target$symmetric_around_value <- gp$target$modes
+    # }
+  
+  modes <- gp$target$modes
+  rb <- gp$target$right_bound
+  lb <- gp$target$left_bound
+  grid_range <- gp$proposal$grid_range
+  
+  f <- gp$target$density
+  
+  center <- gp$target$symmetric
+  
+  n <- 21
+  
+  if(is.finite(lb) || is.finite(rb)){
+    sub <- min(lb, rb)
+  }else{
+    sub <- 5
+  }
+  
+  vals <- seq(from = center + sub, to = center - sub , length.out = n)
+  
+  for ( i in as.integer(n/2) ) {
+    if( f(vals[i]) != f(vals[n - i + 1]) )
+      stop(paste0("the target density is not symmetric around ", center) )
+  }
+  
+  gp$target$modes <- modes[modes > center]
+  if(length(modes) == 1){
+    modes <- center
+    grid_range <- c(center, grid_range[2])
+  }else{
+    
+    if( center %in% modes){
+      modes <- modes[modes >= center]
+    }else{
+      modes <- modes[modes > center]
+    }
+  }
+  
+  gp$target$modes <- modes
+  gp$target$left_bound <- center
+  gp$proposal$grid_range <- grid_range
+  gp$target$modes_count <- length(gp$target$modes)
+  }
+
+  return(gp)
+  
+}
+
+
+#' @noRd
 cache_grid_c <- function(Cnum, grid) {
   
-  n_params <- length(grid$density_parameters)
+  n_params <- length(grid$f_params)
+  
+  if(n_params == 0){
+    f_params <- 0
+  }else{
+    f_params <- unlist(grid$f_params)
+  }
   
   .Call(
     C_cache_grid,
@@ -128,9 +196,10 @@ cache_grid_c <- function(Cnum, grid) {
     grid$rt_properties,
     grid$alpha,
     grid$symmetric,
-    grid$density_parameters,
+    f_params,
     n_params
   )
+  
 }
 
 #' @noRd
@@ -144,3 +213,4 @@ save_builtin_grid <- function(Cnum, grid) {
   
   saveRDS(grid, grids_file_path)
 }
+

@@ -112,7 +112,9 @@ srgamma_optimize = function(
   
   dendata <- pbgrids[[density_name]]
   
-  f_params <- c(shape, scale) # F L
+  cnum <- dendata$Cnum
+  
+  f_params <- list(shape = shape, scale = scale) # F L
   
   modes <- dendata$set_modes(shape, scale)
 
@@ -126,11 +128,11 @@ srgamma_optimize = function(
     h_prime <- stors_prime(modes, h)
     
   }else{
-    cdf <- dendata$create_cdf(mu, sd)
-  }  
+    cdf <- dendata$create_cdf(shape, scale)
+  } 
   
   grid_optimizer(dendata, density_name, f, cdf, h,
                  h_prime, modes, f_params, steps,
-                 grid_range, theta, target_sample_size, verbose)
+                 grid_range, theta, target_sample_size, symmetric = NULL , cnum, verbose)
   
 }

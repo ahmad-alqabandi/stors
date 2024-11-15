@@ -38,7 +38,7 @@
 #'
 #' @export
 srchisq <- function(n) {
-  .Call(C_srchisq, n)
+  .Call(C_srchisq, n,0)
 }
 
 
@@ -110,7 +110,14 @@ srchisq_optimize = function(
   
   dendata <- pbgrids[[density_name]]
   
-  f_params <- c(df) # F L
+  cnum <- dendata$Cnum
+  
+  if (df == 1) {
+    message("Grid building is not available for df = 1. You can square the result of srnorm() to sample from this distribution.")
+    return()
+  }
+  
+  f_params <- list() # F L
   
   modes <- dendata$set_modes(df)
 
@@ -129,6 +136,7 @@ srchisq_optimize = function(
   
   grid_optimizer(dendata, density_name, f, cdf, h,
                  h_prime, modes, f_params, steps,
-                 grid_range, theta, target_sample_size, verbose)
+                 grid_range, theta, target_sample_size, symmetric = NULL,
+                 cnum, verbose)
   
 }

@@ -19,7 +19,6 @@ test_that("Built_in smpling functions returns a sample of correct size and seeds
     expect_equal(x1,x2, info = "set.seed() does not works currectlly")
   }
   
-  
 })
 
 

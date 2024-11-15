@@ -6,7 +6,7 @@
 \alias{srlaplace_truncate}
 \title{Sampling from Laplace Distribution}
 \usage{
-srlaplace(n)
+srlaplace(n, mu = 0, b = 1)
 
 srlaplace_scaled(n, mu = 0, b = 1)
 

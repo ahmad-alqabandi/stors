@@ -2,7 +2,6 @@
 #include "R_cache.h"
 #include "snorm.h"
 #include "srexp.h"
-#include "srnorm_symmetric.h"
 #include "laplace.h"
 #include "old_srnorm.h"
 #include "srchisq.h"
@@ -19,7 +18,6 @@ static const R_CallMethodDef callMethods[]  = {
   {"srnorm", (DL_FUNC) &srnorm, -1},
   {"srnorm_trunc_nav", (DL_FUNC) &srnorm_trunc_nav, -1},
   {"srnorm_trunc", (DL_FUNC) &srnorm_trunc, -1},
-  {"srnorm_symmetric", (DL_FUNC) &srnorm_symmetric, -1},
   {"old_srnorm", (DL_FUNC) &old_srnorm, -1},
   {"old_srnorm_trunc_nav", (DL_FUNC) &old_srnorm_trunc_nav, -1},
   {"old_srnorm_trunc", (DL_FUNC) &old_srnorm_trunc, -1},

@@ -10,10 +10,10 @@ SEXP cache_grid(SEXP R_Cnum, SEXP R_x, SEXP R_s_upper,
                 SEXP R_areas, SEXP R_steps_number,
                 SEXP R_sampling_probabilities, SEXP R_unif_scaler,
                 SEXP R_lt_properties, SEXP R_rt_properties,
-                SEXP Ralpha, SEXP Rsymmetric, SEXP Rparams, SEXP Rn_params){
+                SEXP Ralpha, SEXP Rsymmetric,
+                SEXP Rparams, SEXP Rn_params){
   
-  int j = asInteger(R_Cnum), m = asInteger(R_steps_number),
-    symmetric = asInteger(Rsymmetric), n_params = asInteger(Rn_params);
+  int j = asInteger(R_Cnum), m = asInteger(R_steps_number), n_params = asInteger(Rn_params);
   
   double unif_scaler = asReal(R_unif_scaler), alpha = asReal(Ralpha);
   
@@ -21,7 +21,14 @@ SEXP cache_grid(SEXP R_Cnum, SEXP R_x, SEXP R_s_upper,
     *s_upper_lower = REAL(R_s_upper_lower), *areas = REAL(R_areas),
     *sampling_probabilities = REAL(R_sampling_probabilities),
     *lt_properties = REAL(R_lt_properties), *rt_properties = REAL(R_rt_properties),
-    *params = REAL(Rparams);
+    *params = REAL(Rparams), symmetric = 0;
+    
+    if(!isNull(Rsymmetric)){
+      symmetric = asReal(Rsymmetric);
+      grids.grid[j].is_symmetric = 1;
+    }else{
+      grids.grid[j].is_symmetric = 0;
+    }
   
   grids.grid[j].x =  calloc( (m + 1) , sizeof(double) );
   grids.grid[j].p_a = calloc( (m + 1) , sizeof(double) );
@@ -32,6 +39,7 @@ SEXP cache_grid(SEXP R_Cnum, SEXP R_x, SEXP R_s_upper,
   grids.grid[j].unif_scaler = unif_scaler;
   grids.grid[j].alpha = alpha;
   grids.grid[j].symmetric = symmetric;
+  grids.grid[j].n_params = n_params;
   
   for( size_t i = 0; i < (m + 1); i++){
     grids.grid[j].x[i] = x[i];

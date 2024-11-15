@@ -44,7 +44,8 @@
 #' 
 #'
 #' @export
-grid_optimizer <- function(dendata,density_name,
+grid_optimizer <- function(dendata,
+                           density_name,
                            f,
                            cdf = NULL,
                            h = NULL,
@@ -55,11 +56,14 @@ grid_optimizer <- function(dendata,density_name,
                            grid_range = NULL,
                            theta = NULL,
                            target_sample_size = NULL,
+                           symmetric = NULL,
+                           cnum = NULL,
                            verbose = FALSE) {
+  
   # density_name <- match.arg(density_name)
-  # 
   # dendata <- pbgrids[[density_name]]
-  free_cache_cnum_c(dendata$Cnum)
+  
+  free_cache_cnum_c(cnum)
   
   grid_param <- list(
     target = list(
@@ -71,8 +75,9 @@ grid_optimizer <- function(dendata,density_name,
       modes_count = length(modes),
       between_minima = NULL,
       right_bound = dendata$rb,
-      left_bound = dendata$lb
-    ),
+      left_bound = dendata$lb,
+      symmetric = symmetric
+      ),
     proposal = list(
       grid_range = grid_range,
       tails_method = dendata$tails_method,
@@ -82,12 +87,12 @@ grid_optimizer <- function(dendata,density_name,
       right_steps_proportion = NULL,
       pre_acceptance_threshold = theta,
       target_sample_size = target_sample_size
-    ),
+      ),
     built_in = TRUE,
-    cnum = dendata$Cnum,
-    symmetric = dendata$symmetric,
+    cnum = cnum,
     c_function_name = density_name,
-    verbose = verbose
+    verbose = verbose,
+    f_params = f_params
   )
   
   if (grid_param$proposal$tails_method == "IT") {
@@ -99,17 +104,16 @@ grid_optimizer <- function(dendata,density_name,
   
   grid_param <- grid_error_checking_and_preparation(grid_param)
   
+  grid_param <- grid_check_symmetric(grid_param)
+  
   optimal_grid_params = find_optimal_grid(grid_param)
   opt_grid <- build_final_grid(gp = optimal_grid_params)
-  opt_grid$density_parameters <- f_params
-  
-  cache_grid_c(dendata$Cnum, opt_grid)
-  save_builtin_grid(dendata$Cnum, opt_grid)
+
+  cache_grid_c(cnum, opt_grid)
+  save_builtin_grid(cnum, opt_grid)
   stors_env$grids$builtin[[density_name]]$opt <- TRUE
   
-  #opt_grid$dens_func <- deparse(f)
   opt_grid$dens_func <- f
-  
   
   class(opt_grid) <- "grid"
   
@@ -133,7 +137,9 @@ find_optimal_grid <- function(gp) {
   mode_n <- gp$target$modes_count
   steps <- gp$proposal$steps
   c_function_name <- gp$c_function_name
+  symmetric <- gp$target$symmetric
   verbose <- gp$verbose
+  f_params <- gp$f_params
   
   times = ceiling(opt_times / target_sample_size)
   
@@ -155,7 +161,8 @@ find_optimal_grid <- function(gp) {
     lstpsp = max_left_stps / (max_left_stps + max_right_stps)
     rstpsp = 1 - lstpsp
     if (!is.null(steps)) {
-      gp$proposal$optimal_step_area = 1 / steps
+      if(! is.null(symmetric)) mul = 2 else mul = 1
+      gp$proposal$optimal_step_area = 1 / (steps * mul)
       gp$proposal$left_steps_proportion = lstpsp
       gp$proposal$right_steps_proportion = rstpsp
       return(gp)
@@ -204,10 +211,23 @@ find_optimal_grid <- function(gp) {
       for (j in (1:length(area_seq))) {
         grid <- build_final_grid(gp = gp, opt_area = area_seq[j])
         cache_grid_c(cnum, grid)
+        args <- c(n = target_sample_size, f_params)
         gc = gc()
-        suppressWarnings({
-          cost <- microbenchmark::microbenchmark(st = density_fun(target_sample_size), times = times)
-        })
+        
+        if (gp$built_in) {
+          suppressWarnings({
+            cost <- microbenchmark::microbenchmark(
+              st = do.call(density_fun, args),
+              times = times)
+          })
+        }else{
+          suppressWarnings({
+            cost <- microbenchmark::microbenchmark(
+              st = density_fun(target_sample_size) ,
+              times = times)
+          })
+        }
+
         free_cache_cnum_c(cnum)
         steps_time = append(steps_time, stats::median(cost$time[cost$expr == "st"]))
         if (verbose) {
@@ -261,3 +281,4 @@ opt_df_var = 32 # 4 doubles
 opt_list_var = 160 # 20 doubles
 opt_steps = round(((opt_cache_sizes * 1024) - opt_list_var) / opt_df_var)
 opt_areas = 1 / opt_steps
+

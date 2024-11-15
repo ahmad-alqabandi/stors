@@ -29,39 +29,13 @@
 #' print(samples)
 #'
 #' @export
-srexp <- function(n) {
-  .Call(C_srexp, n)
+srexp <- function(n, rate = 1) {
+  .Call(C_srexp, n, c(rate))
 }
 
 
 #' @rdname srexp
 #' @order 2
-#'
-#' @description
-#' Sampling from any exponential distribution by specifying the scale parameter.
-#'
-#' @param n Integer sample size.
-#' @param scale Scalar scale parameter.
-#'
-#' @return
-#' \code{srexp_scaled()} returns a sample of size \code{n} from an exponential distribution with the specified scale parameter.
-#'
-#' @examples
-#' # Generating Samples from an Exponential Distribution with a Specific Scale
-#' # This example demonstrates how to generate 10 samples,
-#' # from an exponential distribution with a scale parameter of 2.
-#' samples <- srexp_scaled(n = 10, scale = 2)
-#' print(samples)
-#'
-#' @export
-srexp_scaled <- function(n, scale = 1) {
-  .Call(C_srexp, n) * scale
-}
-
-
-
-#' @rdname srexp
-#' @order 3
 #'
 #' @description
 #' Creating a sampling function for a truncated exponential distribution.
@@ -102,5 +76,48 @@ srexp_truncate = function(xl, xr){
   
   function_expression <- parse(text = function_string)
   sampling_function <- eval(function_expression)
+  
+}
+
+
+
+
+#' @export
+srexp_optimize = function(
+    rate = 1,
+    steps = 4091,
+    grid_range = NULL,
+    theta = NULL,
+    target_sample_size = 1000,
+    verbose = FALSE
+    ) {
+  
+  density_name <- 'srexp'
+  
+  dendata <- pbgrids[[density_name]]
+  
+  if(rate == 1) cnum <- dendata$Cnum else cnum <- dendata$Cnum + 1
+  
+  f_params <- list(rate = rate)
+  
+  modes <- 0
+  
+  f <- dendata$create_f(rate)
+  
+  if( identical(dendata$tails_method,"ARS") ){
+    h <- function(x)
+      log(f(x))
+    
+    h_prime <- stors_prime(ratre)
+    
+  }else{
+    cdf <- dendata$create_cdf(rate)
+  }  
+  
+  grid_optimizer(dendata, density_name, f, cdf, h,
+                 h_prime, modes, f_params, steps,
+                 grid_range, theta, target_sample_size,
+                 symmetric = NULL,
+                 cnum, verbose)
   
 }

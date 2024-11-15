@@ -4,13 +4,11 @@
 
 #define NAME srgamma
 
-#define CNUM 6
+#define CNUM 9
 
 #define L_TAIL ARS
 
 #define R_TAIL ARS
-
-#define SYMMETRIC FALSE
 
 #define F(x) (1.0 / (tgamma(g.params[0]) * pow(g.params[1], g.params[0]))) * pow((x), (g.params[0]) - 1.0) * exp(-(x) / (g.params[1]))
 

@@ -135,6 +135,7 @@ build_grid <- function(lb = -Inf,
                        grid_range = NULL,
                        theta = NULL,
                        target_sample_size = 1000,
+                       symmetric = NULL,
                        verbose = FALSE) {
   if (!is.function(f)) {
     stop("Error: 'f' density function must be provided.")
@@ -160,7 +161,8 @@ build_grid <- function(lb = -Inf,
       modes_count = length(modes),
       between_minima = NULL,
       right_bound = rb,
-      left_bound = lb
+      left_bound = lb,
+      symmetric = symmetric
     ),
     proposal = list(
       grid_range = grid_range,
@@ -177,7 +179,11 @@ build_grid <- function(lb = -Inf,
     verbose = verbose
   )
   
+  
+  
   grid_param <- grid_error_checking_and_preparation(grid_param)
+  
+  grid_param <- grid_check_symmetric(grid_param)
   
   if (!is.null(steps))
     grid_param$proposal$pre_acceptance_thres_hold <- 0.1
@@ -185,7 +191,6 @@ build_grid <- function(lb = -Inf,
   optimal_grid_params = find_optimal_grid(grid_param)
   opt_grid <- build_final_grid(gp = optimal_grid_params)
   
-  #opt_grid$dens_func <- deparse(f)
   opt_grid$dens_func <- f
   
   class(opt_grid) <- "grid"
@@ -200,6 +205,7 @@ build_grid <- function(lb = -Inf,
 
 #' @importFrom utils head
 build_final_grid <- function(gp, opt_area = NULL) {
+  
   if (is.null(opt_area))
     opt_area <- gp$proposal$optimal_step_area
   
@@ -215,6 +221,8 @@ build_final_grid <- function(gp, opt_area = NULL) {
   h_prime <- gp$target$log_density_prime
   cdf <- gp$target$Cumulitive_density
   tails_method <- gp$proposal$tails_method
+  symmetric <- gp$target$symmetric
+  f_params <- gp$f_params
   
   grid_bounds <- rep(NA, 2)
   
@@ -336,6 +344,8 @@ build_final_grid <- function(gp, opt_area = NULL) {
   x1 <- final_grid$x[1]
   xm <- final_grid$x[steps_number + 1]
   
+   if(!is.null(symmetric)) steps_number = steps_number * 2
+
   if (identical(tails_method, "ARS")) {
     tails_area = tails_ars(final_grid, f, h, h_prime, modes, lb, rb)
     proposal_areas[1] <- tails_area$lta
@@ -372,7 +382,6 @@ build_final_grid <- function(gp, opt_area = NULL) {
         h(xm)
       )
     }
-    
   }
   
   grid_bounds[1] = lb
@@ -389,7 +398,9 @@ build_final_grid <- function(gp, opt_area = NULL) {
       rt_properties = rt_properties,
       alpha = opt_area,
       tails_method = tails_method,
-      grid_bounds = grid_bounds
+      grid_bounds = grid_bounds,
+      symmetric = symmetric,
+      f_params = f_params
     )
   )
   
@@ -497,7 +508,8 @@ find_right_steps <- function(gp,
       if (r > steps_lim ||
           x_next > rb ||
           (mode_i == mode_n &&
-           ((f(x_next) / f_x <= theta) || x_c > grid_range[2]))) {
+           ((f(x_next) / f_x <= theta) ||
+            x_c > grid_range[2]))) {
         x[r] <- x_c
         s_upper[r] <- s_lower[r] <- s_upper_lower[r] <- p_a[r] <- NA
         break
@@ -544,7 +556,7 @@ h_upper <- function(grid_point, val, h_prime, h) {
 #' @noRd
 tails_ars <- function(grid, f, h, h_prime, modes, lb, rb) {
   steps = length(grid$x)
-  n_modes = length(modes)
+  modes_n = length(modes)
   # left tail
   if (lb == Inf) {
     l_tail_area <- (1 / h_prime(grid$x[1])) * f(grid$x[1])
@@ -559,7 +571,7 @@ tails_ars <- function(grid, f, h, h_prime, modes, lb, rb) {
   if (rb == Inf) {
     r_tail_area <- (1 / h_prime(grid$x[steps])) * -f(grid$x[steps])
   } else {
-    if(modes[mode_n] == grid$x[steps]){
+    if(modes[modes_n] == grid$x[steps]){
       r_tail_area <- 0
     }else{
     r_tail_area <- (1 / h_prime(grid$x[steps])) * (exp(h_upper(grid$x[steps], rb, h_prime, h)) - f(grid$x[steps]))
@@ -582,8 +594,11 @@ stors_prime <- function(mode, h) {
         warning("First step in the grid starts at mode[1].\nNo Adaptive Rejection Sampling (ARS) for left tail.")
       if(x == utils::tail(mode, 1))
         warning("Last step in the grid ends at mode[n].\nNo ARS for right tail.")
+      
+      return(0)
     }
     (h(x0) - h(x)) / (x0 - x)
   }
   
 }
+

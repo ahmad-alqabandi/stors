@@ -2,20 +2,15 @@
 % Please edit documentation in R/srexp.R
 \name{srexp}
 \alias{srexp}
-\alias{srexp_scaled}
 \alias{srexp_truncate}
 \title{Sampling from Exponential Distribution}
 \usage{
-srexp(n)
-
-srexp_scaled(n, scale = 1)
+srexp(n, rate = 1)
 
 srexp_truncate(xl, xr)
 }
 \arguments{
 \item{n}{Integer sample size.}
-
-\item{scale}{Scalar scale parameter.}
 
 \item{xl}{Lower bound for truncation.}
 
@@ -24,14 +19,10 @@ srexp_truncate(xl, xr)
 \value{
 \code{srexp()} returns a sample of size \code{n} from a standard exponential distribution.
 
-\code{srexp_scaled()} returns a sample of size \code{n} from an exponential distribution with the specified scale parameter.
-
 \code{srexp_truncate()} returns a function that generates \code{n} samples from a truncated exponential distribution between \code{xl} and \code{xr}.
 }
 \description{
 Sampling from the exponential distribution using Stors.
-
-Sampling from any exponential distribution by specifying the scale parameter.
 
 Creating a sampling function for a truncated exponential distribution.
 }
@@ -54,12 +45,6 @@ grid_optimizer("srexp")
 # This example illustrates how to generate 10 samples,
 # from a standard exponential distribution.
 samples <- srexp(10)
-print(samples)
-
-# Generating Samples from an Exponential Distribution with a Specific Scale
-# This example demonstrates how to generate 10 samples,
-# from an exponential distribution with a scale parameter of 2.
-samples <- srexp_scaled(n = 10, scale = 2)
 print(samples)
 
 # Generating Samples from a Truncated Exponential Distribution

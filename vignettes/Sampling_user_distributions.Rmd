@@ -37,7 +37,7 @@ To sample from the tails of \( f(x) \) using ARS, we need the log transformation
 ```{r , echo = TRUE}
 library(stors)
 
-modes_bi = c(0, 4)
+modes_bi = c(0.00134865, 3.99865)
 
 f_bi <- function(x) {
   0.5 * dnorm(x, mean = 0, sd = 1) + 0.5 * dnorm(x, mean = 4, sd = 1)

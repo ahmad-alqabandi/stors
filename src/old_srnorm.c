@@ -3,7 +3,9 @@
 
 #define NAME old_srnorm
 
-#define CNUM 3
+#define CNUM 11
+
+#define CNUM_SCALED 12
 
 #define L_TAIL ARS
 

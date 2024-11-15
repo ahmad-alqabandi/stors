@@ -32,7 +32,7 @@ Here's an example of how to optimize a grid for the standard normal distribution
 
 library(stors)
 
-norm_grid = grid_optimizer("srnorm")
+norm_grid = srnorm_optimize()
 
 ```
 
@@ -46,8 +46,8 @@ standard_normal_samples = srnorm(10)
 print(standard_normal_samples)
 
 # Generating samples from a normal distribution with mean = 4 and standard deviation = 2
-general_normal_samples = srnorm_scaled(10, mu = 4, sd = 2)
-print(general_normal_samples)
+# general_normal_samples = srnorm_scaled(10, mu = 4, sd = 2)
+# print(general_normal_samples)
 
 ```
 
@@ -101,21 +101,21 @@ For users who are less familiar with the target distribution, or want to focus o
 
 ```{r , echo = TRUE}
 # Customizing the grid for a specific sample size
-custom_grid = grid_optimizer("srnorm", target_sample_size = 10000)
+custom_grid = srnorm_optimize(target_sample_size = 10000)
 
 print(custom_grid)
 
 plot(custom_grid)
 
 # Customizing the grid with a specific pre-acceptance threshold
-custom_grid_high_theta = grid_optimizer("srnorm", theta = 0.9)
+custom_grid_high_theta = srnorm_optimize(theta = 0.9)
 
 print(custom_grid_high_theta)
 
 plot(custom_grid_high_theta)
 
 # Customizing the grid within a specific range
-custom_grid_range = grid_optimizer("srnorm", grid_range = c(-1, 1))
+custom_grid_range = srnorm_optimize(grid_range = c(-1, 1))
 
 print(custom_grid_range)
 
@@ -129,11 +129,11 @@ By setting the `steps` parameter, users can determine the resolution of the grid
 
 ```{r , echo = TRUE}
 # Customizing the grid with a specific number of steps
-custom_grid_steps = grid_optimizer("srnorm", steps = 50)
+custom_grid_steps = srnorm_optimize(steps = 50)
 
 plot(custom_grid_steps)
 
-custom_grid_steps = grid_optimizer("srnorm", steps = 500)
+custom_grid_steps = srnorm_optimize( steps = 500)
 
 plot(custom_grid_steps)
 

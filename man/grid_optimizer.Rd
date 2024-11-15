@@ -17,6 +17,8 @@ grid_optimizer(
   grid_range = NULL,
   theta = NULL,
   target_sample_size = NULL,
+  symmetric = NULL,
+  cnum = NULL,
   verbose = FALSE
 )
 }

@@ -12,9 +12,9 @@
 #'
 #' Normal distribution has the density:
 #' 
-#' \deqn{ f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{(x - \mu)^2}{2\sigma^2}} }
+#' \deqn{ f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{(x - \mean)^2}{2\sigma^2}} }
 #' 
-#' Where \eqn{\mu} is the mean and \eqn{\sigma} is the standard deviation.
+#' Where \eqn{\mean} is the mean and \eqn{\sigma} is the standard deviation.
 #'
 #'
 #' @param n Integer sample size.
@@ -37,14 +37,14 @@
 #'
 #'
 #' @export
-srnorm <- function(n, mean = 0, stddev = 1) {
-  .Call(C_srnorm, n, c(mean, stddev))
+srnorm <- function(n, mean = 0, sd = 1) {
+  .Call(C_srnorm, n, c(mean, sd))
 }
 
 #' @rdname srnorm
 #' @order 2
 #'
-#' @param mu Scalar mean.
+#' @param mean Scalar mean.
 #' @param sd Scalar standard deviation.
 #' 
 #' 
@@ -53,19 +53,19 @@ srnorm <- function(n, mean = 0, stddev = 1) {
 #' The separation of these functions enhances performance, as the Stors algorithm is highly efficient, and even simple arithmetic can impact its speed.
 #'
 #' @return
-#' \code{srnorm_scaled()} returns a sample of size \code{n} from a normal distribution with mean \eqn{\mu} and standard deviation \eqn{\sigma}.
+#' \code{srnorm_scaled()} returns a sample of size \code{n} from a normal distribution with mean \eqn{\mean} and standard deviation \eqn{\sigma}.
 #'
 #' @examples
 #' # Generating Samples from a Normal Distribution with Specific Mean and Standard Deviation
 #' # This example demonstrates how to generate 10,
 #' # samples from a normal distribution with a mean of 4 and a standard deviation of 2.
 #'
-#' samples <- srnorm_scaled(n = 10, mu = 4, sd = 2)
+#' samples <- srnorm_scaled(n = 10, mean = 4, sd = 2)
 #' print(samples)
 #' 
 #' @export
-srnorm_scaled <- function(n, mu = 0, sd = 1) {
-  .Call(C_srnorm, n) * sd + mu
+srnorm_scaled <- function(n, mean = 0, sd = 1) {
+  .Call(C_srnorm, n) * sd + mean
 }
 
 #' @rdname srnorm
@@ -111,8 +111,10 @@ srnorm_truncate <- function(xl = -Inf, xr = Inf) {
     "xr is has a CDF close to 0" = (Upper_cumsum[2] != 0)
   )
   
-  function_string <- paste0("function(n) { .Call(C_srnorm_trunc, n, ", paste0(xl), ", ", paste0(xr), ", ", paste0(Upper_cumsum[1]),
-                            ", ", paste0(Upper_cumsum[2]), ", ", paste0(as.integer(Upper_cumsum[3])), ", ", paste0(as.integer(Upper_cumsum[4])),")}")
+  function_string <- paste0("function(n) { .Call(C_srnorm_trunc, n, ",
+                            paste0(xl), ", ", paste0(xr), ", ", paste0(Upper_cumsum[1]),
+                            ", ", paste0(Upper_cumsum[2]), ", ", paste0(as.integer(Upper_cumsum[3])), ", ",
+                            paste0(as.integer(Upper_cumsum[4])),")}")
   
   function_expression <- parse(text = function_string)
   sampling_function <- eval(function_expression)
@@ -121,38 +123,45 @@ srnorm_truncate <- function(xl = -Inf, xr = Inf) {
 }
 
 
+
+
+
 #' @export
 srnorm_optimize = function(
-  mu = 0,
+  mean = 0,
   sd = 1,
   steps = 4091,
   grid_range = NULL,
   theta = NULL,
   target_sample_size = 1000,
-  verbose = FALSE
-) {
+  verbose = FALSE,
+  symmetric = NULL) {
   
   density_name <- 'srnorm'
   
   dendata <- pbgrids[[density_name]]
   
-  f_params <- c(mu, sd, 1.0 / (sd * 2.50662827463), -0.5/sd) # F L
+  if(mean == 0 && sd == 1) cnum <- dendata$Cnum else cnum <- dendata$Cnum + 1
   
-  modes <- dendata$set_modes(mu)
+  f_params <- list(mean = mean, sd = sd)
   
-  f <- dendata$create_f(mu, sd)
+  modes <- dendata$set_modes(mean)
   
+  f <- dendata$create_f(mean, sd)
+
   if( identical(dendata$tails_method,"ARS") ){
     h <- function(x)
       log(f(x))
     
     h_prime <- stors_prime(modes, h)
   }else{
-    cdf <- dendata$create_cdf(mu, sd)
-  }  
+    cdf <- dendata$create_cdf(mean, sd)
+  }
   
   grid_optimizer(dendata, density_name, f, cdf, h,
                  h_prime, modes, f_params, steps,
-                 grid_range, theta, target_sample_size, verbose)
+                 grid_range, theta, target_sample_size,
+                 symmetric,
+                 cnum, verbose)
   
 }
