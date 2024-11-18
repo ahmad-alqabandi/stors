@@ -112,7 +112,7 @@ grid_optimizer <- function(dendata,
   cache_grid_c(cnum, opt_grid)
   save_builtin_grid(cnum, opt_grid)
   stors_env$grids$builtin[[density_name]]$opt <- TRUE
-  
+  stors_env$grids$builtin[[density_name]]$is_symmetric <- opt_grid$is_symmetric
   opt_grid$dens_func <- f
   
   class(opt_grid) <- "grid"

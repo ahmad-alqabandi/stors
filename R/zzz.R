@@ -1,10 +1,20 @@
 #' @useDynLib stors, .registration = TRUE, .fixes = "C_"
 
 
+# Globals:
+
+cfun <- new.env()
+
+cfun$srnorm_cfun <- NULL
+
+
+
+
 pbgrids <- list(
   srnorm = list(
     Cnum = 1,
     tails_method = "ARS",
+    scalable = TRUE,
     create_f = function(mu, sd) {
       function(x)
         ((1.0 / (sd * 2.50662827463) *
@@ -23,6 +33,7 @@ pbgrids <- list(
   srlaplace = list(
     Cnum = 3,
     tails_method = "IT",
+    scalable = TRUE,
     create_f = function(mu, b) {
       function(x) {
         (1 / (2 * b)) * exp(-abs(x - mu) / b)
@@ -45,6 +56,7 @@ pbgrids <- list(
   srexp = list(
     Cnum = 5,
     tails_method = "IT",
+    scalable = TRUE,
     create_f = function(rate) {
       function(x)
       {
@@ -65,6 +77,7 @@ pbgrids <- list(
   srchisq = list(
     Cnum = 7,
     tails_method = "ARS",
+    scalable = FALSE,
     create_f = function(df) {
       function(x)
       {
@@ -81,6 +94,7 @@ pbgrids <- list(
   ), srgamma = list(
     Cnum = 9,
     tails_method = "ARS",
+    scalable = FALSE,
     create_f = function(shape = 1, rate = 1, scale = 1/rate) {
       function(x)
       {
@@ -122,6 +136,7 @@ stors_env <- new.env(parent = emptyenv())
       
       if (grids$builtin[[name]]$opt) {
         opt_grid <- readRDS(file.path(builtin_dir, paste0(grids$builtin[[name]]$Cnum, ".rds")))
+        load_ddls_name(name, opt_grid$is_symmetric)
         cache_grid_c(grids$builtin[[name]]$Cnum, opt_grid)
       }
       
@@ -140,7 +155,7 @@ stors_env <- new.env(parent = emptyenv())
     
     
     for (name in names(pbgrids)) {
-      grids$builtin[[name]] = list(opt = FALSE, Cnum = pbgrids[[name]]$Cnum)
+      grids$builtin[[name]] = list(opt = FALSE, is_symmetric = FALSE, Cnum = pbgrids[[name]]$Cnum)
     }
     
     first_time_load = TRUE
@@ -158,12 +173,20 @@ stors_env <- new.env(parent = emptyenv())
   
   
   if (first_time_load) {
-     for (name in names(pbgrids)) {
+    
+     #for (name in names(pbgrids)) {
+      name <- "srnorm"
+      load_ddls_name(name)
       fun_text <- paste0(name,'_optimize()')
       fun_parse <- parse(text = fun_text)
       eval(fun_parse)
-     }
-  }
+     #}
+      
+  } 
+  
+  
+  
+  # load_ddls(name)
   
 }
 

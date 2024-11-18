@@ -16,6 +16,7 @@ static const R_CallMethodDef callMethods[]  = {
   {"free_cache", (DL_FUNC) &free_cache, -1},
   {"free_cache_cnum", (DL_FUNC) &free_cache_cnum, -1},
   {"srnorm", (DL_FUNC) &srnorm, -1},
+  {"srnorm_sym", (DL_FUNC) &srnorm_sym, -1},
   {"srnorm_trunc_nav", (DL_FUNC) &srnorm_trunc_nav, -1},
   {"srnorm_trunc", (DL_FUNC) &srnorm_trunc, -1},
   {"old_srnorm", (DL_FUNC) &old_srnorm, -1},

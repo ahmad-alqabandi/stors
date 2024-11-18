@@ -1,4 +1,14 @@
-
+#' @noRd
+load_ddls_name = function(dist, is_symmetric = FALSE){
+  
+  # cfun$srnorm_cfun <- C_srnorm
+  if(is_symmetric){
+    
+  }else{
+    cfun[[paste0(dist,"_cfun")]] <- get(paste0("C_", dist))
+  }
+  
+}
 
 #' @noRd
 truncate_error_checking <- function(xl, xr, density) {

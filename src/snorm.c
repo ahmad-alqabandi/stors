@@ -11,8 +11,6 @@
 
 #define R_TAIL ARS
 
-#define FLIP_SAMPLE(sample, flip) flip ? g.symmetric - (sample - g.symmetric) : sample
-
 #define SCALABLE
 
 #define SCALE(sample) sample * pp[1] + pp[0]
@@ -22,6 +20,22 @@
 // =================================
 
 #include "stors_sample.c"
+
+// =================================
+
+#undef NAME
+
+#define NAME srnorm_sym
+
+#define FLIP_SAMPLE(sample, flip) flip ? g.symmetric - (sample - g.symmetric) : sample
+
+#include "stors_sample.c"
+
+#undef FLIP_SAMPLE
+
+#undef NAME
+
+#define NAME srnorm
 
 // =================================
 

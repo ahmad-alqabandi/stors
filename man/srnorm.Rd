@@ -4,9 +4,8 @@
 \alias{old_srnorm}
 \alias{srnorm}
 \alias{old_srnorm_scaled}
-\alias{srnorm_scaled}
-\alias{old_srnorm_truncate}
 \alias{srnorm_truncate}
+\alias{old_srnorm_truncate}
 \title{Sampling from Normal Distribution}
 \usage{
 old_srnorm(n)
@@ -15,16 +14,12 @@ srnorm(n, mean = 0, sd = 1)
 
 old_srnorm_scaled(n, mu = 0, sd = 1)
 
-srnorm_scaled(n, mean = 0, sd = 1)
+srnorm_truncate(xl = -Inf, xr = Inf)
 
 old_srnorm_truncate(xl = -Inf, xr = Inf)
-
-srnorm_truncate(xl = -Inf, xr = Inf)
 }
 \arguments{
 \item{n}{Integer sample size.}
-
-\item{mean}{Scalar mean.}
 
 \item{sd}{Scalar standard deviation.}
 
@@ -40,8 +35,6 @@ srnorm_truncate(xl = -Inf, xr = Inf)
 \code{srnorm()} returns a sample of size \code{n} from a standard normal distribution.
 
 \code{srnorm_scaled()} returns a sample of size \code{n} from a normal distribution with mean \eqn{\mu} and standard deviation \eqn{\sigma}.
-
-\code{srnorm_scaled()} returns a sample of size \code{n} from a normal distribution with mean \eqn{\mean} and standard deviation \eqn{\sigma}.
 
 \code{srnorm_truncate()} returns a function that, when called with a sample size \code{n}, generates \code{n} samples from a normal distribution truncated between \code{xl} and \code{xr}.
 
@@ -72,9 +65,6 @@ Normal distribution has the density:
 \deqn{ f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{(x - \mean)^2}{2\sigma^2}} }
 
 Where \eqn{\mean} is the mean and \eqn{\sigma} is the standard deviation.
-
-\code{srnorm_scaled()} allows sampling from any Normal distribution by specifying the mean and standard deviation.
-The separation of these functions enhances performance, as the Stors algorithm is highly efficient, and even simple arithmetic can impact its speed.
 
 \code{srnorm_scaled()} allows sampling from any Normal distribution by specifying the mean and standard deviation.
 The separation of these functions enhances performance, as the Stors algorithm is highly efficient, and even simple arithmetic can impact its speed.
@@ -119,13 +109,6 @@ print(samples)
 # samples from a normal distribution with a mean of 4 and a standard deviation of 2.
 
 samples <- srnorm_scaled(n = 10, mu = 4, sd = 2)
-print(samples)
-
-# Generating Samples from a Normal Distribution with Specific Mean and Standard Deviation
-# This example demonstrates how to generate 10,
-# samples from a normal distribution with a mean of 4 and a standard deviation of 2.
-
-samples <- srnorm_scaled(n = 10, mean = 4, sd = 2)
 print(samples)
 
 # Generating Samples from a Truncated Standard Normal Distribution

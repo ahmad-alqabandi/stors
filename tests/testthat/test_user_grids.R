@@ -33,21 +33,24 @@ steps = 2048
 grids <- list()
 
 for( name in names(dists) ){
-
+  
   grids[[name]] <- do.call(build_grid, c(dists[[name]],list(steps = steps)))
-
+  
 }
 
 
 test_that("User_grid smpling functions returns a sample of correct size and seeds",{
 
-
-  for( name in names(grids)){
-   name <- names(grids)[1]
-   print(name)
-   print(digest(grids[[name]]))
-   print(stors:::stors_env$created_girds_Id)
+  grids <- list()
   
+  for( name in names(dists) ){
+    
+    grids[[name]] <- do.call(build_grid, c(dists[[name]],list(steps = steps)))
+    
+  }
+  
+  for( name in names(grids)){
+
     sampler_fun <- stors(grids[[name]])
     x <- sampler_fun(10)
     n <- length(x)
@@ -67,6 +70,15 @@ test_that("User_grid smpling functions returns a sample of correct size and seed
 
 
 test_that("User_grid sampling functions, samples properties tests", {
+  
+  grids <- list()
+  
+  for( name in names(dists) ){
+    
+    grids[[name]] <- do.call(build_grid, c(dists[[name]],list(steps = steps)))
+    
+  }
+  
   for (name in names(grids)) {
 
     lb <- grids[[name]]$grid_bounds[1]

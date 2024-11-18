@@ -7,7 +7,6 @@
 
 #include "cache.h"
 
-
 #if defined(CNUM) && defined(NAME)
 
 SEXP DEN_SAMPLE(NAME)(SEXP s_size, SEXP Rpassed_params){
@@ -87,17 +86,14 @@ SEXP DEN_SAMPLE(NAME)(SEXP s_size, SEXP Rpassed_params){
   
   for (int i = 0; i < sample_size;)
   {
-    
 
 #ifdef FLIP_SAMPLE
-    if(g.is_symmetric == 1){
       if(u1 > 0.5){
          u1 = 1-u1;
         flip = TRUE; 
       }else{
         flip = FALSE;
       }
-    }
 #endif
     
 
@@ -109,13 +105,7 @@ SEXP DEN_SAMPLE(NAME)(SEXP s_size, SEXP Rpassed_params){
 #if L_TAIL == IT
       
 #ifdef FLIP_SAMPLE
-      if(g.is_symmetric == 1){
         results[i] = FLIP_SAMPLE(L_ITF(u1) ,flip);
-        
-      }else{
-        results[i] = L_ITF(u1);    
-      }
-      
 #else
       results[i] = L_ITF(u1);
       
@@ -134,11 +124,7 @@ SEXP DEN_SAMPLE(NAME)(SEXP s_size, SEXP Rpassed_params){
       {
 
 #ifdef FLIP_SAMPLE
-        if(g.is_symmetric == 1){
           results[i] = FLIP_SAMPLE(sample, flip);
-        }else{
-          results[i] = sample;    
-        }
 #else
         results[i] = sample;
 #endif
@@ -207,12 +193,7 @@ if(u1 > g.sampling_probabilities[1]){
         sample = g.x[j] + u1 * (g.x[j + 1] - g.x[j]);
         
 #ifdef FLIP_SAMPLE
-
-        if(g.is_symmetric == 1){
           results[i] = FLIP_SAMPLE(sample,flip);
-        }else{
-          results[i] = sample;    
-        }
 #else
         results[i] = sample;    
 #endif
@@ -240,12 +221,8 @@ if(u1 > g.sampling_probabilities[1]){
         {
           
 #ifdef FLIP_SAMPLE
-
-          if(g.is_symmetric == 1){
-            results[i] = FLIP_SAMPLE(sample,flip);
-          }else{
-            results[i] = sample;    
-          }
+          
+          results[i] = FLIP_SAMPLE(sample,flip);
 #else
           results[i] = sample;    
 #endif

@@ -387,6 +387,8 @@ build_final_grid <- function(gp, opt_area = NULL) {
   grid_bounds[1] = lb
   grid_bounds[2] = rb
   
+  if(is.null(symmetric)) is_symmetric = FALSE else is_symmetric = TRUE
+  
   invisible(
     list(
       grid_data = final_grid,
@@ -400,6 +402,7 @@ build_final_grid <- function(gp, opt_area = NULL) {
       tails_method = tails_method,
       grid_bounds = grid_bounds,
       symmetric = symmetric,
+      is_symmetric = is_symmetric,
       f_params = f_params
     )
   )

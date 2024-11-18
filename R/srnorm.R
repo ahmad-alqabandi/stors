@@ -38,38 +38,11 @@
 #'
 #' @export
 srnorm <- function(n, mean = 0, sd = 1) {
-  .Call(C_srnorm, n, c(mean, sd))
+  .Call(cfun$srnorm_cfun, n, c(mean, sd))
 }
 
 #' @rdname srnorm
 #' @order 2
-#'
-#' @param mean Scalar mean.
-#' @param sd Scalar standard deviation.
-#' 
-#' 
-#' @details
-#' \code{srnorm_scaled()} allows sampling from any Normal distribution by specifying the mean and standard deviation.
-#' The separation of these functions enhances performance, as the Stors algorithm is highly efficient, and even simple arithmetic can impact its speed.
-#'
-#' @return
-#' \code{srnorm_scaled()} returns a sample of size \code{n} from a normal distribution with mean \eqn{\mean} and standard deviation \eqn{\sigma}.
-#'
-#' @examples
-#' # Generating Samples from a Normal Distribution with Specific Mean and Standard Deviation
-#' # This example demonstrates how to generate 10,
-#' # samples from a normal distribution with a mean of 4 and a standard deviation of 2.
-#'
-#' samples <- srnorm_scaled(n = 10, mean = 4, sd = 2)
-#' print(samples)
-#' 
-#' @export
-srnorm_scaled <- function(n, mean = 0, sd = 1) {
-  .Call(C_srnorm, n) * sd + mean
-}
-
-#' @rdname srnorm
-#' @order 3
 #'
 #' @param xl Lower bound for truncation.
 #' @param xr Upper bound for truncation.
@@ -156,6 +129,28 @@ srnorm_optimize = function(
     h_prime <- stors_prime(modes, h)
   }else{
     cdf <- dendata$create_cdf(mean, sd)
+  }
+  
+  std_is_symmetric <- stors_env$grids$builtin[[density_name]]$is_symmetric
+  
+  if(dendata$scalable){
+    
+    if(cnum %% 2 == 1){ 
+      free_cache_cnum_c(cnum + 1)
+    }
+    
+    if(cnum == dendata$Cnum + 1){
+      if(!is.null(symmetric) && !std_is_symmetric){
+        stop(" You need the standered destrebution's proposal to be symmetric first ")
+      }
+    }
+  }
+  
+  if(is.null(symmetric)){
+    cfun[[paste0(density_name,"_cfun")]] <- C_srnorm
+  } else{
+    cfun[[paste0(density_name,"_cfun")]] <- C_srnorm_sym
+
   }
   
   grid_optimizer(dendata, density_name, f, cdf, h,
