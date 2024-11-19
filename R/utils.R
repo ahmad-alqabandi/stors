@@ -1,18 +1,49 @@
 #' @noRd
-load_ddls_name = function(dist, is_symmetric = FALSE){
-  
-  # cfun$srnorm_cfun <- C_srnorm
-  if(is_symmetric){
-    
-  }else{
-    cfun[[paste0(dist,"_cfun")]] <- get(paste0("C_", dist))
+load_ddls_name = function(dist_name, is_symmetric = FALSE) {
+  if (is_symmetric) {
+    assign("C_sampling_fun", get(paste0("C_", dist_name, "_sym")), envir = environment(get(dist_name)))
+  } else{
+    assign("C_sampling_fun", get(paste0("C_", dist_name)), envir = environment(get(dist_name)))
   }
   
 }
 
 #' @noRd
+check_grid_optimization_criteria = function(symmetric, cnum, dendata) {
+  if (dendata$scalable) {
+    std_symmetric = !is.null(symmetric)
+    
+    if (cnum %% 2 == 1) {
+      scaled_params <- cached_grid_info(cnum + 1)
+      which_grid <- "secondary"
+    } else{
+      scaled_params <- cached_grid_info(cnum)
+      which_grid <- "standerd"
+    }
+    if (!is.null(scaled_params)) {
+      if ((std_symmetric &&
+           !scaled_params[1]) || (!std_symmetric && scaled_params[1])) {
+        msg <- cat("you need to delete the ",
+                   which_grid,
+                   " built-in grid, that has ")
+        name <- names(dendata$std_params)
+        for (i in (1:(length(scaled_params) - 1)))
+        {
+          msg <- cat(msg, name[i], " = ", scaled_params[i + 1])
+          if (i != length(scaled_params) - 1)
+            msg <- cat(msg, ", ")
+          else
+            msg <- cat(msg, ".\n")
+        }
+        stop(msg)
+      }
+    }
+  }
+}
+
+
+#' @noRd
 truncate_error_checking <- function(xl, xr, density) {
-  
   stopifnot(
     "xl must be a scaler" = (is.numeric(xl) && length(xl) == 1),
     "xr must be a scaler" = (is.numeric(xr) && length(xr) == 1),
@@ -29,7 +60,6 @@ truncate_error_checking <- function(xl, xr, density) {
 
 #' @noRd
 grid_error_checking_and_preparation = function(gp) {
-  
   modes <- gp$target$modes
   f <- gp$target$density
   between_minima <- gp$target$between_minima
@@ -120,10 +150,8 @@ is_valid_grid = function(grid) {
 }
 
 #' @noRd
-grid_check_symmetric <- function(gp){
-  
-  if(!is.null( gp$target$symmetric)){
-
+grid_check_symmetric <- function(gp) {
+  if (!is.null(gp$target$symmetric)) {
     # if( is.null(gp$target$symmetric_around_value) ){
     #   if(gp$target$modes_count > 1){
     #     stop("you need to provide symmetric_around_value to build symmetric grid.")
@@ -131,50 +159,51 @@ grid_check_symmetric <- function(gp){
     #   warning("symmetric_around_value has been set equale to the distrebution's mode.")
     #   gp$target$symmetric_around_value <- gp$target$modes
     # }
-  
-  modes <- gp$target$modes
-  rb <- gp$target$right_bound
-  lb <- gp$target$left_bound
-  grid_range <- gp$proposal$grid_range
-  
-  f <- gp$target$density
-  
-  center <- gp$target$symmetric
-  
-  n <- 21
-  
-  if(is.finite(lb) || is.finite(rb)){
-    sub <- min(lb, rb)
-  }else{
-    sub <- 5
-  }
-  
-  vals <- seq(from = center + sub, to = center - sub , length.out = n)
-  
-  for ( i in as.integer(n/2) ) {
-    if( f(vals[i]) != f(vals[n - i + 1]) )
-      stop(paste0("the target density is not symmetric around ", center) )
-  }
-  
-  gp$target$modes <- modes[modes > center]
-  if(length(modes) == 1){
-    modes <- center
-    grid_range <- c(center, grid_range[2])
-  }else{
     
-    if( center %in% modes){
-      modes <- modes[modes >= center]
-    }else{
-      modes <- modes[modes > center]
+    modes <- gp$target$modes
+    rb <- gp$target$right_bound
+    lb <- gp$target$left_bound
+    grid_range <- gp$proposal$grid_range
+    
+    f <- gp$target$density
+    
+    center <- gp$target$symmetric
+    
+    n <- 21
+    
+    if (is.finite(lb) || is.finite(rb)) {
+      sub <- min(lb, rb)
+    } else{
+      sub <- 5
     }
+    
+    vals <- seq(from = center + sub,
+                to = center - sub ,
+                length.out = n)
+    
+    for (i in as.integer(n / 2)) {
+      if (f(vals[i]) != f(vals[n - i + 1]))
+        stop(paste0("the target density is not symmetric around ", center))
+    }
+    
+    gp$target$modes <- modes[modes > center]
+    if (length(modes) == 1) {
+      modes <- center
+      grid_range <- c(center, grid_range[2])
+    } else{
+      if (center %in% modes) {
+        modes <- modes[modes >= center]
+      } else{
+        modes <- modes[modes > center]
+      }
+    }
+    
+    gp$target$modes <- modes
+    gp$target$left_bound <- center
+    gp$proposal$grid_range <- grid_range
+    gp$target$modes_count <- length(gp$target$modes)
   }
   
-  gp$target$modes <- modes
-  gp$target$left_bound <- center
-  gp$proposal$grid_range <- grid_range
-  gp$target$modes_count <- length(gp$target$modes)
-  }
-
   return(gp)
   
 }
@@ -182,12 +211,11 @@ grid_check_symmetric <- function(gp){
 
 #' @noRd
 cache_grid_c <- function(Cnum, grid) {
-  
   n_params <- length(grid$f_params)
   
-  if(n_params == 0){
+  if (n_params == 0) {
     f_params <- 0
-  }else{
+  } else{
     f_params <- unlist(grid$f_params)
   }
   
@@ -224,3 +252,23 @@ save_builtin_grid <- function(Cnum, grid) {
   saveRDS(grid, grids_file_path)
 }
 
+#' @noRd
+delete_build_in_grid_cnum <- function(Cnum) {
+  path <- file.path(stors_env$user_dirs$builtin_dir, paste0(Cnum, ".rds"))
+  if (file.exists(path)) {
+    file.remove(path)
+    
+    
+    
+  } else{
+    stop("This grid does not exist.\n")
+  }
+  
+  free_cache_cnum_c(Cnum)
+  
+}
+
+#' @export
+cached_grid_info = function(cnum) {
+  .Call(C_grid_info, cnum)
+}

@@ -38,7 +38,7 @@
 #'
 #' @export
 srnorm <- function(n, mean = 0, sd = 1) {
-  .Call(cfun$srnorm_cfun, n, c(mean, sd))
+  .Call(C_sampling_fun, n, c(mean, sd))
 }
 
 #' @rdname srnorm
@@ -113,8 +113,12 @@ srnorm_optimize = function(
   density_name <- 'srnorm'
   
   dendata <- pbgrids[[density_name]]
-  
-  if(mean == 0 && sd == 1) cnum <- dendata$Cnum else cnum <- dendata$Cnum + 1
+
+  if(dendata$scalable){
+    if(identical(list(mean = mean, sd = sd), dendata$std_params)) cnum <- dendata$Cnum else cnum <- dendata$Cnum + 1
+  }else{
+    cnum <- dendata$Cnum
+  }
   
   f_params <- list(mean = mean, sd = sd)
   
@@ -122,36 +126,19 @@ srnorm_optimize = function(
   
   f <- dendata$create_f(mean, sd)
 
+  
   if( identical(dendata$tails_method,"ARS") ){
+    
     h <- function(x)
-      log(f(x))
+    log(f(x))
     
     h_prime <- stors_prime(modes, h)
   }else{
     cdf <- dendata$create_cdf(mean, sd)
   }
   
-  std_is_symmetric <- stors_env$grids$builtin[[density_name]]$is_symmetric
-  
-  if(dendata$scalable){
-    
-    if(cnum %% 2 == 1){ 
-      free_cache_cnum_c(cnum + 1)
-    }
-    
-    if(cnum == dendata$Cnum + 1){
-      if(!is.null(symmetric) && !std_is_symmetric){
-        stop(" You need the standered destrebution's proposal to be symmetric first ")
-      }
-    }
-  }
-  
-  if(is.null(symmetric)){
-    cfun[[paste0(density_name,"_cfun")]] <- C_srnorm
-  } else{
-    cfun[[paste0(density_name,"_cfun")]] <- C_srnorm_sym
 
-  }
+  check_grid_optimization_criteria(symmetric, cnum, dendata)
   
   grid_optimizer(dendata, density_name, f, cdf, h,
                  h_prime, modes, f_params, steps,

@@ -3,6 +3,7 @@
 S3method(plot,grid)
 S3method(print,grid)
 export(build_grid)
+export(cached_grid_info)
 export(delete_grid)
 export(grid_optimizer)
 export(load_grid)

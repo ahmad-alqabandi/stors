@@ -3,18 +3,13 @@
 
 # Globals:
 
-cfun <- new.env()
-
-cfun$srnorm_cfun <- NULL
-
-
-
 
 pbgrids <- list(
   srnorm = list(
     Cnum = 1,
     tails_method = "ARS",
     scalable = TRUE,
+    std_params = list(mean = 0, sd = 1),
     create_f = function(mu, sd) {
       function(x)
         ((1.0 / (sd * 2.50662827463) *
@@ -34,6 +29,7 @@ pbgrids <- list(
     Cnum = 3,
     tails_method = "IT",
     scalable = TRUE,
+    std_params = c(0,1),
     create_f = function(mu, b) {
       function(x) {
         (1 / (2 * b)) * exp(-abs(x - mu) / b)
@@ -57,6 +53,7 @@ pbgrids <- list(
     Cnum = 5,
     tails_method = "IT",
     scalable = TRUE,
+    std_params = c(1),
     create_f = function(rate) {
       function(x)
       {

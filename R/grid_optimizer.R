@@ -273,6 +273,33 @@ find_optimal_grid <- function(gp) {
     
 }
 
+delete_build_in_grid = function(sampling_function, standerd_grid = TRUE){
+  sampling_function <- 'srnorm'
+  
+  if(sampling_function %in% stors_env$grids$builtin$names){
+    
+    dendata <- pbgrids[[sampling_function]]
+    
+    if(standerd_grid){
+      delete_build_in_grid_cnum(dendata$Cnum)
+    }else{
+      if(!dendata$scalable) stop(cat(sampling_function, " Does not has secondary (scaled) grid.\n"))
+      
+      grid_info <- cached_grid_info(dendata$Cnum + 1)
+      if(is.null(grid_info)){
+        
+      }else{
+        delete_build_in_grid_cnum(dendata$Cnum + 1)
+      }
+    }
+    
+    # stors_env$grids$builtin[[sampling_function]]$opt = FALSE
+    # stors_env$grids$builtin[[sampling_function]]$is_symmetric = FALSE
+    
+    }
+
+}
+
 
 opt_alpha_length = 3
 opt_times = 10000
