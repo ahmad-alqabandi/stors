@@ -7,6 +7,8 @@
 grid_optimizer(
   dendata,
   density_name,
+  xl = NULL,
+  xr = NULL,
   f,
   cdf = NULL,
   h = NULL,
@@ -17,6 +19,7 @@ grid_optimizer(
   grid_range = NULL,
   theta = NULL,
   target_sample_size = NULL,
+  grid_type,
   symmetric = NULL,
   cnum = NULL,
   verbose = FALSE

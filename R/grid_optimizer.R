@@ -1,4 +1,3 @@
-
 #' Optimize Built-in Grid
 #'
 #' @description
@@ -43,9 +42,10 @@
 #'\item{"dens_func"}{The function passed by the user for the target density \code{f}.}
 #' 
 #'
-#' @export
 grid_optimizer <- function(dendata,
                            density_name,
+                           xl = NULL,
+                           xr = NULL,
                            f,
                            cdf = NULL,
                            h = NULL,
@@ -56,14 +56,17 @@ grid_optimizer <- function(dendata,
                            grid_range = NULL,
                            theta = NULL,
                            target_sample_size = NULL,
+                           grid_type,
                            symmetric = NULL,
                            cnum = NULL,
                            verbose = FALSE) {
   
-  # density_name <- match.arg(density_name)
-  # dendata <- pbgrids[[density_name]]
-  
   free_cache_cnum_c(cnum)
+  
+  if( is.null(xl) || ( xl < dendata$lb  && xl > dendata$rb) ) xl = dendata$lb
+  if( is.null(xr) || (xr < dendata$lb  && xr > dendata$rb) ) xr = dendata$rb
+  if( !is.null(xr) && !is.null(xl) && xl > xr ) stop("xl must be smaller than xr.")
+  
   
   grid_param <- list(
     target = list(
@@ -74,8 +77,9 @@ grid_optimizer <- function(dendata,
       modes = modes,
       modes_count = length(modes),
       between_minima = NULL,
-      right_bound = dendata$rb,
-      left_bound = dendata$lb,
+      right_bound = xr,
+      left_bound = xl,
+      estimated_area = NULL,
       symmetric = symmetric
       ),
     proposal = list(
@@ -90,6 +94,7 @@ grid_optimizer <- function(dendata,
       ),
     built_in = TRUE,
     cnum = cnum,
+    grid_type = grid_type,
     c_function_name = density_name,
     verbose = verbose,
     f_params = f_params
@@ -103,24 +108,81 @@ grid_optimizer <- function(dendata,
   }
   
   grid_param <- grid_error_checking_and_preparation(grid_param)
-  
   grid_param <- grid_check_symmetric(grid_param)
   
   optimal_grid_params = find_optimal_grid(grid_param)
   opt_grid <- build_final_grid(gp = optimal_grid_params)
-
+  
   cache_grid_c(cnum, opt_grid)
-  save_builtin_grid(cnum, opt_grid)
-  stors_env$grids$builtin[[density_name]]$opt <- TRUE
-  stors_env$grids$builtin[[density_name]]$is_symmetric <- opt_grid$is_symmetric
-  opt_grid$dens_func <- f
+  opt_grid$dens_func <- deparse(f)
+  opt_grid$density_name = density_name
+  
+  lock <- digest(opt_grid)
+  opt_grid$lock <- lock
   
   class(opt_grid) <- "grid"
+  
+  save_builtin_grid(cnum, opt_grid)
+  
   
   return(opt_grid)
   
 }
 
+
+optimized_area_based_on_steps <- function(gp, target_steps, mode_n, alphas= 0.001, qualifier = 0.1){
+
+  total_steps <- 0
+  counter <- 0
+  
+
+  repeat{
+    
+      max_left_stps = find_left_steps(
+        gp = gp,
+        area = alphas,
+        mode_i = 1,
+        steps_lim = Inf
+      )$steps
+
+      max_right_stps = find_right_steps(
+        gp = gp,
+        area = alphas,
+        mode_i = mode_n,
+        steps_lim = Inf
+      )$steps
+
+      total_steps <- max_left_stps + max_right_stps
+      
+      steps_diffrence <- total_steps - target_steps
+
+        if ( steps_diffrence > 0  && steps_diffrence < 10) {
+          return(alphas)
+        }
+      
+    if(target_steps > total_steps ){
+        alphas <- alphas * (1 - qualifier)
+
+
+      }else{
+        alphas <- alphas * (1 + qualifier)
+
+      }
+      
+      counter <- counter + 1
+      
+      if(counter == 10){
+        
+       dist <- abs(target_steps - total_steps)
+        
+        if( dist < 100){
+          qualifier <- min(qualifier * 0.75, 0.005)
+        }
+        
+        counter <- 0
+      }
+  }
+}
 
 #' @importFrom microbenchmark microbenchmark
 find_optimal_grid <- function(gp) {
@@ -140,42 +202,77 @@ find_optimal_grid <- function(gp) {
   symmetric <- gp$target$symmetric
   verbose <- gp$verbose
   f_params <- gp$f_params
+  density_fun <- NULL
+  opt_area <- NULL
   
   times = ceiling(opt_times / target_sample_size)
   
+  
+
+  f_integrate <- integrate(f, lower = lb, upper = rb)
+  relative_error <- f_integrate$abs.error / f_integrate$value * 100
+  
+  if(relative_error > 0.1){
+    stop(paste0("provided density has large relative error = ",relative_error))
+  }
+  
+  f_area <- f_integrate$value
+  gp$target$estimated_area <- f_area 
+  
+  
   if ((theta == 0 &&
-       identical(grid_range, c(lb, rb))) || !is.null(steps))
+       identical(grid_range, c(lb, rb))) ||
+      !is.null(steps))
   {
+    
+    if(!is.null(steps))
+    {
+      alphas <- 1 / steps * f_area
+      opt_area <- optimized_area_based_on_steps(gp = gp,
+                                                target_steps = steps,
+                                                alphas = alphas,
+                                                mode_n)
+    }else{
+      opt_area <- optimized_area_based_on_steps(gp = gp,
+                                                target_steps = 4096,
+                                                alphas = 0.000244439,
+                                                mode_n)
+    }
+    
     max_left_stps = find_left_steps(
       gp = gp,
-      area = 0.001,
+      area = opt_area,
       mode_i = 1,
       steps_lim = Inf
     )$steps
+    
     max_right_stps = find_right_steps(
       gp = gp,
-      area = 0.001,
+      area = opt_area,
       mode_i = mode_n,
       steps_lim = Inf
     )$steps
+    
     lstpsp = max_left_stps / (max_left_stps + max_right_stps)
     rstpsp = 1 - lstpsp
+    
     if (!is.null(steps)) {
-      if(! is.null(symmetric)) mul = 2 else mul = 1
-      gp$proposal$optimal_step_area = 1 / (steps * mul)
+      gp$proposal$optimal_step_area = opt_area
       gp$proposal$left_steps_proportion = lstpsp
       gp$proposal$right_steps_proportion = rstpsp
       return(gp)
     }
+    
   }
   
     performance = data.frame(area = numeric(),
                              time = numeric(),
                              steps = numeric())
     
+    
     if (gp$built_in) {
       cnum <- gp$cnum
-      density_fun <- get(gp$c_function_name, mode = "function")
+      density_fun <- get_buildin_sampling_function(cnum, c_function_name)
     } else{
       cnum <- 0
       rfunc_env <- new.env()
@@ -183,9 +280,11 @@ find_optimal_grid <- function(gp) {
         .Call(C_stors, n, cnum, f, rfunc_env)
       }
     }
- 
-    for (i in (1:length(opt_areas))) {
-      area = opt_areas[i]
+    
+    custom_opt_areas <-opt_areas * f_area
+    
+    for (i in (1:length(custom_opt_areas))) {
+      area = custom_opt_areas[i]
       
       if (is.null(rstpsp)) {
         step = Inf
@@ -206,18 +305,18 @@ find_optimal_grid <- function(gp) {
       area_seq = seq(from = area * 0.95 ,
                      to = area * 1.05,
                      length.out = opt_alpha_length)
+      
       steps_time = double()
       
       for (j in (1:length(area_seq))) {
         grid <- build_final_grid(gp = gp, opt_area = area_seq[j])
         cache_grid_c(cnum, grid)
-        args <- c(n = target_sample_size, f_params)
         gc = gc()
         
         if (gp$built_in) {
           suppressWarnings({
             cost <- microbenchmark::microbenchmark(
-              st = do.call(density_fun, args),
+              st = density_fun(target_sample_size),
               times = times)
           })
         }else{
@@ -245,7 +344,7 @@ find_optimal_grid <- function(gp) {
           for (k in 1:nrow(performance)) {
             cat(
               sprintf(
-                "%13.10f | %10.2f | %7d\n",
+                "%13.10f | %10.2f | %7.2f\n",
                 performance$area[k],
                 performance$time[k],
                 performance$steps[k]
@@ -256,7 +355,6 @@ find_optimal_grid <- function(gp) {
         }
         break
       }
-      
       
       min_ind = which(steps_time == min(steps_time, na.rm = TRUE))[1]
       performance[nrow(performance) + 1, ] = c(area_seq[min_ind], steps_time[min_ind], step)
@@ -273,30 +371,50 @@ find_optimal_grid <- function(gp) {
     
 }
 
-delete_build_in_grid = function(sampling_function, standerd_grid = TRUE){
-  sampling_function <- 'srnorm'
+
+
+#' @export
+delete_build_in_grid = function(sampling_function, grid_type = "custom"){
+
+  grid_type <- match.arg(grid_type, c("scaled", "custom"))
   
-  if(sampling_function %in% stors_env$grids$builtin$names){
-    
-    dendata <- pbgrids[[sampling_function]]
-    
-    if(standerd_grid){
-      delete_build_in_grid_cnum(dendata$Cnum)
+  if(sampling_function %in% names(pbgrids)){
+    if(grid_type == "scaled"){
+      grid_number = pbgrids[[sampling_function]]$Cnum
     }else{
-      if(!dendata$scalable) stop(cat(sampling_function, " Does not has secondary (scaled) grid.\n"))
+      grid_number = pbgrids[[sampling_function]]$Cnum + 1
+    }
+  
+    }else{
+    stop(paste0("sampling function ",sampling_function," does not exist!"))
+  
+    }
+  
+  builtin_grids <- list.files(stors:::stors_env$builtin_grids_dir)
+  
+  for(grid_name in builtin_grids){
+    
+    grid_path <- file.path(stors:::stors_env$builtin_grids_dir, grid_name)
+    grid <- readRDS(grid_path)
+    
+    if("lock" %in% names(grid)){
       
-      grid_info <- cached_grid_info(dendata$Cnum + 1)
-      if(is.null(grid_info)){
+      temp <-grid[setdiff(names(grid),"lock")]
+      key <- digest(temp)
+      
+      if( key == grid$lock){
         
-      }else{
-        delete_build_in_grid_cnum(dendata$Cnum + 1)
+        if(grid$cnum == 2){
+          file.remove(grid_path)
+          free_cache_cnum_c(grid$cnum)
+          cat(" grid number ", grid$cnum, " DELETED !")
+        }
+        
       }
+      
     }
     
-    # stors_env$grids$builtin[[sampling_function]]$opt = FALSE
-    # stors_env$grids$builtin[[sampling_function]]$is_symmetric = FALSE
-    
-    }
+  }
 
 }
 

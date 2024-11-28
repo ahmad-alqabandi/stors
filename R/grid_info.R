@@ -45,9 +45,8 @@ plot.grid <- function(x,
                       ...) {
   grid <- x
   n = nrow(grid$grid_data)
-  #f <- eval(parse(text = grid$dens_func))
-  f <-  grid$dens_func
-  
+  f <- eval(parse(text = grid$dens_func))
+
   lf <- f
   rf <- f
   
@@ -151,8 +150,6 @@ plot.grid <- function(x,
 }
 
 
-
-
 #' Print Method for Grid Objects
 #'
 #' This method extends the generic \code{print} function for objects of class \code{grid}.
@@ -186,6 +183,7 @@ plot.grid <- function(x,
 #' @export
 #' @method print grid
 print.grid <- function(x, ...) {
+  
   grid <- x
   
   # Format the number of steps with commas and without scientific notation
@@ -195,12 +193,11 @@ print.grid <- function(x, ...) {
   domain_start <- grid$grid_data$x[1]
   n <- length(grid$grid_data$x)
   domain_end <- grid$grid_data$x[n]
-  
-  
+
   if(!is.null(grid$symmetric)) mul = 2 else mul = 1
   
   # Calculate sampling efficiency
-  sampling_efficiency <- (1 / (sum(grid$areas) * mul)) * 100
+  sampling_efficiency <- (grid$target_function_area / (sum(grid$areas))) * 100
   
   # Improved printing with clearer structure
   cat("\n=========================================\n")
@@ -211,9 +208,6 @@ print.grid <- function(x, ...) {
   cat(sprintf("Sampling efficiency: %.2f%%", sampling_efficiency), "\n")
   cat("=========================================\n\n")
 }
-
-
-
 
 
 #' Print Grids

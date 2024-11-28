@@ -10,7 +10,7 @@
 
 #define R_TAIL ARS
 
-#define F(x) (1.0 / (tgamma(g.params[0]) * pow(g.params[1], g.params[0]))) * pow((x), (g.params[0]) - 1.0) * exp(-(x) / (g.params[1]))
+#define F(x) (1.0 / (tgamma(g->params[0]) * pow(g->params[1], g->params[0]))) * pow((x), (g->params[0]) - 1.0) * exp(-(x) / (g->params[1]))
 
 // =================================
 

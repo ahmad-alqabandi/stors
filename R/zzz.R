@@ -1,6 +1,5 @@
 #' @useDynLib stors, .registration = TRUE, .fixes = "C_"
 
-
 # Globals:
 
 
@@ -24,6 +23,7 @@ pbgrids <- list(
       mu,
     lb = -Inf,
     rb = Inf
+    
   ),
   srlaplace = list(
     Cnum = 3,
@@ -113,86 +113,87 @@ pbgrids <- list(
 
 stors_env <- new.env(parent = emptyenv())
 
+
 .onLoad <- function(lib, pkg) {
   
+
   data_dir <- tools::R_user_dir("stors", "data")
   
-  builtin_dir = file.path(data_dir, "builtin_grids")
+  builtin_grids_dir <- file.path(data_dir, "builtin_grids")
+  
+  user_grids_dir <- file.path(data_dir, "user_grids")
   
   
-  if (!dir.exists(builtin_dir))
-    dir.create(builtin_dir, recursive = TRUE)
-  
-  stors_grids_path <- file.path(builtin_dir, "grids.rds")
+  if (!dir.exists(builtin_grids_dir))
+    dir.create(builtin_grids_dir, recursive = TRUE)
   
   
-  if (file.exists(stors_grids_path)) {
-    grids <- readRDS(stors_grids_path)
+  if (!dir.exists(user_grids_dir))
+    dir.create(user_grids_dir, recursive = TRUE)
+  
+  created_girds_Id = character()
+  
+  assign("builtin_grids_dir", builtin_grids_dir, envir = stors_env)
+  assign("user_grids_dir", user_grids_dir, envir = stors_env)
+  assign("created_girds_Id", created_girds_Id, envir = stors_env)
+  
+  
+  #  stors_grids_path <- file.path(builtin_grids_dir, "grids.rds")
+  
+  builtin_grids <- list.files(builtin_grids_dir)
+  
+  if(length(builtin_grids) == 0 ){
     
-    for (name in grids$builtin$names) {
+    # here we have to optimize for all scalable grids
+    
+    # for (name in names(pbgrids)) {
+    
+    name <- 'srnorm' # temp
+    
+      if(pbgrids[[name]]$scalable){
+        fun_name <- paste0(name,'_optimize')
+        do.call(fun_name, args = pbgrids[[name]]$std_params)
+        
+      }
+
+    # }
+    
+  }else{
+    
+    #here we have to load all RDS files , check validation using digest
+    # cache all grids
+    
+    for(grid_name in builtin_grids){
       
-      if (grids$builtin[[name]]$opt) {
-        opt_grid <- readRDS(file.path(builtin_dir, paste0(grids$builtin[[name]]$Cnum, ".rds")))
-        load_ddls_name(name, opt_grid$is_symmetric)
-        cache_grid_c(grids$builtin[[name]]$Cnum, opt_grid)
+      grid_path <- file.path(builtin_grids_dir, grid_name)
+      grid <- readRDS(grid_path)
+      
+      if("lock" %in% names(grid)){
+        
+        temp <-grid[setdiff(names(grid),"lock")]
+        key <- digest(temp)
+        
+        if( key == grid$lock){
+          
+          cat(" grid number ", grid$cnum, " CACHED !")
+          cache_grid_c(grid$cnum, grid)
+          
+        }
+        
       }
       
     }
     
-    first_time_load = FALSE
-    
-  } else{
-    grids <- list(
-      builtin = list(
-        names = names(pbgrids),
-        builtin_num = length(pbgrids)
-      ),
-      user = data.frame(name = character(), efficiency = double())
-    )
-    
-    
-    for (name in names(pbgrids)) {
-      grids$builtin[[name]] = list(opt = FALSE, is_symmetric = FALSE, Cnum = pbgrids[[name]]$Cnum)
-    }
-    
-    first_time_load = TRUE
-    
   }
-  
-  user_cached_grids <- data.frame(Id = character(), Cnum = integer())
-  user_dirs <- list(data_dir = data_dir, builtin_dir = builtin_dir)
-  created_girds_Id = character()
-  
-  assign("grids", grids, envir = stors_env)
-  assign("user_cached_grids", user_cached_grids, envir = stors_env)
-  assign("user_dirs", user_dirs, envir = stors_env)
-  assign("created_girds_Id", created_girds_Id, envir = stors_env)
-  
-  
-  if (first_time_load) {
-    
-     #for (name in names(pbgrids)) {
-      name <- "srnorm"
-      load_ddls_name(name)
-      fun_text <- paste0(name,'_optimize()')
-      fun_parse <- parse(text = fun_text)
-      eval(fun_parse)
-     #}
-      
-  } 
-  
-  
-  
-  # load_ddls(name)
   
 }
 
 
 
 .onUnload <- function(...) {
-  stors_env_path <- file.path(stors_env$user_dirs$builtin_dir, "grids.rds")
+  # stors_env_path <- file.path(stors_env$user_dirs$builtin_grids_dir, "grids.rds")
   
-  saveRDS(stors_env$grids, stors_env_path)
+  # saveRDS(stors_env$grids, stors_env_path)
   
   .Call(C_free_cache)
 }

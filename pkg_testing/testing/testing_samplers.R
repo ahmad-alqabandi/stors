@@ -5,7 +5,7 @@
 modes = 0
 
 f_norm = function(x) {
-  0.3989423 * exp(-0.5 * x * x)
+   exp(-0.5 * x * x)
 }
 
 h_norm = function(x) {
@@ -16,10 +16,12 @@ h_prime_norm = function(x) {
   -x
 }
 
-norm_grid = build_grid(lb = -Inf, rb = Inf, modes , f = f_norm, h = h_norm, h_prime = h_prime_norm,
+norm_grid = build_grid(lb = -Inf, rb = Inf, modes , f = f_norm,
                        steps = 1000, verbose = TRUE,  target_sample_size = 10000)
 
 plot(norm_grid)
+
+s <- stors(norm_grid)
 
 ? save_grid
 

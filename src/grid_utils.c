@@ -23,7 +23,7 @@ SEXP grid_info( SEXP Rcnum){
 
   for(int i = offset; i < n; i++){
     
-    grid_info_ptr[i] = g.params[i];
+    grid_info_ptr[i] = g.params[i-offset];
     
   }
   

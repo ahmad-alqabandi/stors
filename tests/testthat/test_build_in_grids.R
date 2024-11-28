@@ -2,7 +2,7 @@
 
 test_that("Built_in smpling functions returns a sample of correct size and seeds",{
   
-  for( name in stors:::stors_env$grids$builtin$names){
+  for( name in stors:::stors_env$grids$builtin__names){
     
     srname_txt <- paste0(name,'(10)')
     srname_exp <- parse(text = srname_txt)

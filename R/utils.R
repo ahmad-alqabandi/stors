@@ -1,12 +1,4 @@
-#' @noRd
-load_ddls_name = function(dist_name, is_symmetric = FALSE) {
-  if (is_symmetric) {
-    assign("C_sampling_fun", get(paste0("C_", dist_name, "_sym")), envir = environment(get(dist_name)))
-  } else{
-    assign("C_sampling_fun", get(paste0("C_", dist_name)), envir = environment(get(dist_name)))
-  }
-  
-}
+
 
 #' @noRd
 check_grid_optimization_criteria = function(symmetric, cnum, dendata) {
@@ -151,15 +143,9 @@ is_valid_grid = function(grid) {
 
 #' @noRd
 grid_check_symmetric <- function(gp) {
+  
   if (!is.null(gp$target$symmetric)) {
-    # if( is.null(gp$target$symmetric_around_value) ){
-    #   if(gp$target$modes_count > 1){
-    #     stop("you need to provide symmetric_around_value to build symmetric grid.")
-    #   }
-    #   warning("symmetric_around_value has been set equale to the distrebution's mode.")
-    #   gp$target$symmetric_around_value <- gp$target$modes
-    # }
-    
+
     modes <- gp$target$modes
     rb <- gp$target$right_bound
     lb <- gp$target$left_bound
@@ -209,6 +195,46 @@ grid_check_symmetric <- function(gp) {
 }
 
 
+
+#' @noRd
+get_buildin_sampling_function <- function(cnum, name) {
+  if (cnum %% 2 == 0) {
+    even = TRUE
+    cnum_search = cnum - 1
+  } else{
+    even = FALSE
+    cnum_search = cnum
+  }
+  
+  
+  
+    if (pbgrids[[name]]$Cnum == cnum_search) {
+      
+      if (even) {
+        fun <- function(n) {
+          args <- list(n = n)
+          return(do.call(paste0(name, "_custom"), args))
+        }
+        
+      } else{
+        fun <- function(n) {
+          args <- as.list(c(n = n, pbgrids[[name]]$std_params))
+          do.call(paste0(name, "_scaled"), args)
+        }
+
+      
+    }
+    
+    }else{
+    stop("Check the grid caching number Cnum !")
+  }
+  
+  return(fun)
+  
+  
+}
+
+
 #' @noRd
 cache_grid_c <- function(Cnum, grid) {
   n_params <- length(grid$f_params)
@@ -247,25 +273,8 @@ free_cache_cnum_c <- function(Cnum) {
 
 #' @noRd
 save_builtin_grid <- function(Cnum, grid) {
-  grids_file_path <- file.path(stors_env$user_dirs$builtin_dir, paste0(Cnum, ".rds"))
-  
+  grids_file_path <- file.path(stors_env$builtin_grids_dir, paste0(Cnum, ".rds"))
   saveRDS(grid, grids_file_path)
-}
-
-#' @noRd
-delete_build_in_grid_cnum <- function(Cnum) {
-  path <- file.path(stors_env$user_dirs$builtin_dir, paste0(Cnum, ".rds"))
-  if (file.exists(path)) {
-    file.remove(path)
-    
-    
-    
-  } else{
-    stop("This grid does not exist.\n")
-  }
-  
-  free_cache_cnum_c(Cnum)
-  
 }
 
 #' @export

@@ -123,7 +123,7 @@ cache_stors_grid <- function(grid){
     Cnum = stors_env$user_cached_grids[stors_env$user_cached_grids$Id == digest(grid), "Cnum"]
   } else{
     n <- nrow(stors_env$user_cached_grids) + 1
-    Cnum <- stors_env$grids$builtin$builtin_num + 100 + n
+    Cnum <- stors_env$grids$builtin_num + 100 + n
     new_row <- data.frame(Id = digest(grid), Cnum = Cnum)
     stors_env$user_cached_grids <- rbind(stors_env$user_cached_grids, new_row)
     cache_grid_c(Cnum, grid)

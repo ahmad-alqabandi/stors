@@ -223,6 +223,17 @@ build_final_grid <- function(gp, opt_area = NULL) {
   tails_method <- gp$proposal$tails_method
   symmetric <- gp$target$symmetric
   f_params <- gp$f_params
+  grid_type <- gp$grid_type
+  cnum <- gp$cnum
+  f_area <- gp$target$estimated_area
+  
+  
+  if(gp$built_in){
+    density_name = gp$density_name
+  }else{
+    density_name = NULL
+  }
+  
   
   grid_bounds <- rep(NA, 2)
   
@@ -401,9 +412,12 @@ build_final_grid <- function(gp, opt_area = NULL) {
       alpha = opt_area,
       tails_method = tails_method,
       grid_bounds = grid_bounds,
+      cnum = cnum,
       symmetric = symmetric,
+      f_params = f_params,
       is_symmetric = is_symmetric,
-      f_params = f_params
+      grid_type = grid_type,
+      target_function_area = f_area
     )
   )
   
