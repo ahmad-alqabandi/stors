@@ -12,7 +12,7 @@
 SEXP DEN_SAMPLE(NAME)(SEXP s_size, SEXP Rpassed_params){
   
   int j, sample_size = asInteger(s_size), match = TRUE;
-  struct grid *g = grids.grid+CNUM_SCALABLE;
+  struct grid *g = grids.grid + CNUM_SCALABLE;
   double *pp = REAL(Rpassed_params);
   int n_params = g->n_params
   

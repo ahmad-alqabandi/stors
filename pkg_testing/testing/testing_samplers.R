@@ -16,7 +16,7 @@ h_prime_norm = function(x) {
   -x
 }
 
-norm_grid = build_grid(lb = -Inf, rb = Inf, modes , f = f_norm,
+norm_grid <- build_grid(lb = -Inf, rb = Inf, modes , f = f_norm,
                        steps = 1000, verbose = TRUE,  target_sample_size = 10000)
 
 plot(norm_grid)
@@ -39,7 +39,7 @@ print_grids()
 
 steps = 2000
 
-norm_grid = build_grid(lb = -Inf, rb = Inf, modes , f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = steps)
+norm_grid = build_grid(lb = -1, rb = Inf, modes , f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = steps)
 
 norm_grid
 

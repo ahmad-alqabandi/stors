@@ -117,6 +117,7 @@ grid_optimizer <- function(dendata,
   opt_grid$dens_func <- deparse(f)
   opt_grid$density_name = density_name
   
+  
   lock <- digest(opt_grid)
   opt_grid$lock <- lock
   
@@ -130,7 +131,7 @@ grid_optimizer <- function(dendata,
 }
 
 
-optimized_area_based_on_steps <- function(gp, target_steps, mode_n, alphas= 0.001, qualifier = 0.1){
+optimized_area_based_on_steps <- function(gp, target_steps, mode_n, alphas= 0.001, qualifier = 0.02){
 
   total_steps <- 0
   counter <- 0
@@ -205,6 +206,15 @@ find_optimal_grid <- function(gp) {
   density_fun <- NULL
   opt_area <- NULL
   
+  opt_alpha_length = 3
+  opt_times = 10000
+  opt_cache_sizes = c(4 , 8 , 16 , 32, 64, 128, 256, 512, 1024)
+  opt_df_var = 32 # 4 doubles
+  opt_list_var = 160 # 20 doubles
+  opt_steps = round(((opt_cache_sizes * 1024) - opt_list_var) / opt_df_var)
+  opt_areas = 1 / opt_steps
+  
+  
   times = ceiling(opt_times / target_sample_size)
   
   
@@ -213,7 +223,7 @@ find_optimal_grid <- function(gp) {
   relative_error <- f_integrate$abs.error / f_integrate$value * 100
   
   if(relative_error > 0.1){
-    stop(paste0("provided density has large relative error = ",relative_error))
+    stop(paste0("provided density has large relative error = ",relative_error,"%"))
   }
   
   f_area <- f_integrate$value
@@ -233,9 +243,11 @@ find_optimal_grid <- function(gp) {
                                                 alphas = alphas,
                                                 mode_n)
     }else{
+      alphas <- 1 / 4096 * f_area
+      
       opt_area <- optimized_area_based_on_steps(gp = gp,
                                                 target_steps = 4096,
-                                                alphas = 0.000244439,
+                                                alphas = alphas,
                                                 mode_n)
     }
     
@@ -419,11 +431,4 @@ delete_build_in_grid = function(sampling_function, grid_type = "custom"){
 }
 
 
-opt_alpha_length = 3
-opt_times = 10000
-opt_cache_sizes = c(4 , 8 , 16 , 32, 64, 128, 256, 512, 1024)
-opt_df_var = 32 # 4 doubles
-opt_list_var = 160 # 20 doubles
-opt_steps = round(((opt_cache_sizes * 1024) - opt_list_var) / opt_df_var)
-opt_areas = 1 / opt_steps
 

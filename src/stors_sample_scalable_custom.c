@@ -12,7 +12,7 @@
 #ifdef SCALABLE
 SEXP DEN_SAMPLE_SCALED(NAME)(SEXP s_size, SEXP Rpassed_params){
   
-  struct grid *g = grids.grid + CNUM ;
+  struct grid *restrict g = grids.grid + CNUM ;
   
   int match = TRUE;
   double *pp = REAL(Rpassed_params);

@@ -11,7 +11,8 @@ pbgrids <- list(
     std_params = list(mean = 0, sd = 1),
     create_f = function(mu, sd) {
       function(x)
-        ((1.0 / (sd * 2.50662827463) *
+        ((1.0 / (sd ) *
+            #* 2.50662827463
             exp(-0.5 * ((
               x - mu
             ) / sd) *
@@ -131,11 +132,13 @@ stors_env <- new.env(parent = emptyenv())
   if (!dir.exists(user_grids_dir))
     dir.create(user_grids_dir, recursive = TRUE)
   
-  created_girds_Id = character()
+  user_cnum_counter <- 100
+  user_session_cached_grid_locks <- data.frame(lock = character(), cnum = numeric())
   
   assign("builtin_grids_dir", builtin_grids_dir, envir = stors_env)
   assign("user_grids_dir", user_grids_dir, envir = stors_env)
-  assign("created_girds_Id", created_girds_Id, envir = stors_env)
+  assign("user_cnum_counter", user_cnum_counter, envir = stors_env)
+  assign("user_session_cached_grid_locks", user_session_cached_grid_locks, envir = stors_env)
   
   
   #  stors_grids_path <- file.path(builtin_grids_dir, "grids.rds")
@@ -168,19 +171,10 @@ stors_env <- new.env(parent = emptyenv())
       grid_path <- file.path(builtin_grids_dir, grid_name)
       grid <- readRDS(grid_path)
       
-      if("lock" %in% names(grid)){
-        
-        temp <-grid[setdiff(names(grid),"lock")]
-        key <- digest(temp)
-        
-        if( key == grid$lock){
-          
-          cat(" grid number ", grid$cnum, " CACHED !")
-          cache_grid_c(grid$cnum, grid)
-          
-        }
-        
-      }
+      if(is_valid_grid(grid))
+        cache_grid_c(grid$cnum, grid)
+      
+      
       
     }
     

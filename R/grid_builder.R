@@ -135,7 +135,6 @@ build_grid <- function(lb = -Inf,
                        grid_range = NULL,
                        theta = NULL,
                        target_sample_size = 1000,
-                       symmetric = NULL,
                        verbose = FALSE) {
   if (!is.function(f)) {
     stop("Error: 'f' density function must be provided.")
@@ -151,6 +150,9 @@ build_grid <- function(lb = -Inf,
     h_prime <- stors_prime(modes, h)
   }
   
+  
+  
+  
   grid_param <- list(
     target = list(
       density = f,
@@ -162,8 +164,8 @@ build_grid <- function(lb = -Inf,
       between_minima = NULL,
       right_bound = rb,
       left_bound = lb,
-      symmetric = symmetric
-    ),
+      estimated_area = NULL
+      ),
     proposal = list(
       grid_range = grid_range,
       tails_method = "ARS",
@@ -176,14 +178,15 @@ build_grid <- function(lb = -Inf,
     ),
     built_in = FALSE,
     cnum = NULL,
-    verbose = verbose
+    grid_type = NULL,
+    c_function_name = NULL,
+    verbose = verbose,
+    f_params = NULL
   )
   
   
   
   grid_param <- grid_error_checking_and_preparation(grid_param)
-  
-  grid_param <- grid_check_symmetric(grid_param)
   
   if (!is.null(steps))
     grid_param$proposal$pre_acceptance_thres_hold <- 0.1
@@ -191,12 +194,16 @@ build_grid <- function(lb = -Inf,
   optimal_grid_params = find_optimal_grid(grid_param)
   opt_grid <- build_final_grid(gp = optimal_grid_params)
   
-  opt_grid$dens_func <- f
+  opt_grid$dens_func <- deparse(f)
+  
+  lock <- digest(opt_grid)
+  opt_grid$lock <- lock
   
   class(opt_grid) <- "grid"
   
-  if (!(digest(opt_grid) %in% stors_env$created_girds_Id))
-    stors_env$created_girds_Id  = append(stors_env$created_girds_Id , digest(opt_grid))
+  
+  # if (!(digest(opt_grid) %in% stors_env$created_girds_Id))
+  #   stors_env$created_girds_Id  = append(stors_env$created_girds_Id , digest(opt_grid))
   
   return(opt_grid)
   

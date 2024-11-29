@@ -11,7 +11,7 @@
 
 #define R_TAIL ARS
 
-#define F(sample) (1.0 / (g->params[1] * 2.50662827463) * exp(-0.5 * ((sample - g->params[0]) / g->params[1]) * ((sample - g->params[0]) / g->params[1])))
+#define F(sample) (1.0 / (g->params[1]) * exp(-0.5 * ((sample - g->params[0]) / g->params[1]) * ((sample - g->params[0]) / g->params[1])))
 
 // =================================
 # define SCALABLE
@@ -40,10 +40,6 @@
 #include "stors_sample_scalable_custom.c"
 #undef CUSTOM
 
-// #include "stors_sample_scalable.c"
-// 
-// #include "stors_sample_custom.c"
-
 #undef FLIP_SAMPLE
 
 #undef NAME
@@ -56,7 +52,7 @@
 
 #include "stors_sample_trunc.c"
 
-
+// =================================
 
 #undef CNUM_SCALABLE
 

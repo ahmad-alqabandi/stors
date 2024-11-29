@@ -135,10 +135,21 @@ grid_error_checking_and_preparation = function(gp) {
 #' @import digest digest
 #' @noRd
 is_valid_grid = function(grid) {
-  stopifnot(
-    " This grid is not optmized using build_grid() " = digest(grid) %in% stors_env$created_girds_Id
-  )
   
+  if("lock" %in% names(grid)){
+    
+    temp <-grid[setdiff(names(grid),"lock")]
+    key <- digest(temp)
+    
+    if( key == grid$lock){
+      
+      return(TRUE)
+      
+    }
+    
+  }
+  
+  return(FALSE)
 }
 
 #' @noRd
@@ -198,6 +209,7 @@ grid_check_symmetric <- function(gp) {
 
 #' @noRd
 get_buildin_sampling_function <- function(cnum, name) {
+  
   if (cnum %% 2 == 0) {
     even = TRUE
     cnum_search = cnum - 1
@@ -263,6 +275,40 @@ cache_grid_c <- function(Cnum, grid) {
     f_params,
     n_params
   )
+  
+}
+
+
+
+#' @noRd
+cache_user_grid_c <- function(grid) {
+  if(!is_valid_grid(grid))
+    stop("This grid is not valid")
+  
+  if(grid$lock %in% stors_env$user_session_cached_grid_locks[["lock"]])
+  {
+    print("cashed grid already exist, no more cashing cashing!. Just returning Cnum !")
+    
+    Cnum <- stors_env$user_session_cached_grid_locks[stors_env$user_session_cached_grid_locks$lock == grid$lock, ]$cnum
+    
+    return(Cnum)
+    
+  }
+  
+  print("this grid has not been cashed before !")
+  
+  Cnum <- stors_env$user_cnum_counter
+  
+  cache_grid_c(Cnum, grid)
+  
+  user_session_cached_grid_locks <- data.frame(lock = grid$lock, cnum = Cnum)
+  
+  stors_env$user_session_cached_grid_locks <- rbind(stors_env$user_session_cached_grid_locks,
+                                                    user_session_cached_grid_locks)
+  
+  stors_env$user_cnum_counter <- stors_env$user_cnum_counter + 1
+  
+  return(Cnum)
   
 }
 

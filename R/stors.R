@@ -82,10 +82,19 @@ stors <- function(grid, xl = grid$grid_bounds[1], xr = grid$grid_bounds[2]) {
 
   force(grid)
   
-  is_valid_grid(grid)
-  Cnum <- cache_stors_grid(grid)
+  # if(!is_valid_grid(grid))
+  #   stop("This grid is not valid")
+  # 
+  # Cnum <- stors_env$user_cnum_counter
+  # 
+  # stors_env$user_cnum_counter <- stors_env$user_cnum_counter + 1
   
-  dens_func <- grid$dens_func
+  Cnum <- cache_user_grid_c(grid)
+  
+  print(paste0("cnum = ",Cnum))
+
+  
+  dens_func <- eval(parse(text = grid$dens_func))
   rfunc_env <- new.env()
   
   if( xl != grid$grid_bounds[1] || xr != grid$grid_bounds[2]){
@@ -114,21 +123,5 @@ stors <- function(grid, xl = grid$grid_bounds[1], xr = grid$grid_bounds[2]) {
   rm(grid)
   
   return(sampling_function)
-  
-}
-
-cache_stors_grid <- function(grid){
-  
-  if(digest(grid) %in% stors_env$user_cached_grids$Id ){
-    Cnum = stors_env$user_cached_grids[stors_env$user_cached_grids$Id == digest(grid), "Cnum"]
-  } else{
-    n <- nrow(stors_env$user_cached_grids) + 1
-    Cnum <- stors_env$grids$builtin_num + 100 + n
-    new_row <- data.frame(Id = digest(grid), Cnum = Cnum)
-    stors_env$user_cached_grids <- rbind(stors_env$user_cached_grids, new_row)
-    cache_grid_c(Cnum, grid)
-  }
-  
-  return(Cnum)
   
 }

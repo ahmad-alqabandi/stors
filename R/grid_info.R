@@ -246,10 +246,13 @@ print.grid <- function(x, ...) {
 #' 
 #' @export
 print_grids <- function() {
-  if (nrow(stors_env$grids$user) == 0) {
+
+  user_grids <- list.files(stors_env$user_grids_dir)
+
+  if (length(user_grids) == 0) {
     message("No grids are currently stored.")
   } else{
-    grids <- list.files(path = stors_env$user_dirs$data_dir,
+    grids <- list.files(path = stors_env$user_grids_dir,
                         full.names = TRUE)
     grids_details <- file.info(grids)
     grids_sizes <- grids_details[grids_details$isdir == FALSE, ]$size
@@ -298,15 +301,12 @@ print_grids <- function() {
 #' print_grids()
 #' 
 save_grid <- function(grid, grid_name) {
-  is_valid_grid(grid)
+  if(!is_valid_grid(grid))
+    stop("This grid is not valid")
   
-  if (grid_name %in% stors_env$grids$user$name)
-    invisible(delete_grid(grid_name))
-  
-  grids_file_path <- file.path(stors_env$user_dirs$data_dir, paste0(grid_name, ".rds"))
+  grids_file_path <- file.path(stors_env$user_grids_dir, paste0(grid_name, ".rds"))
   saveRDS(grid, grids_file_path)
   efficiency <- (1 / sum(grid$areas))
-  stors_env$grids$user[nrow(stors_env$grids$user) + 1 , ] = list(grid_name, efficiency)
 }
 
 
@@ -379,17 +379,29 @@ delete_grid <- function(grid_name) {
 #' print(loaded_normal_grid)
 #'  
 load_grid <- function(grid_name) {
-  if (!(grid_name %in% stors_env$grids$user$name)) {
+  
+  grid_name <- paste0(grid_name,".rds")
+  
+  user_grids <- list.files(stors_env$user_grids_dir)
+  
+  if(grid_name %in% user_grids){
+    
+    grid_path <- file.path(stors_env$user_grids_dir,grid_name)
+    
+    grid <- readRDS(grid_path)
+    
+    if(!is_valid_grid(grid))
+      stop("This grid is not valid")
+    
+    return(grid)
+    
+    
+  }else{
     stop("There is no grid named '",
          grid_name,
          "' stored on your machine.")
   }
   
-  grids_file_path <- file.path(stors_env$user_dirs$data_dir, paste0(grid_name, ".rds"))
-  grid <- readRDS(grids_file_path)
-  stors_env$created_girds_Id  = append(stors_env$created_girds_Id , digest(grid))
-  
-  return(grid)
   
 }
 
