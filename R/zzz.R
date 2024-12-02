@@ -11,8 +11,7 @@ pbgrids <- list(
     std_params = list(mean = 0, sd = 1),
     create_f = function(mu, sd) {
       function(x)
-        ((1.0 / (sd ) *
-            #* 2.50662827463
+        ((1.0 / (sd) *
             exp(-0.5 * ((
               x - mu
             ) / sd) *

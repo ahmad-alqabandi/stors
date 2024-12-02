@@ -443,24 +443,22 @@ find_left_steps <- function(gp, area, mode_i, steps_lim = Inf) {
   # to check if new constructed steps get less than mode_previous due to low density value compared to area
   mode_previous <- ifelse(mode_i == 1, NA, gp$target$modes[mode_i - 1])
   
-  memory_res <- (max(500, ceiling(1 / area)) + 500)
+  init_memory_res <- (max(500, ceiling(1 / area)) + 500) * 2
   
-  x <- rep(NA, memory_res)
-  s_upper <- rep(NA, memory_res)
-  s_lower <- rep(NA, memory_res)
-  p_a <- rep(NA, memory_res)
-  s_upper_lower <- rep(NA, memory_res)
-  
-  l <- 0
-  
-  i <- memory_res
+  x <- rep(NA, init_memory_res)
+  s_upper <- rep(NA, init_memory_res)
+  s_lower <- rep(NA, init_memory_res)
+  p_a <- rep(NA, init_memory_res)
+  s_upper_lower <- rep(NA, init_memory_res)
+
+  i <- 0
   
   if (mode != lb) {
     x_previous <- mode
     f_x_previous <- f(x_previous)
     while (TRUE) {
       x_c <- x_previous - area / f_x_previous
-      if (l >= steps_lim ||
+      if (i >= steps_lim ||
           x_c < lb ||
           (mode_i == 1 &&
            ((f(x_c) / f_x_previous  <= theta) ||
@@ -472,12 +470,12 @@ find_left_steps <- function(gp, area, mode_i, steps_lim = Inf) {
           (!is.na(mode_previous) && x_c <  mode_previous)) {
         break
       }
-      l <- l + 1
-      x[i - l] <- x_c
-      s_upper[i - l] <- f_x_previous
-      s_lower[i - l] <- f_x
-      s_upper_lower[i - l] <- s_upper[i - l] / s_lower[i - l]
-      p_a[i - l] <- f_x / f_x_previous
+      i <- i + 1
+      x[i] <- x_c
+      s_upper[i] <- f_x_previous
+      s_lower[i] <- f_x
+      s_upper_lower[i] <- s_upper[i] / s_lower[i]
+      p_a[i] <- f_x / f_x_previous
       f_x_previous <- f_x
       x_previous <- x_c
     }
@@ -490,9 +488,11 @@ find_left_steps <- function(gp, area, mode_i, steps_lim = Inf) {
     s_upper_lower = s_upper_lower
   )
   
+  d <- d[rev(1:nrow(d)), ]
+  
   d <- subset(d, rowSums(is.na(d)) != ncol(d))
   
-  return(list(data = d, steps = l))
+  return(list(data = d, steps = i))
 }
 
 
@@ -514,13 +514,13 @@ find_right_steps <- function(gp,
   # to check if x_next exceeds mode_next due to low density value compared to area
   mode_next <- ifelse(mode_i == mode_n, NA, gp$target$modes[mode_i + 1])
   
-  memory_res <- (max(500, ceiling(1 / area)) + 500)
+  init_memory_res <- (max(500, ceiling(1 / area)) + 500)
   
-  x <- rep(NA, memory_res)
-  s_upper <- rep(NA, memory_res)
-  s_lower <- rep(NA, memory_res)
-  p_a <- rep(NA, memory_res)
-  s_upper_lower <- rep(NA, memory_res)
+  x <- rep(NA, init_memory_res)
+  s_upper <- rep(NA, init_memory_res)
+  s_lower <- rep(NA, init_memory_res)
+  p_a <- rep(NA, init_memory_res)
+  s_upper_lower <- rep(NA, init_memory_res)
   
   r <- 1
   

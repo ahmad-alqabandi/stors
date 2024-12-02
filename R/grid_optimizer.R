@@ -139,12 +139,13 @@ optimized_area_based_on_steps <- function(gp, target_steps, mode_n, alphas= 0.00
 
   repeat{
     
-      max_left_stps = find_left_steps(
+    max_left_stps = find_left_steps(
         gp = gp,
         area = alphas,
         mode_i = 1,
         steps_lim = Inf
       )$steps
+      
 
       max_right_stps = find_right_steps(
         gp = gp,
@@ -251,22 +252,28 @@ find_optimal_grid <- function(gp) {
                                                 mode_n)
     }
     
-    max_left_stps = find_left_steps(
+    gdl <- find_left_steps(
       gp = gp,
       area = opt_area,
       mode_i = 1,
       steps_lim = Inf
-    )$steps
+    )
     
-    max_right_stps = find_right_steps(
+    max_left_stps <- gdl$steps
+    
+    gdr <- find_right_steps(
       gp = gp,
       area = opt_area,
       mode_i = mode_n,
       steps_lim = Inf
-    )$steps
+    )
     
-    lstpsp = max_left_stps / (max_left_stps + max_right_stps)
-    rstpsp = 1 - lstpsp
+    
+    max_right_stps <- gdr$steps
+    
+    
+    lstpsp <- max_left_stps / (max_left_stps + max_right_stps)
+    rstpsp <- 1 - lstpsp
     
     if (!is.null(steps)) {
       gp$proposal$optimal_step_area = opt_area
