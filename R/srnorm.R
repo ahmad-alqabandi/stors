@@ -38,12 +38,10 @@
 #'
 #'
 #' @export
-srnorm_scaled <- function(n, mean = 0, sd = 1) {
+srnorm <- function(n, mean = 0, sd = 1) {
   # C_scaled_sampling_fun <- get("C_scaled_sampling_fun", envir = srnorm_fun_env)
   .Call(C_srnorm_scaled_check, n, c(mean, sd))
 }
-
-# TODO, change srnorm_scaled -> srnorm
 
 #' @export
 srnorm_custom <- function(n) {
@@ -98,11 +96,11 @@ srnorm_truncate <- function(xl = -Inf, xr = Inf, mean = 0, sd = 1){
   
   if( !is.null(custom_info) && all(custom_info[-1] == c(mean, sd)) ){
     choosen_grid_num <- cnum_custom
-    Upper_cumsum = .Call(C_srnorm_trunc_nav, xl, xr, choosen_grid_num)
+    Upper_cumsum <- .Call(C_srnorm_trunc_nav, xl, xr, choosen_grid_num)
     
   }else if( !is.null(scalable_info)){
     choosen_grid_num <- cnum_scalable
-    Upper_cumsum = .Call(C_srnorm_trunc_nav, xl, xr, choosen_grid_num)
+    Upper_cumsum <- .Call(C_srnorm_trunc_nav, xl, xr, choosen_grid_num)
     
   } else{
     .Call(C_grid_error,0,0)
@@ -110,8 +108,7 @@ srnorm_truncate <- function(xl = -Inf, xr = Inf, mean = 0, sd = 1){
     
   }
   
-  # Upper_cumsum = .Call(C_srnorm_trunc_nav, xl, xr)
-  
+
   stopifnot(
     "xl is has a CDF close to 1" = (Upper_cumsum[1] != 1),
     "xr is has a CDF close to 0" = (Upper_cumsum[2] != 0)
@@ -172,21 +169,10 @@ srnorm_optimize = function(
   f <- dendata$create_f(mean, sd)
 
   
-  if( identical(dendata$tails_method,"ARS") ){
-    
-    h <- function(x)
-    log(f(x))
-    
-    h_prime <- stors_prime(modes, h)
-  }else{
-    cdf <- dendata$create_cdf(mean, sd)
-  }
-  
 
   check_grid_optimization_criteria(symmetric, cnum, dendata)
   
-  grid_optimizer(dendata, dist_name, xl, xr, f, cdf, h,
-                 h_prime, modes, f_params, steps,
+  grid_optimizer(dendata, dist_name, xl, xr, f, modes, f_params, steps,
                  grid_range, theta, target_sample_size,
                  grid_type,
                  symmetric,

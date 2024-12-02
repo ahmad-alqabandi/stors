@@ -29,7 +29,7 @@ pbgrids <- list(
     Cnum = 3,
     tails_method = "IT",
     scalable = TRUE,
-    std_params = c(0,1),
+    std_params = list(mu = 0, b =1),
     create_f = function(mu, b) {
       function(x) {
         (1 / (2 * b)) * exp(-abs(x - mu) / b)
@@ -53,7 +53,7 @@ pbgrids <- list(
     Cnum = 5,
     tails_method = "IT",
     scalable = TRUE,
-    std_params = c(1),
+    std_params = list(rate = 1),
     create_f = function(rate) {
       function(x)
       {

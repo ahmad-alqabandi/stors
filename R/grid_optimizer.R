@@ -47,9 +47,6 @@ grid_optimizer <- function(dendata,
                            xl = NULL,
                            xr = NULL,
                            f,
-                           cdf = NULL,
-                           h = NULL,
-                           h_prime = NULL,
                            modes,
                            f_params = NULL,
                            steps = NULL,
@@ -60,6 +57,7 @@ grid_optimizer <- function(dendata,
                            symmetric = NULL,
                            cnum = NULL,
                            verbose = FALSE) {
+  
   
   free_cache_cnum_c(cnum)
   
@@ -99,6 +97,16 @@ grid_optimizer <- function(dendata,
     verbose = verbose,
     f_params = f_params
   )
+  
+  if( identical(dendata$tails_method,"ARS") ){
+    h <- function(x)
+      log(f(x))
+    
+    h_prime <- stors_prime(modes, h)
+  }else{
+    cdf <- do.call(dendata$create_cdf, f_params)
+    
+  }
   
   if (grid_param$proposal$tails_method == "IT") {
     grid_param$target$Cumulitive_density = cdf

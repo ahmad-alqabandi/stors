@@ -54,12 +54,8 @@
 
 // =================================
 
-#undef CNUM_SCALABLE
-
-#undef CNUM_CUSTOM
+#undef CNUM
 
 #undef L_TAIL
 
 #undef R_TAIL
-
-#undef FLIP_SAMPLE

@@ -15,7 +15,6 @@ build_grid(
   grid_range = NULL,
   theta = NULL,
   target_sample_size = 1000,
-  symmetric = NULL,
   verbose = FALSE
 )
 }

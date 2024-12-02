@@ -32,7 +32,8 @@
 #'
 #' @export
 srlaplace <- function(n, mu = 0, b = 1) {
-  .Call(C_laplace, n, c(mu, b))
+  .Call(C_srlaplace_scaled_check, n, c(mu, b))
+
 }
 
 
@@ -57,8 +58,8 @@ srlaplace <- function(n, mu = 0, b = 1) {
 #' print(samples)
 #'
 #' @export
-srlaplace_scaled <- function(n, mu = 0, b = 1) {
-  .Call(C_laplace, n) * b + mu
+srnorm_custom <- function(n) {
+  .Call(C_srlaplace_custom_check, n)
 }
 
 
@@ -89,26 +90,53 @@ srlaplace_scaled <- function(n, mu = 0, b = 1) {
 #' hist(samples, main = "Histogram of Truncated Laplace Samples", xlab = "Value", breaks = 20)
 #'
 #' @export
-srlaplace_truncate = function(xl, xr){
+srlaplace_truncate = function(xl, xr, mu = 0, b = 1){
   
-  res <- truncate_error_checking(xl, xr, pbgrids$srlaplace)
+  dist_name <- 'srlaplace'
+  
+  dendata <- pbgrids[[dist_name]]
+  
+  cnum_scalable <- dendata$Cnum
+  cnum_custom <- dendata$Cnum + 1
+  choosen_grid_num <- NULL
+  
+  scalable_info <-  cached_grid_info(cnum_scalable)
+  custom_info <-  stors:::cached_grid_info(cnum_custom)
+  
+  res <- truncate_error_checking(xl, xr, dendata)
   xl <- res$xl; xr <- res$xr
   
+  if( !is.null(custom_info) && all(custom_info[-1] == c(mu, b)) ){
+    choosen_grid_num <- cnum_custom
+    Upper_cumsum <- .Call(C_srlaplace_trunc_nav, xl, xr, choosen_grid_num)
+    
+  }else if( !is.null(scalable_info)){
+    choosen_grid_num <- cnum_scalable
+    Upper_cumsum <- .Call(C_srlaplace_trunc_nav, xl, xr, choosen_grid_num)
+    
+  } else{
+    .Call(C_grid_error,0,0)
+    return(NULL)
+    
+  }
   
-  Upper_cumsum = .Call(C_laplace_trunc_nav, xl, xr)
-  
+
   stopifnot(
-    "xl has a CDF close to 1" = (Upper_cumsum[1] != 1),
-    "xr has a CDF close to 0" = (Upper_cumsum[2] != 0)
+    "xl is has a CDF close to 1" = (Upper_cumsum[1] != 1),
+    "xr is has a CDF close to 0" = (Upper_cumsum[2] != 0)
   )
   
-  function_string <- paste0("function(n) { .Call(C_laplace_trunc, n, ", paste0(xl), ", ", paste0(xr), ", ", paste0(Upper_cumsum[1]),
-                            ", ", paste0(Upper_cumsum[2]), ", ", paste0(as.integer(Upper_cumsum[3])), ", ", paste0(as.integer(Upper_cumsum[4])), ")}")
+  function_string <- paste0("function(n) { .Call(C_srnorm_trunc, n, ",
+                            paste0(xl), ", ", paste0(xr), ", ", paste0(Upper_cumsum[1]),
+                            ", ", paste0(Upper_cumsum[2]), ", ", paste0(as.integer(Upper_cumsum[3])), ", ",
+                            paste0(as.integer(Upper_cumsum[4])),", ", 
+                            paste0(as.integer(choosen_grid_num)), ")}")
+  
   function_expression <- parse(text = function_string)
   sampling_function <- eval(function_expression)
   
   return(sampling_function)
-}
+  }
 
 
 
@@ -118,6 +146,8 @@ srlaplace_truncate = function(xl, xr){
 srlaplace_optimize = function(
     mu = 0,
     b = 1,
+    xl = NULL,
+    xr = NULL,
     steps = 4091,
     grid_range = NULL,
     theta = NULL,
@@ -126,11 +156,27 @@ srlaplace_optimize = function(
     symmetric = NULL
 ) {
   
-  density_name <- 'srlaplace'
+  dist_name <- 'srlaplace'
   
-  dendata <- pbgrids[[density_name]]
+  dendata <- pbgrids[[dist_name]]
   
-  if(mu == 0 && b == 1) cnum <- dendata$Cnum else cnum <- dendata$Cnum + 1
+  
+  
+  if(dendata$scalable){
+    if(identical(list(mu = mu, b = b), dendata$std_params))
+    {
+      cnum <- dendata$Cnum
+      grid_type = "scaled"
+    } else {
+      cnum <- dendata$Cnum + 1
+      grid_type = "custom"
+    }
+  }else{
+    cnum <- dendata$Cnum + 1
+    grid_type = "custom"
+    
+  }
+  
   
   f_params <- list(mu = mu, b = b) # F L
   
@@ -138,18 +184,12 @@ srlaplace_optimize = function(
   
   f <- dendata$create_f(mu, b)
   
-  if( identical(dendata$tails_method,"ARS") ){
-    h <- function(x)
-      log(f(x))
-    
-    h_prime <- stors_prime(modes, h)
-  }else{
-    cdf <- dendata$create_cdf(mu, b)
-  }
+  check_grid_optimization_criteria(symmetric, cnum, dendata)
   
-  grid_optimizer(dendata, density_name, f, cdf, h,
-                 h_prime, modes, f_params, steps,
-                 grid_range, theta, target_sample_size, symmetric,
-                 cnum, verbose)
   
+  grid_optimizer(dendata, dist_name, xl, xr, f, modes, f_params, steps,
+                 grid_range, theta, target_sample_size,
+                 grid_type,
+                 symmetric,
+                 cnum, verbose)  
 }

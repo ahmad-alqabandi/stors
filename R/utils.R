@@ -231,7 +231,7 @@ get_buildin_sampling_function <- function(cnum, name) {
       } else{
         fun <- function(n) {
           args <- as.list(c(n = n, pbgrids[[name]]$std_params))
-          do.call(paste0(name, "_scaled"), args)
+          do.call(paste0(name), args)
         }
 
       

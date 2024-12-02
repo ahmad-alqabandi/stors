@@ -1,11 +1,11 @@
-#include "laplace.h"
+#include "srlaplace.h"
 #include "macro_var.h"
 
-#define NAME laplace
+#define NAME srlaplace
 
 #define CNUM 3
 
-#define CNUM_SCALED 4
+#define SCALE(sample) sample * pp[1] + pp[0]
 
 #define L_TAIL IT
 
@@ -19,19 +19,42 @@
 
 #define CDF(x) (((x) <= (g->params[0])) ? (0.5 * exp((x - g->params[0]) / g->params[1])) : (1 - 0.5 * exp(-(x - g->params[0]) / g->params[1])))
 
+// =================================
+# define SCALABLE
+#include "stors_sample_scalable_custom.c"
+#include "scaled_custom_check.c"
+#undef SCALABLE
+
+# define CUSTOM
+#include "stors_sample_scalable_custom.c"
+#include "scaled_custom_check.c"
+#undef CUSTOM
+// =================================
+
+
+#undef NAME
+
+#define NAME srlaplace_sym
+
 #define FLIP_SAMPLE(sample, flip) flip ? g->symmetric - (sample - g->symmetric) : sample
 
-#define SCALABLE
+# define SCALABLE
+#include "stors_sample_scalable_custom.c"
+#undef SCALABLE
 
-#define SCALE(sample) sample * pp[1] + pp[0]
+# define CUSTOM
+#include "stors_sample_scalable_custom.c"
+#undef CUSTOM
 
-#include "stors_sample.c"
+#undef FLIP_SAMPLE
+
+#undef NAME
 
 // =================================
+
+#define NAME srlaplace
 
 #include "stors_trunc_nav.c"
-
-// =================================
 
 #include "stors_sample_trunc.c"
 

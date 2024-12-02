@@ -4,10 +4,6 @@
 #ifndef SNORM_H
 #define SNORM_H
 
-
-
-
-
 SEXP srnorm_scaled_check(SEXP s_size, SEXP Rpassed_params );
 
 SEXP srnorm_scaled(SEXP s_size, SEXP Rpassed_params);

@@ -2,7 +2,7 @@
 % Please edit documentation in R/old_srnorm.R, R/srnorm.R
 \name{old_srnorm}
 \alias{old_srnorm}
-\alias{srnorm_scaled}
+\alias{srnorm}
 \alias{old_srnorm_scaled}
 \alias{srnorm_truncate}
 \alias{old_srnorm_truncate}
@@ -10,7 +10,7 @@
 \usage{
 old_srnorm(n)
 
-srnorm_scaled(n, mean = 0, sd = 1)
+srnorm(n, mean = 0, sd = 1)
 
 old_srnorm_scaled(n, mu = 0, sd = 1)
 

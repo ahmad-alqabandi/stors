@@ -2,7 +2,7 @@
 #include "R_cache.h"
 #include "snorm.h"
 #include "srexp.h"
-#include "laplace.h"
+#include "srlaplace.h"
 // #include "old_srnorm.h"
 #include "srchisq.h"
 #include "srgamma.h"
@@ -19,7 +19,7 @@ static const R_CallMethodDef callMethods[]  = {
   {"free_cache", (DL_FUNC) &free_cache, 0},
   {"free_cache_cnum", (DL_FUNC) &free_cache_cnum, 1},
   {"grid_error", (DL_FUNC) &grid_error, 2},
-  
+  // NORMAL
   {"srnorm_scaled", (DL_FUNC) &srnorm_scaled, 2},
   {"srnorm_sym_scaled", (DL_FUNC) &srnorm_sym_scaled, 2},
   {"srnorm_scaled_check", (DL_FUNC) &srnorm_scaled_check, 2},
@@ -27,18 +27,26 @@ static const R_CallMethodDef callMethods[]  = {
   {"srnorm_custom", (DL_FUNC) &srnorm_custom, 1},
   {"srnorm_sym_custom", (DL_FUNC) &srnorm_sym_custom, 1},
   {"srnorm_custom_check", (DL_FUNC) &srnorm_custom_check, 1},
+  
   {"srnorm_trunc_nav", (DL_FUNC) &srnorm_trunc_nav, 3},
   {"srnorm_trunc", (DL_FUNC) &srnorm_trunc, 8},
+  // LAPLACE
+  {"srlaplace_scaled", (DL_FUNC) &srlaplace_scaled, 2},
+  {"srlaplace_sym_scaled", (DL_FUNC) &srlaplace_sym_scaled, 2},
+  {"srlaplace_scaled_check", (DL_FUNC) &srlaplace_scaled_check, 2},
+  
+  {"srlaplace_custom", (DL_FUNC) &srlaplace_custom, 1},
+  {"srlaplace_sym_custom", (DL_FUNC) &srlaplace_sym_custom, 1},
+  {"srlaplace_custom_check", (DL_FUNC) &srlaplace_custom_check, 1},
+  
+  {"srlaplace_trunc_nav", (DL_FUNC) &srlaplace_trunc_nav, 3},
+  {"srlaplace_trunc", (DL_FUNC) &srlaplace_trunc, 8},
+  // ===== 
   
   // {"old_srnorm", (DL_FUNC) &old_srnorm, 1},
   // {"old_srnorm_trunc_nav", (DL_FUNC) &old_srnorm_trunc_nav, 2},
   // {"old_srnorm_trunc", (DL_FUNC) &old_srnorm_trunc, 8},
   // {"srexp", (DL_FUNC) &srexp, 2},
-  // {"srexp_trunc_nav", (DL_FUNC) &srexp_trunc_nav, 2},
-  // {"srexp_trunc", (DL_FUNC) &srexp_trunc, 8},
-  // {"laplace", (DL_FUNC) &laplace, 2},
-  // {"laplace_trunc_nav", (DL_FUNC) &laplace_trunc_nav,2},
-  // {"laplace_trunc", (DL_FUNC) &laplace_trunc, 8},
   // {"srchisq", (DL_FUNC) &srchisq, 2},
   // {"srchisq_trunc_nav", (DL_FUNC) &srchisq_trunc_nav, 2},
   // {"srchisq_trunc", (DL_FUNC) &srchisq_trunc, 7},

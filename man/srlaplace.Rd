@@ -2,15 +2,15 @@
 % Please edit documentation in R/srlaplace.R
 \name{srlaplace}
 \alias{srlaplace}
-\alias{srlaplace_scaled}
+\alias{srnorm_custom}
 \alias{srlaplace_truncate}
 \title{Sampling from Laplace Distribution}
 \usage{
 srlaplace(n, mu = 0, b = 1)
 
-srlaplace_scaled(n, mu = 0, b = 1)
+srnorm_custom(n)
 
-srlaplace_truncate(xl, xr)
+srlaplace_truncate(xl, xr, mu = 0, b = 1)
 }
 \arguments{
 \item{n}{Integer sample size.}
