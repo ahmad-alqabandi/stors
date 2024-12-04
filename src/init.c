@@ -41,7 +41,13 @@ static const R_CallMethodDef callMethods[]  = {
   
   {"srlaplace_trunc_nav", (DL_FUNC) &srlaplace_trunc_nav, 3},
   {"srlaplace_trunc", (DL_FUNC) &srlaplace_trunc, 8},
-  // ===== 
+  // EXPONENTIAL
+  {"srexp_scaled", (DL_FUNC) &srexp_scaled, 2},
+  {"srexp_custom", (DL_FUNC) &srexp_custom, 1},
+  // GAMMA
+  {"srgamma_custom", (DL_FUNC) &srgamma_custom, 1},
+  // CHISQ
+  {"srchisq_custom", (DL_FUNC) &srchisq_custom, 1},
   
   // {"old_srnorm", (DL_FUNC) &old_srnorm, 1},
   // {"old_srnorm_trunc_nav", (DL_FUNC) &old_srnorm_trunc_nav, 2},

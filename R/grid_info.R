@@ -46,9 +46,6 @@ plot.grid <- function(x,
   grid <- x
   n = nrow(grid$grid_data)
   f <- eval(parse(text = grid$dens_func))
-
-  lf <- f
-  rf <- f
   
   if (grid$tails_method == "ARS") {
     if (!all(grid$lt_properties == 0)) {

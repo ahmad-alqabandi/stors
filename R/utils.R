@@ -1,4 +1,7 @@
-
+#' @noRd
+adjust_mode <- function(mode, xl, xr){
+  if(xl <= mode && mode <= xr){return(mode)}else if(mode < xl){return(xl)} else return(xr)
+}
 
 #' @noRd
 check_grid_optimization_criteria = function(symmetric, cnum, dendata) {
@@ -33,7 +36,6 @@ check_grid_optimization_criteria = function(symmetric, cnum, dendata) {
   }
 }
 
-
 #' @noRd
 truncate_error_checking <- function(xl, xr, density) {
   stopifnot(
@@ -47,8 +49,6 @@ truncate_error_checking <- function(xl, xr, density) {
   return(list(xl = xl, xr = xr))
   
 }
-
-
 
 #' @noRd
 grid_error_checking_and_preparation = function(gp) {
@@ -129,8 +129,6 @@ grid_error_checking_and_preparation = function(gp) {
   return(gp)
   
 }
-
-
 
 #' @import digest digest
 #' @noRd

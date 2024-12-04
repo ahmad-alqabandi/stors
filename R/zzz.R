@@ -1,5 +1,4 @@
 #' @useDynLib stors, .registration = TRUE, .fixes = "C_"
-
 # Globals:
 
 
@@ -10,22 +9,18 @@ pbgrids <- list(
     scalable = TRUE,
     std_params = list(mean = 0, sd = 1),
     create_f = function(mu, sd) {
-      function(x)
-        ((1.0 / (sd) *
-            exp(-0.5 * ((
-              x - mu
-            ) / sd) *
-              ((
-                x - mu
-              ) / sd))))
+      fun_txt <- paste0(
+        "function(x){((1.0 / (", sd, ")*exp(-0.5 * ((x -"
+        ,mu ,")/", sd,
+        ")*((x - ", mu, ") / sd))))}")
+      return(eval(parse(text = fun_txt)))
     },
     set_modes = function(mu = 0)
       mu,
     lb = -Inf,
     rb = Inf
     
-  ),
-  srlaplace = list(
+  ), srlaplace = list(
     Cnum = 3,
     tails_method = "IT",
     scalable = TRUE,
@@ -48,8 +43,7 @@ pbgrids <- list(
       mu,
     lb = -Inf,
     rb = Inf
-  ),
-  srexp = list(
+  ), srexp = list(
     Cnum = 5,
     tails_method = "IT",
     scalable = TRUE,
@@ -69,15 +63,14 @@ pbgrids <- list(
       },
     lb = 0,
     rb = Inf
-  )
-  ,
-  srchisq = list(
+  ), srchisq = list(
     Cnum = 7,
     tails_method = "ARS",
     scalable = FALSE,
     create_f = function(df) {
       function(x)
       {
+        df <- df
         fx <- (1 / (2 ^ (df / 2) * gamma(df / 2))) * x ^ (df / 2 - 1) * exp(-x / 2)
         fx <- ifelse(is.nan(fx), 0, fx)
         return(fx)
@@ -95,10 +88,7 @@ pbgrids <- list(
     create_f = function(shape = 1, rate = 1, scale = 1/rate) {
       function(x)
       {
-        if (x < 0) {
-          return(0)
-        }
-        fx <- (1 / (gamma(shape) * scale ^ shape) * x ^ (shape - 1) * exp(-x / scale))
+        fx <- ifelse(x < 0, 0, (1 / (gamma(shape) * scale ^ shape) * x ^ (shape - 1) * exp(-x / scale)))
         fx <- ifelse(is.nan(fx), 0, fx)
         return(fx)
       }
@@ -148,17 +138,16 @@ stors_env <- new.env(parent = emptyenv())
     
     # here we have to optimize for all scalable grids
     
-    # for (name in names(pbgrids)) {
+     for (name in names(pbgrids)) {
     
-    name <- 'srnorm' # temp
-    
-      if(pbgrids[[name]]$scalable){
-        fun_name <- paste0(name,'_optimize')
-        do.call(fun_name, args = pbgrids[[name]]$std_params)
-        
-      }
 
-    # }
+      # if(pbgrids[[name]]$scalable){
+        fun_name <- paste0(name,'_optimize')
+        do.call(fun_name, list())
+        
+      # }
+
+     }
     
   }else{
     
@@ -184,9 +173,5 @@ stors_env <- new.env(parent = emptyenv())
 
 
 .onUnload <- function(...) {
-  # stors_env_path <- file.path(stors_env$user_dirs$builtin_grids_dir, "grids.rds")
-  
-  # saveRDS(stors_env$grids, stors_env_path)
-  
   .Call(C_free_cache)
 }

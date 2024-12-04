@@ -17,16 +17,10 @@
 
 // =================================
 
-#include "stors_sample.c"
+# define CUSTOM
+#include "stors_sample_scalable_custom.c"
+#undef CUSTOM
 
-// =================================
-
-#include "stors_trunc_nav.c"
-
-// =================================
-
-
-#include "stors_sample_trunc.c"
 
 
 // =================================

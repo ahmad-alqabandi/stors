@@ -2,24 +2,15 @@
 % Please edit documentation in R/srgamma.R
 \name{srgamma}
 \alias{srgamma}
-\alias{srgamma_truncate}
 \title{Sampling from Normal Distribution}
 \usage{
 srgamma(n)
-
-srgamma_truncate(xl = 0, xr = Inf)
 }
 \arguments{
 \item{n}{Integer sample size.}
-
-\item{xl}{Lower bound for truncation.}
-
-\item{xr}{Upper bound for truncation.}
 }
 \value{
 \code{srgamma()} returns a sample of size \code{n} from a standard normal distribution.
-
-\code{srgamma_truncate()} returns a function that, when called with a sample size \code{n}, generates \code{n} samples from a normal distribution truncated between \code{xl} and \code{xr}.
 }
 \description{
 Sampling from the Normal distribution using Stors.
@@ -34,10 +25,6 @@ Normal distribution has the density:
 \deqn{ f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{(x - \mu)^2}{2\sigma^2}} }
 
 Where \eqn{\mu} is the mean and \eqn{\sigma} is the standard deviation.
-
-\code{srgamma_truncate()}, this function allows sampling from a standard normal distribution that is truncated within specified bounds.
- It is particularly useful when the area of interest in a normal distribution is limited to a specific range.
- The function first validates the truncation bounds to ensure they are within the allowable range of the distribution and then creates a tailored sampling function based on these bounds.
 }
 \examples{
 # Generating Samples from a Standard Normal Distribution
@@ -51,19 +38,5 @@ grid_optimizer("srgamma")
 # Generate and print 10 samples from the standard normal distribution
 samples <- srgamma(10)
 print(samples)
-
-
-# Generating Samples from a Truncated Standard Normal Distribution
-# This example demonstrates how to generate 100,
-# samples from a standard normal distribution truncated in the range [-2, 2].
-
-# Create the truncated sampling function
-norm_trunc <- srgamma_truncate(xl = -2, xr = 2)
-
-# Generate 100 samples
-sample <- norm_trunc(100)
-
-# Plot a histogram of the samples
-hist(sample, main = "Histogram of Truncated Normal Samples", xlab = "Value", breaks = 20)
 
 }

@@ -13,6 +13,7 @@
 SEXP DEN_SAMPLE_SCALED(NAME)(SEXP s_size, SEXP Rpassed_params){
   
   struct grid *restrict g = grids.grid + CNUM ;
+  double * restrict p_a = g->p_a;
   
   int match = TRUE;
   double *pp = REAL(Rpassed_params);
@@ -23,9 +24,18 @@ SEXP DEN_SAMPLE_SCALED(NAME)(SEXP s_size, SEXP Rpassed_params){
 #ifdef CUSTOM
   SEXP DEN_SAMPLE_CUSTOM(NAME)(SEXP s_size){
     struct grid *g = grids.grid + CNUM + 1;
+    double * restrict p_a = g->p_a;
+    
     
 #endif
-      
+
+#ifdef NON_SYMMETRIC_DIST
+    if(g->x == NULL){
+      REprintf("you need to optimize your destribution's grid first");
+      R_RETURN_NULL;
+    }
+#endif
+    
   int j, sample_size = asInteger(s_size);
   
 #if L_TAIL == ARS || R_TAIL == ARS 
@@ -158,7 +168,7 @@ if(u1 > g->sampling_probabilities[1]){
       
       u1 -= j;
       
-      if (u1 < g->p_a[j])
+      if (u1 < p_a[j])
       { 
         u1 = u1 * g->s_upper_lower[j];
         

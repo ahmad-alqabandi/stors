@@ -5,7 +5,7 @@
 
 
 struct grid {
-  double *x , *s_upper , *p_a, *s_upper_lower;
+  double *restrict x , *restrict s_upper , *restrict p_a, *restrict s_upper_lower;
   double areas[3];
   int steps_number;
   double sampling_probabilities[2];

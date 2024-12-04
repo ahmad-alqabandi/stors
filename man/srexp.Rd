@@ -2,29 +2,21 @@
 % Please edit documentation in R/srexp.R
 \name{srexp}
 \alias{srexp}
-\alias{srexp_truncate}
+\alias{srexp_custom}
 \title{Sampling from Exponential Distribution}
 \usage{
 srexp(n, rate = 1)
 
-srexp_truncate(xl, xr)
+srexp_custom(n)
 }
 \arguments{
 \item{n}{Integer sample size.}
-
-\item{xl}{Lower bound for truncation.}
-
-\item{xr}{Upper bound for truncation.}
 }
 \value{
 \code{srexp()} returns a sample of size \code{n} from a standard exponential distribution.
-
-\code{srexp_truncate()} returns a function that generates \code{n} samples from a truncated exponential distribution between \code{xl} and \code{xr}.
 }
 \description{
 Sampling from the exponential distribution using Stors.
-
-Creating a sampling function for a truncated exponential distribution.
 }
 \details{
 The function \code{srexp()} is used for sampling from a standard exponential distribution with a rate parameter of 1.
@@ -32,9 +24,6 @@ The function \code{srexp()} is used for sampling from a standard exponential dis
 Exponential distribution has the density:
 \deqn{ f(x; \lambda) = \lambda e^{-\lambda x} }
 Where \eqn{\lambda} is the rate parameter.
-
-\code{srexp_truncate()} is used for sampling from a standard exponential distribution truncated within specified bounds.
-The function validates the truncation bounds before creating the sampling function.
 }
 \examples{
 
@@ -46,12 +35,5 @@ grid_optimizer("srexp")
 # from a standard exponential distribution.
 samples <- srexp(10)
 print(samples)
-
-# Generating Samples from a Truncated Exponential Distribution
-# This example demonstrates how to generate 100 samples,
-# from an exponential distribution truncated in the range [1, 3].
-exp_trunc <- srexp_truncate(xl = 1, xr = 3)
-samples <- exp_trunc(100)
-hist(samples, main = "Histogram of Truncated Exponential Samples", xlab = "Value", breaks = 20)
 
 }

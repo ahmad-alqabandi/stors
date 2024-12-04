@@ -6,6 +6,8 @@
 
 #define CNUM 9
 
+#define NON_SYMMETRIC_DIST
+
 #define L_TAIL ARS
 
 #define R_TAIL ARS
@@ -14,17 +16,9 @@
 
 // =================================
 
-#include "stors_sample.c"
-
-// =================================
-
-#include "stors_trunc_nav.c"
-
-// =================================
-
-
-#include "stors_sample_trunc.c"
-
+# define CUSTOM
+#include "stors_sample_scalable_custom.c"
+#undef CUSTOM
 
 // =================================
 

@@ -368,11 +368,15 @@ build_final_grid <- function(gp, opt_area = NULL) {
 
   if (identical(tails_method, "ARS")) {
     tails_area = tails_ars(final_grid, f, h, h_prime, modes, lb, rb)
-    proposal_areas[1] <- tails_area$lta
-    proposal_areas[3] <- tails_area$rta
+    
+    if(modes == lb) proposal_areas[1] = 0 else  proposal_areas[1] <- tails_area$lta
+    
+    if(modes == rb) proposal_areas[3] = 0 else proposal_areas[3] <- tails_area$rta
+    
   } else{
-    proposal_areas[1] <- cdf(x1)
-    proposal_areas[3] <- 1 - cdf(xm)
+    if(modes == lb) proposal_areas[1] = 0 else proposal_areas[1] <- cdf(x1)
+    
+    if(modes == rb) proposal_areas[3] = 0 else proposal_areas[3] <- 1 - cdf(xm)
   }
   
   normalizing_con <- sum(proposal_areas)

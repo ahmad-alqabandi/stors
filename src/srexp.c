@@ -5,7 +5,9 @@
 
 #define CNUM 5
 
-#define CNUM_SCALED 6
+#define NON_SYMMETRIC_DIST
+
+#define SCALE(sample) sample / pp[0]
 
 #define R_TAIL IT
 
@@ -15,22 +17,16 @@
 
 #define CDF(x)(1 - exp(-x * g->params[0]))
 
+// =================================
+
 #define SCALABLE
-
-#define SCALE(sample) sample / pp[0]
-
+#include "stors_sample_scalable_custom.c"
+#undef SCALABLE
 // =================================
 
-#include "stors_sample.c"
-
-// =================================
-
-#include "stors_trunc_nav.c"
-
-// =================================
-
-#include "stors_sample_trunc.c"
-
+# define CUSTOM
+#include "stors_sample_scalable_custom.c"
+#undef CUSTOM
 // =================================
 
 

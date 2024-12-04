@@ -43,6 +43,8 @@ srnorm <- function(n, mean = 0, sd = 1) {
   .Call(C_srnorm_scaled_check, n, c(mean, sd))
 }
 
+
+
 #' @export
 srnorm_custom <- function(n) {
   .Call(C_srnorm_custom_check, n)

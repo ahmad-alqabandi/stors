@@ -7,7 +7,6 @@
 #define DEN_SAMPLE(NAME) DEN_SAMPLE2(NAME)
 
 
-
 #define DEN_SAMPLE33(NAME) NAME ## _scaled_check
 #define DEN_CHECK_SCALED(NAME) DEN_SAMPLE33(NAME)
 

@@ -65,6 +65,8 @@ grid_optimizer <- function(dendata,
   if( is.null(xr) || (xr < dendata$lb  && xr > dendata$rb) ) xr = dendata$rb
   if( !is.null(xr) && !is.null(xl) && xl > xr ) stop("xl must be smaller than xr.")
   
+  modes <- adjust_mode(modes, xl, xr)
+  
   
   grid_param <- list(
     target = list(

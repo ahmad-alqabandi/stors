@@ -5,13 +5,13 @@
 
 #define CNUM 1
 
-#define SCALE(sample) sample * pp[1] + pp[0]
+#define SCALE(x) x * pp[1] + pp[0]
 
 #define L_TAIL ARS
 
 #define R_TAIL ARS
 
-#define F(sample) (1.0 / (g->params[1]  ) * exp(-0.5 * ((sample - g->params[0]) / g->params[1]) * ((sample - g->params[0]) / g->params[1])))
+#define F(x) (1.0 / (g->params[1]  ) * exp(-0.5 * ((x - g->params[0]) / g->params[1]) * ((x - g->params[0]) / g->params[1])))
 
 // =================================
 # define SCALABLE
