@@ -31,13 +31,13 @@
 #' 
 #'
 #' @export
-srlaplace <- function(n, mu = 0, b = 1) {
-  .Call(C_srlaplace_scaled_check, n, c(mu, b))
+srlaplace <- function(n=1, mu = 0, b = 1, x = NULL) {
+  .Call(C_srlaplace_scaled_check, n, c(mu, b),x)
 
 }
 
 
-
+#' Sampling from Custom Laplace Distribution
 #' @rdname srlaplace
 #' @order 2
 #'
@@ -58,94 +58,63 @@ srlaplace <- function(n, mu = 0, b = 1) {
 #' print(samples)
 #'
 #' @export
-srnorm_custom <- function(n) {
-  .Call(C_srlaplace_custom_check, n)
+srlaplace_custom <- function(n = 1, x = NULL) {
+  .Call(C_srlaplace_custom_check, n, x)
 }
 
-
-
-#' @rdname srlaplace
-#' @order 3
-#'
-#' @description
-#' Creating a sampling function for a truncated Laplace distribution.
-#'
-#' @details
-#' \code{srlaplace_truncate()} is used for sampling from a standard Laplace distribution truncated within specified bounds. 
-#' It is beneficial when the area of interest in a Laplace distribution is limited to a specific range. The function validates 
-#' the truncation bounds before creating the sampling function.
-#'
-#' @param xl Lower bound for truncation.
-#' @param xr Upper bound for truncation.
-#'
-#' @return
-#' \code{srlaplace_truncate()} returns a function that generates \code{n} samples from a truncated Laplace distribution between \code{xl} and \code{xr}.
-#'
-#' @examples
-#' # Generating Samples from a Truncated Laplace Distribution
-#' # This example demonstrates how to generate 100 samples,
-#' # from a Laplace distribution truncated in the range [1, 3].
-#' laplace_trunc <- srlaplace_truncate(xl = 1, xr = 3)
-#' samples <- laplace_trunc(100)
-#' hist(samples, main = "Histogram of Truncated Laplace Samples", xlab = "Value", breaks = 20)
-#'
-#' @export
-srlaplace_truncate = function(xl, xr, mu = 0, b = 1){
-  
-  dist_name <- 'srlaplace'
-  
-  dendata <- pbgrids[[dist_name]]
-  
-  cnum_scalable <- dendata$Cnum
-  cnum_custom <- dendata$Cnum + 1
-  choosen_grid_num <- NULL
-  
-  scalable_info <-  cached_grid_info(cnum_scalable)
-  custom_info <-  stors:::cached_grid_info(cnum_custom)
-  
-  res <- truncate_error_checking(xl, xr, dendata)
-  xl <- res$xl; xr <- res$xr
-  
-  if( !is.null(custom_info) && all(custom_info[-1] == c(mu, b)) ){
-    choosen_grid_num <- cnum_custom
-    Upper_cumsum <- .Call(C_srlaplace_trunc_nav, xl, xr, choosen_grid_num)
-    
-  }else if( !is.null(scalable_info)){
-    choosen_grid_num <- cnum_scalable
-    Upper_cumsum <- .Call(C_srlaplace_trunc_nav, xl, xr, choosen_grid_num)
-    
-  } else{
-    .Call(C_grid_error,0,0)
-    return(NULL)
-    
-  }
-  
-
-  stopifnot(
-    "xl is has a CDF close to 1" = (Upper_cumsum[1] != 1),
-    "xr is has a CDF close to 0" = (Upper_cumsum[2] != 0)
-  )
-  
-  function_string <- paste0("function(n) { .Call(C_srnorm_trunc, n, ",
-                            paste0(xl), ", ", paste0(xr), ", ", paste0(Upper_cumsum[1]),
-                            ", ", paste0(Upper_cumsum[2]), ", ", paste0(as.integer(Upper_cumsum[3])), ", ",
-                            paste0(as.integer(Upper_cumsum[4])),", ", 
-                            paste0(as.integer(choosen_grid_num)), ")}")
-  
-  function_expression <- parse(text = function_string)
-  sampling_function <- eval(function_expression)
-  
-  return(sampling_function)
-  }
-
-
-
+# srlaplace_truncate = function(xl, xr, mu = 0, b = 1){
+# 
+#   dist_name <- 'srlaplace'
+# 
+#   dendata <- pbgrids[[dist_name]]
+# 
+#   cnum_scalable <- dendata$Cnum
+#   cnum_custom <- dendata$Cnum + 1
+#   choosen_grid_num <- NULL
+# 
+#   scalable_info <-  cached_grid_info(cnum_scalable)
+#   custom_info <-  stors:::cached_grid_info(cnum_custom)
+# 
+#   res <- truncate_error_checking(xl, xr, dendata)
+#   xl <- res$xl; xr <- res$xr
+# 
+#   if( !is.null(custom_info) && all(custom_info[-1] == c(mu, b)) ){
+#     choosen_grid_num <- cnum_custom
+#     Upper_cumsum <- .Call(C_srlaplace_trunc_nav, xl, xr, choosen_grid_num)
+# 
+#   }else if( !is.null(scalable_info)){
+#     choosen_grid_num <- cnum_scalable
+#     Upper_cumsum <- .Call(C_srlaplace_trunc_nav, xl, xr, choosen_grid_num)
+# 
+#   } else{
+#     .Call(C_grid_error,0,0)
+#     return(NULL)
+# 
+#   }
+# 
+# 
+#   stopifnot(
+#     "xl is has a CDF close to 1" = (Upper_cumsum[1] != 1),
+#     "xr is has a CDF close to 0" = (Upper_cumsum[2] != 0)
+#   )
+# 
+#   function_string <- paste0("function(n) { .Call(C_srnorm_trunc, n, ",
+#                             paste0(xl), ", ", paste0(xr), ", ", paste0(Upper_cumsum[1]),
+#                             ", ", paste0(Upper_cumsum[2]), ", ", paste0(as.integer(Upper_cumsum[3])), ", ",
+#                             paste0(as.integer(Upper_cumsum[4])),", ",
+#                             paste0(as.integer(choosen_grid_num)), ")}")
+# 
+#   function_expression <- parse(text = function_string)
+#   sampling_function <- eval(function_expression)
+# 
+#   return(sampling_function)
+#   }
 
 
 #' @export
 srlaplace_optimize = function(
-    mu = 0,
-    b = 1,
+    mu = NULL,
+    b = NULL,
     xl = NULL,
     xr = NULL,
     steps = 4091,
@@ -160,36 +129,36 @@ srlaplace_optimize = function(
   
   dendata <- pbgrids[[dist_name]]
   
-  
+  f_params <- list(mu = mu, b = b)
   
   if(dendata$scalable){
-    if(identical(list(mu = mu, b = b), dendata$std_params))
-    {
+    
+    isnull <- sapply(f_params, is.null)
+    
+    if(all(isnull)){
       cnum <- dendata$Cnum
       grid_type = "scaled"
-    } else {
+    }else{
       cnum <- dendata$Cnum + 1
       grid_type = "custom"
     }
-  }else{
-    cnum <- dendata$Cnum + 1
-    grid_type = "custom"
     
+    f_params <- ifelse(isnull, dendata$std_params, f_params)
+    
+  }else{
+    
+    cnum <- dendata$Cnum + 1
+    grid_type <- "custom"
   }
   
+  modes <- dendata$set_modes(f_params$mu)
   
-  f_params <- list(mu = mu, b = b) # F L
-  
-  modes <- dendata$set_modes(mu)
-  
-  f <- dendata$create_f(mu, b)
+  f <- dendata$create_f(f_params$mu, f_params$b)
   
   check_grid_optimization_criteria(symmetric, cnum, dendata)
   
-  
   grid_optimizer(dendata, dist_name, xl, xr, f, modes, f_params, steps,
                  grid_range, theta, target_sample_size,
-                 grid_type,
-                 symmetric,
-                 cnum, verbose)  
+                 grid_type, symmetric, cnum, verbose)
+  
 }

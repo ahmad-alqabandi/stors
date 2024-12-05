@@ -38,95 +38,69 @@
 #'
 #'
 #' @export
-srnorm <- function(n, mean = 0, sd = 1) {
+srnorm <- function(n = 1, mean = 0, sd = 1, x = NULL) {
   # C_scaled_sampling_fun <- get("C_scaled_sampling_fun", envir = srnorm_fun_env)
-  .Call(C_srnorm_scaled_check, n, c(mean, sd))
+  .Call(C_srnorm_scaled_check, n, c(mean, sd), x)
 }
 
 
-
+#' Sampling from Custom Normal Distribution
 #' @export
-srnorm_custom <- function(n) {
-  .Call(C_srnorm_custom_check, n)
+srnorm_custom <- function(n = 1, x = NULL) {
+  .Call(C_srnorm_custom_check, n, x)
 }
 
-#' @rdname srnorm
-#' @order 2
-#'
-#' @param xl Lower bound for truncation.
-#' @param xr Upper bound for truncation.
-#' 
-#' 
-#' @details
-#' \code{srnorm_truncate()}, this function allows sampling from a standard normal distribution that is truncated within specified bounds.
-#'  It is particularly useful when the area of interest in a normal distribution is limited to a specific range.
-#'  The function first validates the truncation bounds to ensure they are within the allowable range of the distribution and then creates a tailored sampling function based on these bounds.
-#' 
-#' @return
-#' \code{srnorm_truncate()} returns a function that, when called with a sample size \code{n}, generates \code{n} samples from a normal distribution truncated between \code{xl} and \code{xr}.
-#'
-#' @examples
-#' # Generating Samples from a Truncated Standard Normal Distribution
-#' # This example demonstrates how to generate 100,
-#' # samples from a standard normal distribution truncated in the range [-2, 2].
-#'
-#' # Create the truncated sampling function
-#' norm_trunc <- srnorm_truncate(xl = -2, xr = 2)
-#'
-#' # Generate 100 samples
-#' sample <- norm_trunc(100)
-#'
-#' # Plot a histogram of the samples
-#' hist(sample, main = "Histogram of Truncated Normal Samples", xlab = "Value", breaks = 20)
-#' 
-#' @export
-srnorm_truncate <- function(xl = -Inf, xr = Inf, mean = 0, sd = 1){
-  
-  dist_name <- 'srnorm'
-  
-  dendata <- pbgrids[[dist_name]]
-  
-  cnum_scalable <- dendata$Cnum
-  cnum_custom <- dendata$Cnum + 1
-  choosen_grid_num <- NULL
-  
-  scalable_info <-  cached_grid_info(cnum_scalable)
-  custom_info <-  stors:::cached_grid_info(cnum_custom)
-  
-  res <- truncate_error_checking(xl, xr, dendata)
-  xl <- res$xl; xr <- res$xr
-  
-  if( !is.null(custom_info) && all(custom_info[-1] == c(mean, sd)) ){
-    choosen_grid_num <- cnum_custom
-    Upper_cumsum <- .Call(C_srnorm_trunc_nav, xl, xr, choosen_grid_num)
-    
-  }else if( !is.null(scalable_info)){
-    choosen_grid_num <- cnum_scalable
-    Upper_cumsum <- .Call(C_srnorm_trunc_nav, xl, xr, choosen_grid_num)
-    
-  } else{
-    .Call(C_grid_error,0,0)
-    return(NULL)
-    
-  }
-  
 
-  stopifnot(
-    "xl is has a CDF close to 1" = (Upper_cumsum[1] != 1),
-    "xr is has a CDF close to 0" = (Upper_cumsum[2] != 0)
-  )
-  
-  function_string <- paste0("function(n) { .Call(C_srnorm_trunc, n, ",
-                            paste0(xl), ", ", paste0(xr), ", ", paste0(Upper_cumsum[1]),
-                            ", ", paste0(Upper_cumsum[2]), ", ", paste0(as.integer(Upper_cumsum[3])), ", ",
-                            paste0(as.integer(Upper_cumsum[4])),", ", 
-                            paste0(as.integer(choosen_grid_num)), ")}")
-  
-  function_expression <- parse(text = function_string)
-  sampling_function <- eval(function_expression)
-  
-  return(sampling_function)
-}
+
+
+ 
+# srnorm_truncate <- function(xl = -Inf, xr = Inf, mean = 0, sd = 1){
+# 
+#   dist_name <- 'srnorm'
+# 
+#   dendata <- pbgrids[[dist_name]]
+# 
+#   cnum_scalable <- dendata$Cnum
+#   cnum_custom <- dendata$Cnum + 1
+#   choosen_grid_num <- NULL
+# 
+#   scalable_info <-  cached_grid_info(cnum_scalable)
+#   custom_info <-  stors:::cached_grid_info(cnum_custom)
+# 
+#   res <- truncate_error_checking(xl, xr, dendata)
+#   xl <- res$xl; xr <- res$xr
+# 
+#   if( !is.null(custom_info) && all(custom_info[-1] == c(mean, sd)) ){
+#     choosen_grid_num <- cnum_custom
+#     Upper_cumsum <- .Call(C_srnorm_trunc_nav, xl, xr, choosen_grid_num)
+# 
+#   }else if( !is.null(scalable_info)){
+#     choosen_grid_num <- cnum_scalable
+#     Upper_cumsum <- .Call(C_srnorm_trunc_nav, xl, xr, choosen_grid_num)
+# 
+#   } else{
+#     .Call(C_grid_error,0,0)
+#     return(NULL)
+# 
+#   }
+# 
+# 
+#   stopifnot(
+#     "xl is has a CDF close to 1" = (Upper_cumsum[1] != 1),
+#     "xr is has a CDF close to 0" = (Upper_cumsum[2] != 0)
+#   )
+# 
+#   function_string <- paste0("function(n) { .Call(C_srnorm_trunc, n, ",
+#                             paste0(xl), ", ", paste0(xr), ", ", paste0(Upper_cumsum[1]),
+#                             ", ", paste0(Upper_cumsum[2]), ", ", paste0(as.integer(Upper_cumsum[3])), ", ",
+#                             paste0(as.integer(Upper_cumsum[4])),", ",
+#                             paste0(as.integer(choosen_grid_num)), ")}")
+# 
+#   function_expression <- parse(text = function_string)
+#   sampling_function <- eval(function_expression)
+# 
+#   return(sampling_function)
+# }
 
 
 
@@ -134,8 +108,8 @@ srnorm_truncate <- function(xl = -Inf, xr = Inf, mean = 0, sd = 1){
 
 #' @export
 srnorm_optimize = function(
-  mean = 0,
-  sd = 1,
+  mean = NULL,
+  sd = NULL,
   xl = NULL,
   xr = NULL,
   steps = 4091,
@@ -149,35 +123,36 @@ srnorm_optimize = function(
   
   dendata <- pbgrids[[dist_name]]
 
+  f_params <- list(mean = mean, sd = sd)
+  
   if(dendata$scalable){
-    if(identical(list(mean = mean, sd = sd), dendata$std_params))
-      {
+    
+    isnull <- sapply(f_params, is.null)
+    
+    if(all(isnull)){
       cnum <- dendata$Cnum
       grid_type = "scaled"
-    } else {
-        cnum <- dendata$Cnum + 1
-        grid_type = "custom"
-        }
+    }else{
+      cnum <- dendata$Cnum + 1
+      grid_type = "custom"
+    }
+    
+    f_params <- ifelse(isnull, dendata$std_params, f_params)
+
   }else{
     cnum <- dendata$Cnum + 1
     grid_type = "custom"
-    
   }
   
-  f_params <- list(mean = mean, sd = sd)
+  modes <- dendata$set_modes(f_params$mean)
   
-  modes <- dendata$set_modes(mean)
-  
-  f <- dendata$create_f(mean, sd)
-
+  f <- dendata$create_f(f_params$mean, f_params$sd)
   
 
   check_grid_optimization_criteria(symmetric, cnum, dendata)
   
   grid_optimizer(dendata, dist_name, xl, xr, f, modes, f_params, steps,
                  grid_range, theta, target_sample_size,
-                 grid_type,
-                 symmetric,
-                 cnum, verbose)
+                 grid_type, symmetric, cnum, verbose)
   
 }

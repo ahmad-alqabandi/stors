@@ -352,7 +352,7 @@ build_final_grid <- function(gp, opt_area = NULL) {
       }
     }
     
-  } else {
+  }else{
     final_grid <- grids[[1]]$data
     proposal_areas[2] <- grids[[1]]$steps * opt_area
     g_len[length(g_len) + 1] <- grids[[1]]$steps
@@ -374,9 +374,16 @@ build_final_grid <- function(gp, opt_area = NULL) {
     if(modes == rb) proposal_areas[3] = 0 else proposal_areas[3] <- tails_area$rta
     
   } else{
-    if(modes == lb) proposal_areas[1] = 0 else proposal_areas[1] <- cdf(x1)
+    if(modes == lb) {
+      proposal_areas[1] = 0
+      } else{
+        proposal_areas[1] <- cdf(x1) - cdf(lb)
+      }
     
-    if(modes == rb) proposal_areas[3] = 0 else proposal_areas[3] <- 1 - cdf(xm)
+    if(modes == rb)
+    {proposal_areas[3] = 0
+    } else{
+        proposal_areas[3] <- 1 - 1 - cdf(rb) + cdf(xm)}
   }
   
   normalizing_con <- sum(proposal_areas)

@@ -31,12 +31,7 @@
 #undef CUSTOM
 // =================================
 
-
-#undef NAME
-
-#define NAME srlaplace_sym
-
-#define FLIP_SAMPLE(sample, flip) flip ? g->symmetric - (sample - g->symmetric) : sample
+#define INPLACE
 
 # define SCALABLE
 #include "stors_sample_scalable_custom.c"
@@ -46,17 +41,36 @@
 #include "stors_sample_scalable_custom.c"
 #undef CUSTOM
 
-#undef FLIP_SAMPLE
-
-#undef NAME
+#undef INPLACE
 
 // =================================
 
-#define NAME srlaplace
+#define FLIP_SAMPLE(sample, flip) flip ? g->symmetric - (sample - g->symmetric) : sample
 
-#include "stors_trunc_nav.c"
 
-#include "stors_sample_trunc.c"
+# define SCALABLE
+#include "stors_sample_scalable_custom.c"
+#undef SCALABLE
+
+# define CUSTOM
+#include "stors_sample_scalable_custom.c"
+#undef CUSTOM
+
+
+
+#define INPLACE
+
+# define SCALABLE
+#include "stors_sample_scalable_custom.c"
+#undef SCALABLE
+
+# define CUSTOM
+#include "stors_sample_scalable_custom.c"
+#undef CUSTOM
+
+#undef INPLACE
+
+#undef FLIP_SAMPLE
 
 // =================================
 

@@ -246,14 +246,34 @@ get_buildin_sampling_function <- function(cnum, name) {
 
 
 #' @noRd
+built_in_parameters_transformation <- function(f_params, cnum){
+  
+  for(name in names(pbgrids)){
+    
+    if(pbgrids[[name]]$Cnum == cnum || pbgrids[[name]]$Cnum + 1 == cnum){
+      
+      return(pbgrids[[name]]$transform_params(f_params))
+      
+    }
+  }
+  return(f_params)
+}
+
+#' @noRd
 cache_grid_c <- function(Cnum, grid) {
+  
   n_params <- length(grid$f_params)
   
   if (n_params == 0) {
+    
     f_params <- 0
   } else{
+    
+    f_params <- built_in_parameters_transformation(grid$f_params, Cnum)
+    
     f_params <- unlist(grid$f_params)
   }
+  
   
   .Call(
     C_cache_grid,
@@ -325,3 +345,52 @@ save_builtin_grid <- function(Cnum, grid) {
 cached_grid_info = function(cnum) {
   .Call(C_grid_info, cnum)
 }
+
+
+#' @export
+delete_build_in_grid <- function(sampling_function, grid_type = "custom"){
+  
+  grid_type <- match.arg(grid_type, c("scaled", "custom"))
+  
+  if(sampling_function %in% names(pbgrids)){
+    if(grid_type == "scaled"){
+      grid_number = pbgrids[[sampling_function]]$Cnum
+    }else{
+      grid_number = pbgrids[[sampling_function]]$Cnum + 1
+    }
+    
+  }else{
+    stop(paste0("sampling function ",sampling_function," does not exist!"))
+    
+  }
+  
+  builtin_grids <- list.files(stors:::stors_env$builtin_grids_dir)
+  
+  for(grid_name in builtin_grids){
+    
+    grid_path <- file.path(stors:::stors_env$builtin_grids_dir, grid_name)
+    grid <- readRDS(grid_path)
+    
+    if("lock" %in% names(grid)){
+      
+      temp <-grid[setdiff(names(grid),"lock")]
+      key <- digest(temp)
+      
+      if( key == grid$lock){
+        
+        if(grid$cnum == grid_number){
+          file.remove(grid_path)
+          free_cache_cnum_c(grid$cnum)
+          cat(" grid number ", grid$cnum, " DELETED !")
+        }
+        
+      }
+      
+    }
+    
+  }
+  
+}
+
+
+

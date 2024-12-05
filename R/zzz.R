@@ -8,23 +8,31 @@ pbgrids <- list(
     tails_method = "ARS",
     scalable = TRUE,
     std_params = list(mean = 0, sd = 1),
+    transform_params = function(par){
+      par$sd <- 1/par$sd
+      return(par)
+    },
     create_f = function(mu, sd) {
       fun_txt <- paste0(
-        "function(x){((1.0 / (", sd, ")*exp(-0.5 * ((x -"
+        "function(x){((1.0 / (",
+        sd, ")*exp(-0.5 * ((x -"
         ,mu ,")/", sd,
-        ")*((x - ", mu, ") / sd))))}")
+        ")*((x - ", mu,
+        ") / sd))))}")
       return(eval(parse(text = fun_txt)))
     },
     set_modes = function(mu = 0)
       mu,
     lb = -Inf,
     rb = Inf
-    
   ), srlaplace = list(
     Cnum = 3,
     tails_method = "IT",
     scalable = TRUE,
     std_params = list(mu = 0, b =1),
+    transform_params = function(par){
+      return(par)
+    },
     create_f = function(mu, b) {
       function(x) {
         (1 / (2 * b)) * exp(-abs(x - mu) / b)
@@ -48,6 +56,9 @@ pbgrids <- list(
     tails_method = "IT",
     scalable = TRUE,
     std_params = list(rate = 1),
+    transform_params = function(par){
+      return(par)
+    },
     create_f = function(rate) {
       function(x)
       {
@@ -67,6 +78,9 @@ pbgrids <- list(
     Cnum = 7,
     tails_method = "ARS",
     scalable = FALSE,
+    transform_params = function(par){
+      return(par)
+    },
     create_f = function(df) {
       function(x)
       {
@@ -85,6 +99,9 @@ pbgrids <- list(
     Cnum = 9,
     tails_method = "ARS",
     scalable = FALSE,
+    transform_params = function(par){
+      return(par)
+    },
     create_f = function(shape = 1, rate = 1, scale = 1/rate) {
       function(x)
       {
@@ -138,16 +155,13 @@ stors_env <- new.env(parent = emptyenv())
     
     # here we have to optimize for all scalable grids
     
-     for (name in names(pbgrids)) {
-    
-
-      # if(pbgrids[[name]]$scalable){
-        fun_name <- paste0(name,'_optimize')
-        do.call(fun_name, list())
-        
-      # }
-
-     }
+     # for (name in names(pbgrids)) {
+     # 
+     # 
+     #    fun_name <- paste0(name,'_optimize')
+     #    do.call(fun_name, list())
+     #    
+     # }
     
   }else{
     

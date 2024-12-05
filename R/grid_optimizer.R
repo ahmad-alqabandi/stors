@@ -40,8 +40,6 @@
 #'\item{"tails_method"}{A string representing the tails sampling method, either 'ARS' for Adaptive Rejection Sampling or 'IT' for Inverse Transform.}
 #'\item{"grid_bounds"}{A vector including the left and right bounds of the target density.}
 #'\item{"dens_func"}{The function passed by the user for the target density \code{f}.}
-#' 
-#'
 grid_optimizer <- function(dendata,
                            density_name,
                            xl = NULL,
@@ -66,7 +64,7 @@ grid_optimizer <- function(dendata,
   if( !is.null(xr) && !is.null(xl) && xl > xr ) stop("xl must be smaller than xr.")
   
   modes <- adjust_mode(modes, xl, xr)
-  
+
   
   grid_param <- list(
     target = list(
@@ -105,6 +103,7 @@ grid_optimizer <- function(dendata,
       log(f(x))
     
     h_prime <- stors_prime(modes, h)
+    
   }else{
     cdf <- do.call(dendata$create_cdf, f_params)
     
@@ -112,9 +111,11 @@ grid_optimizer <- function(dendata,
   
   if (grid_param$proposal$tails_method == "IT") {
     grid_param$target$Cumulitive_density = cdf
+    
   } else{
     grid_param$target$log_density = h
     grid_param$target$log_density_prime = h_prime
+    
   }
   
   grid_param <- grid_error_checking_and_preparation(grid_param)
@@ -134,7 +135,6 @@ grid_optimizer <- function(dendata,
   class(opt_grid) <- "grid"
   
   save_builtin_grid(cnum, opt_grid)
-  
   
   return(opt_grid)
   
@@ -224,11 +224,8 @@ find_optimal_grid <- function(gp) {
   opt_list_var = 160 # 20 doubles
   opt_steps = round(((opt_cache_sizes * 1024) - opt_list_var) / opt_df_var)
   opt_areas = 1 / opt_steps
-  
-  
+
   times = ceiling(opt_times / target_sample_size)
-  
-  
 
   f_integrate <- integrate(f, lower = lb, upper = rb)
   relative_error <- f_integrate$abs.error / f_integrate$value * 100
@@ -239,8 +236,7 @@ find_optimal_grid <- function(gp) {
   
   f_area <- f_integrate$value
   gp$target$estimated_area <- f_area 
-  
-  
+
   if ((theta == 0 &&
        identical(grid_range, c(lb, rb))) ||
       !is.null(steps))
@@ -398,53 +394,6 @@ find_optimal_grid <- function(gp) {
     
     return(gp)
     
-}
-
-
-
-#' @export
-delete_build_in_grid = function(sampling_function, grid_type = "custom"){
-
-  grid_type <- match.arg(grid_type, c("scaled", "custom"))
-  
-  if(sampling_function %in% names(pbgrids)){
-    if(grid_type == "scaled"){
-      grid_number = pbgrids[[sampling_function]]$Cnum
-    }else{
-      grid_number = pbgrids[[sampling_function]]$Cnum + 1
-    }
-  
-    }else{
-    stop(paste0("sampling function ",sampling_function," does not exist!"))
-  
-    }
-  
-  builtin_grids <- list.files(stors:::stors_env$builtin_grids_dir)
-  
-  for(grid_name in builtin_grids){
-    
-    grid_path <- file.path(stors:::stors_env$builtin_grids_dir, grid_name)
-    grid <- readRDS(grid_path)
-    
-    if("lock" %in% names(grid)){
-      
-      temp <-grid[setdiff(names(grid),"lock")]
-      key <- digest(temp)
-      
-      if( key == grid$lock){
-        
-        if(grid$cnum == 2){
-          file.remove(grid_path)
-          free_cache_cnum_c(grid$cnum)
-          cat(" grid number ", grid$cnum, " DELETED !")
-        }
-        
-      }
-      
-    }
-    
-  }
-
 }
 
 

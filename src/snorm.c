@@ -11,7 +11,7 @@
 
 #define R_TAIL ARS
 
-#define F(x) (1.0 / (g->params[1]  ) * exp(-0.5 * ((x - g->params[0]) / g->params[1]) * ((x - g->params[0]) / g->params[1])))
+#define F(x) ( ( g->params[1]  ) * exp(-0.5 * ((x - g->params[0]) * g->params[1]) * ((x - g->params[0]) * g->params[1])))
 
 // =================================
 # define SCALABLE
@@ -23,12 +23,37 @@
 #include "stors_sample_scalable_custom.c"
 #include "scaled_custom_check.c"
 #undef CUSTOM
+
 // =================================
 
+#define INPLACE
 
-#undef NAME
+# define SCALABLE
+#include "stors_sample_scalable_custom.c"
+#undef SCALABLE
 
-#define NAME srnorm_sym
+# define CUSTOM
+#include "stors_sample_scalable_custom.c"
+#undef CUSTOM
+
+#undef INPLACE
+
+// =================================
+
+#define FLIP_SAMPLE(sample, flip) flip ? g->symmetric - (sample - g->symmetric) : sample
+
+
+# define SCALABLE
+#include "stors_sample_scalable_custom.c"
+#undef SCALABLE
+
+# define CUSTOM
+#include "stors_sample_scalable_custom.c"
+#undef CUSTOM
+
+
+
+#define INPLACE
 
 #define FLIP_SAMPLE(sample, flip) flip ? g->symmetric - (sample - g->symmetric) : sample
 
@@ -40,17 +65,9 @@
 #include "stors_sample_scalable_custom.c"
 #undef CUSTOM
 
+#undef INPLACE
+
 #undef FLIP_SAMPLE
-
-#undef NAME
-
-// =================================
-
-#define NAME srnorm
-
-#include "stors_trunc_nav.c"
-
-#include "stors_sample_trunc.c"
 
 // =================================
 

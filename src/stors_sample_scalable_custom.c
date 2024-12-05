@@ -9,34 +9,154 @@
 
 #if defined(CUSTOM) || defined(SCALABLE) && defined(NAME)
 
+// FOR NON-SYMMETRIC DIST
+
+#ifndef FLIP_SAMPLE
+
 #ifdef SCALABLE
+#ifndef INPLACE
 SEXP DEN_SAMPLE_SCALED(NAME)(SEXP s_size, SEXP Rpassed_params){
   
   struct grid *restrict g = grids.grid + CNUM ;
   double * restrict p_a = g->p_a;
+  double * restrict x = g->x;
+  int sample_size = asInteger(s_size);
   
   int match = TRUE;
   double *pp = REAL(Rpassed_params);
   int n_params = g->n_params;
-        
-#endif
   
+  SEXP Rresults = PROTECT((allocVector(REALSXP, sample_size)));
+  
+  double *results = REAL(Rresults);
+#endif     
+  
+        #ifdef INPLACE
+        SEXP DEN_SAMPLE_SCALED_INPLACE(NAME)( SEXP Rpassed_params, SEXP Rresults){
+          
+          struct grid *restrict g = grids.grid + CNUM ;
+          double * restrict p_a = g->p_a;
+          double * restrict x = g->x;
+          
+          int match = TRUE;
+          double *pp = REAL(Rpassed_params);
+          int n_params = g->n_params;
+          
+          int sample_size = LENGTH(Rresults);
+          
+          double *results = REAL(Rresults);
+          
+  #endif
+#endif
+ 
+ 
+          
 #ifdef CUSTOM
+#ifndef INPLACE
+
   SEXP DEN_SAMPLE_CUSTOM(NAME)(SEXP s_size){
     struct grid *g = grids.grid + CNUM + 1;
     double * restrict p_a = g->p_a;
+    double * restrict x = g->x;
+    int sample_size = asInteger(s_size);
     
+    SEXP Rresults = PROTECT((allocVector(REALSXP, sample_size)));
+    
+    double *results = REAL(Rresults);
     
 #endif
 
+    #ifdef INPLACE
+    SEXP DEN_SAMPLE_CUSTOM_INPLACE(NAME)(SEXP Rresults){
+      struct grid *g = grids.grid + CNUM + 1;
+      double * restrict p_a = g->p_a;
+      double * restrict x = g->x;
+      
+      int sample_size = LENGTH(Rresults);
+      
+      double *results = REAL(Rresults);
+      
+  #endif
+#endif
+#endif
+  
+  
+// FOR SYMMETRIC DIST
+#ifdef FLIP_SAMPLE
+      
+#ifdef SCALABLE
+#ifndef INPLACE
+SEXP DEN_SAMPLE_SYM_SCALED(NAME)(SEXP s_size, SEXP Rpassed_params){
+  
+  struct grid *restrict g = grids.grid + CNUM ;
+  double * restrict p_a = g->p_a;
+  double * restrict x = g->x;
+  int sample_size = asInteger(s_size);
+  
+  int match = TRUE;
+  double *pp = REAL(Rpassed_params);
+  int n_params = g->n_params;
+  
+  SEXP Rresults = PROTECT((allocVector(REALSXP, sample_size)));
+  
+  double *results = REAL(Rresults);
+#endif
+  
+  #ifdef INPLACE
+        SEXP DEN_SAMPLE_SYM_SCALED_INPLACE(NAME)( SEXP Rpassed_params, SEXP Rresults){
+          
+          struct grid *restrict g = grids.grid + CNUM ;
+          double * restrict p_a = g->p_a;
+          double * restrict x = g->x;
+          
+          int match = TRUE;
+          double *pp = REAL(Rpassed_params);
+          int n_params = g->n_params;
+          
+          int sample_size = LENGTH(Rresults);
+          
+          double *results = REAL(Rresults);
+          
+  #endif
+          
+#endif
+          
+#ifdef CUSTOM
+#ifndef INPLACE
+
+  SEXP DEN_SAMPLE_SYM_CUSTOM(NAME)(SEXP s_size){
+    struct grid *g = grids.grid + CNUM + 1;
+    double * restrict p_a = g->p_a;
+    double * restrict x = g->x;
+    int sample_size = asInteger(s_size);
+    
+    SEXP Rresults = PROTECT((allocVector(REALSXP, sample_size)));
+    
+    double *results = REAL(Rresults);
+#endif
+  #ifdef INPLACE
+    SEXP DEN_SAMPLE_SYM_CUSTOM_INPLACE(NAME)(SEXP Rresults){
+      struct grid *g = grids.grid + CNUM + 1;
+      double * restrict p_a = g->p_a;
+      double * restrict x = g->x;
+      
+      int sample_size = LENGTH(Rresults);
+      
+      double *results = REAL(Rresults);
+      
+    #endif
+  #endif
+#endif
+      
+      
 #ifdef NON_SYMMETRIC_DIST
-    if(g->x == NULL){
+    if(x == NULL){
       REprintf("you need to optimize your destribution's grid first");
       R_RETURN_NULL;
     }
 #endif
     
-  int j, sample_size = asInteger(s_size);
+  int j;
   
 #if L_TAIL == ARS || R_TAIL == ARS 
   
@@ -52,10 +172,6 @@ SEXP DEN_SAMPLE_SCALED(NAME)(SEXP s_size, SEXP Rpassed_params){
   
   
   double  u1, sample, f_sample;
-  
-  SEXP Rresults = PROTECT((allocVector(REALSXP, sample_size)));
-  
-  double *results = REAL(Rresults);
   
   
 #ifdef SPECIAL_FUNCTION
@@ -99,8 +215,8 @@ SEXP DEN_SAMPLE_SCALED(NAME)(SEXP s_size, SEXP Rpassed_params){
       
 #elif L_TAIL == ARS
       
-      sample = g->x[0] + (log( g->lt_properties[0] + u1 * g->lt_properties[1]) - g->lt_properties[2]) * g->lt_properties[3];
-      h_upper = g->lt_properties[4] * (sample - g->x[0]) + g->lt_properties[2];
+      sample = x[0] + (log( g->lt_properties[0] + u1 * g->lt_properties[1]) - g->lt_properties[2]) * g->lt_properties[3];
+      h_upper = g->lt_properties[4] * (sample - x[0]) + g->lt_properties[2];
       u = unif_rand();
       if (u < F(sample) / exp(h_upper))
       {
@@ -137,9 +253,9 @@ if(u1 > g->sampling_probabilities[1]){
 
 #elif R_TAIL == ARS
       
-      sample = g->x[g->steps_number] + log1p((u1 * g->rt_properties[0] - g->rt_properties[1]) * g->rt_properties[2]) * g->rt_properties[3];
+      sample = x[g->steps_number] + log1p((u1 * g->rt_properties[0] - g->rt_properties[1]) * g->rt_properties[2]) * g->rt_properties[3];
       
-      h_upper = g->rt_properties[4] * (sample - g->x[g->steps_number]) + g->rt_properties[5];
+      h_upper = g->rt_properties[4] * (sample - x[g->steps_number]) + g->rt_properties[5];
       
       u = unif_rand();
       
@@ -172,7 +288,7 @@ if(u1 > g->sampling_probabilities[1]){
       { 
         u1 = u1 * g->s_upper_lower[j];
         
-        sample = g->x[j] + u1 * (g->x[j + 1] - g->x[j]);
+        sample = x[j] + u1 * (x[j + 1] - x[j]);
         
 #ifdef FLIP_SAMPLE
           results[i] = FLIP_SAMPLE(sample,flip);
@@ -193,7 +309,7 @@ if(u1 > g->sampling_probabilities[1]){
         
         double u0 = unif_rand();
         
-        sample = g->x[j] + u0 * (g->x[j + 1] - g->x[j]);
+        sample = x[j] + u0 * (x[j + 1] - x[j]);
         
         f_sample = F(sample);
         
@@ -240,7 +356,9 @@ if(u1 > g->sampling_probabilities[1]){
   
   PutRNGstate();
   
+#ifndef INPLACE
   UNPROTECT(1);
+#endif
   
   return (Rresults);
   
