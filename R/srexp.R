@@ -29,23 +29,23 @@
 #' print(samples)
 #'
 #' @export
-srexp <- function(n, rate = 1) {
-  .Call(C_srexp_scaled, n, c(rate))
+srexp <- function(n = 1, rate = 1, x = NULL) {
+  .Call(C_srexp_scaled_check, n, c(rate), x)
 }
 
 #' Sampling from Custom Exponential Distribution
 #' @rdname srexp
 #' @order 2
 #' @export
-srexp_custom <- function(n) {
-  .Call(C_srexp_custom, n)
+srexp_custom <- function(n = 1, x = NULL) {
+  .Call(C_srlaplace_custom_check, n, x)
 }
 
 
 
 #' @export
 srexp_optimize = function(
-    rate = 1,
+    rate = NULL,
     xl = NULL,
     xr = NULL,
     steps = 4091,
@@ -60,26 +60,32 @@ srexp_optimize = function(
   
   dendata <- pbgrids[[dist_name]]
   
+  f_params <- list(rate = rate)
+  
   if(dendata$scalable){
-    if(identical(list(rate = rate), dendata$std_params))
-    {
+    
+    isnull <- sapply(f_params, is.null)
+    
+    if(all(isnull)){
       cnum <- dendata$Cnum
       grid_type = "scaled"
-    } else {
+    }else{
       cnum <- dendata$Cnum + 1
       grid_type = "custom"
     }
-  }else{
-    cnum <- dendata$Cnum + 1
-    grid_type = "custom"
     
+    f_params <- ifelse(isnull, dendata$std_params, f_params)
+    
+  }else{
+    
+    cnum <- dendata$Cnum + 1
+    grid_type <- "custom"
   }
   
-  f_params <- list(rate = rate)
   
   modes <- 0
   
-  f <- dendata$create_f(rate)
+  f <- dendata$create_f(f_params$rate)
   
   
   grid_optimizer(dendata, dist_name, xl, xr, f, modes, f_params, steps,

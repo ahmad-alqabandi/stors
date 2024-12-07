@@ -37,8 +37,8 @@
 #'
 #'
 #' @export
-srchisq <- function(n) {
-  .Call(C_srchisq_custom, n,0)
+srchisq <- function(n = 1, x = NULL) {
+  .Call(C_srchisq_custom_check, n,x)
 }
 
 
@@ -46,7 +46,7 @@ srchisq <- function(n) {
 
 #' @export
 srchisq_optimize = function(
-  df = 2,
+  df = NULL,
   xl = NULL,
   xr = NULL,
   steps = 4091,
@@ -55,6 +55,8 @@ srchisq_optimize = function(
   target_sample_size = 1000,
   verbose = FALSE
 ) {
+  
+  if(is.null(df)) df <- 2
   
   dist_name <- 'srchisq'
   
@@ -81,5 +83,5 @@ srchisq_optimize = function(
                  grid_range, theta, target_sample_size,
                  grid_type,
                  symmetric,
-                 cnum, verbose)  
+                 cnum, verbose)
 }

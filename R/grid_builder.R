@@ -361,8 +361,7 @@ build_final_grid <- function(gp, opt_area = NULL) {
   steps_number <- sum(g_len)
   x1 <- final_grid$x[1]
   xm <- final_grid$x[steps_number + 1]
-  xm <- final_grid$x[steps_number + 1]
-  
+
   
    if(!is.null(symmetric)) steps_number = steps_number * 2
 
@@ -383,7 +382,7 @@ build_final_grid <- function(gp, opt_area = NULL) {
     if(modes == rb)
     {proposal_areas[3] = 0
     } else{
-        proposal_areas[3] <- 1 - 1 - cdf(rb) + cdf(xm)}
+        proposal_areas[3] <- cdf(rb) - cdf(xm)}
   }
   
   normalizing_con <- sum(proposal_areas)

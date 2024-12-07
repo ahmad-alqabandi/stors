@@ -291,7 +291,9 @@ cache_grid_c <- function(Cnum, grid) {
     grid$alpha,
     grid$symmetric,
     f_params,
-    n_params
+    n_params,
+    grid$grid_bounds[1],
+    grid$grid_bounds[2]
   )
   
 }

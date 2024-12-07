@@ -62,6 +62,7 @@ srlaplace_custom <- function(n = 1, x = NULL) {
   .Call(C_srlaplace_custom_check, n, x)
 }
 
+
 # srlaplace_truncate = function(xl, xr, mu = 0, b = 1){
 # 
 #   dist_name <- 'srlaplace'

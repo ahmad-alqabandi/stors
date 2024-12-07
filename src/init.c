@@ -1,11 +1,11 @@
 #include "stors.h"
 #include "R_cache.h"
 #include "snorm.h"
-// #include "srexp.h"
+#include "srexp.h"
 #include "srlaplace.h"
 // #include "old_srnorm.h"
-// #include "srchisq.h"
-// #include "srgamma.h"
+#include "srchisq.h"
+#include "srgamma.h"
 #include "grid_utils.h"
 #include "err.h"
 
@@ -15,7 +15,7 @@ static const R_CallMethodDef callMethods[]  = {
   {"stors_trunc_nav", (DL_FUNC) &stors_trunc_nav, 2},
   {"stors_trunc", (DL_FUNC) &stors_trunc, 3},
   {"grid_info", (DL_FUNC) &grid_info, 1},
-  {"cache_grid", (DL_FUNC) &cache_grid, 15},
+  {"cache_grid", (DL_FUNC) &cache_grid, 17},
   {"free_cache", (DL_FUNC) &free_cache, 0},
   {"free_cache_cnum", (DL_FUNC) &free_cache_cnum, 1},
   {"grid_error", (DL_FUNC) &grid_error, 2},
@@ -58,13 +58,30 @@ static const R_CallMethodDef callMethods[]  = {
   {"srlaplace_custom_check", (DL_FUNC) &srlaplace_custom_check, 2},
   
   // // EXPONENTIAL
-  // {"srexp_scaled", (DL_FUNC) &srexp_scaled, 2},
-  // {"srexp_custom", (DL_FUNC) &srexp_custom, 1},
-  // // GAMMA
-  // {"srgamma_custom", (DL_FUNC) &srgamma_custom, 1},
-  // // CHISQ
-  // {"srchisq_custom", (DL_FUNC) &srchisq_custom, 1},
   
+  {"srexp_scaled", (DL_FUNC) &srexp_scaled, 2},
+  {"srexp_scaled_inplace", (DL_FUNC) &srexp_scaled_inplace, 2},
+  {"srexp_scaled_check", (DL_FUNC) &srexp_scaled_check, 3},
+  
+  {"srexp_custom", (DL_FUNC) &srexp_custom, 1},
+  {"srexp_custom_inplace", (DL_FUNC) &srexp_custom_inplace, 1},
+  {"srexp_custom_check", (DL_FUNC) &srexp_custom_check, 2},
+  
+  // // CHISQ
+  
+  {"srchisq_custom", (DL_FUNC) &srchisq_custom, 1},
+  {"srchisq_custom_inplace", (DL_FUNC) &srchisq_custom_inplace, 1},
+  {"srchisq_custom_check", (DL_FUNC) &srchisq_custom_check, 2},
+  
+  // // GAMMA
+  
+  {"srgamma_custom", (DL_FUNC) &srgamma_custom, 1},
+  {"srgamma_custom_inplace", (DL_FUNC) &srgamma_custom_inplace, 1},
+  {"srgamma_custom_check", (DL_FUNC) &srgamma_custom_check, 2},
+  
+  
+  // {"srgamma_custom", (DL_FUNC) &srgamma_custom, 1},
+
   // {"old_srnorm", (DL_FUNC) &old_srnorm, 1},
   // {"old_srnorm_trunc_nav", (DL_FUNC) &old_srnorm_trunc_nav, 2},
   // {"old_srnorm_trunc", (DL_FUNC) &old_srnorm_trunc, 8},

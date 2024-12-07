@@ -147,15 +147,7 @@ SEXP DEN_SAMPLE_SYM_SCALED(NAME)(SEXP s_size, SEXP Rpassed_params){
     #endif
   #endif
 #endif
-      
-      
-#ifdef NON_SYMMETRIC_DIST
-    if(x == NULL){
-      REprintf("you need to optimize your destribution's grid first");
-      R_RETURN_NULL;
-    }
-#endif
-    
+
   int j;
   
 #if L_TAIL == ARS || R_TAIL == ARS 
@@ -182,8 +174,12 @@ SEXP DEN_SAMPLE_SYM_SCALED(NAME)(SEXP s_size, SEXP Rpassed_params){
   
   u1 = unif_rand();
   
+  // Rprintf("rb = %f \n",g->rb);
+  // Rprintf("lb = %f \n",g->lb);
+  
   for (int i = 0; i < sample_size;)
   {
+    
 
 #ifdef FLIP_SAMPLE
       if(u1 > 0.5){
@@ -203,9 +199,12 @@ SEXP DEN_SAMPLE_SYM_SCALED(NAME)(SEXP s_size, SEXP Rpassed_params){
 #if L_TAIL == IT
       
 #ifdef FLIP_SAMPLE
-        results[i] = FLIP_SAMPLE(L_ITF(u1) ,flip);
+        results[i] = FLIP_SAMPLE(L_ITF(u1 + CDF(g->lb)) ,flip);
 #else
-      results[i] = L_ITF(u1);
+      results[i] = L_ITF(u1 + CDF(g->lb));
+      // Rprintf("u1 + CDF(g->lb) = %f \n", u1 + CDF(g->lb));
+      // Rprintf("L_ITF(u1 + CDF(g->lb)) = %f \n\n", L_ITF(u1 + CDF(g->lb)));
+        
       
 #endif
 
@@ -246,11 +245,12 @@ if(u1 > g->sampling_probabilities[1]){
       
 #if R_TAIL == IT
       
-      results[i] = R_ITF(u1);
+      results[i] = R_ITF(u1 - 1 + CDF(g->rb));
+      // Rprintf("u1 - 1 + CDF(g->rb) = %f \n", u1 - 1 + CDF(g->rb));
+      // Rprintf("R_ITF(u1 - 1 + CDF(g->rb)) = %f \n\n", R_ITF(u1 - 1 + CDF(g->rb)));
       i++;
       u1 = unif_rand();
       
-
 #elif R_TAIL == ARS
       
       sample = x[g->steps_number] + log1p((u1 * g->rt_properties[0] - g->rt_properties[1]) * g->rt_properties[2]) * g->rt_properties[3];

@@ -11,7 +11,7 @@ SEXP cache_grid(SEXP R_Cnum, SEXP R_x, SEXP R_s_upper,
                 SEXP R_sampling_probabilities, SEXP R_unif_scaler,
                 SEXP R_lt_properties, SEXP R_rt_properties,
                 SEXP Ralpha, SEXP Rsymmetric,
-                SEXP Rparams, SEXP Rn_params){
+                SEXP Rparams, SEXP Rn_params, SEXP Rlb, SEXP Rrb){
   
   int j = asInteger(R_Cnum), m = asInteger(R_steps_number), n_params = asInteger(Rn_params);
   
@@ -22,6 +22,8 @@ SEXP cache_grid(SEXP R_Cnum, SEXP R_x, SEXP R_s_upper,
     *sampling_probabilities = REAL(R_sampling_probabilities),
     *lt_properties = REAL(R_lt_properties), *rt_properties = REAL(R_rt_properties),
     *params = REAL(Rparams), symmetric = 0;
+    
+    double lb = asReal(Rlb), rb = asReal(Rrb) ;
     
     if(!isNull(Rsymmetric)){
       symmetric = asReal(Rsymmetric);
@@ -40,6 +42,8 @@ SEXP cache_grid(SEXP R_Cnum, SEXP R_x, SEXP R_s_upper,
   grids.grid[j].alpha = alpha;
   grids.grid[j].symmetric = symmetric;
   grids.grid[j].n_params = n_params;
+  grids.grid[j].lb = lb;
+  grids.grid[j].rb = rb;
   
   for( size_t i = 0; i < (m + 1); i++){
     grids.grid[j].x[i] = x[i];

@@ -18,7 +18,18 @@
 
 # define CUSTOM
 #include "stors_sample_scalable_custom.c"
+#include "scaled_custom_check.c"
 #undef CUSTOM
+
+// =================================
+
+#define INPLACE
+
+# define CUSTOM
+#include "stors_sample_scalable_custom.c"
+#undef CUSTOM
+
+#undef INPLACE
 
 // =================================
 

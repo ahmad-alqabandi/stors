@@ -18,7 +18,7 @@ pbgrids <- list(
         sd, ")*exp(-0.5 * ((x -"
         ,mu ,")/", sd,
         ")*((x - ", mu,
-        ") / sd))))}")
+        ") / ",sd,"))))}")
       return(eval(parse(text = fun_txt)))
     },
     set_modes = function(mu = 0)
@@ -97,6 +97,7 @@ pbgrids <- list(
     rb = Inf
   ), srgamma = list(
     Cnum = 9,
+    std_params = list(shape = 1, scale = 1),
     tails_method = "ARS",
     scalable = FALSE,
     transform_params = function(par){

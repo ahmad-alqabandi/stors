@@ -27,6 +27,8 @@ SEXP DEN_CHECK_SCALED(NAME)(SEXP s_size, SEXP Rpassed_params, SEXP R_reserved_me
     R_RETURN_NULL;
   }
   
+#ifndef NON_SYMMETRIC_DIST
+  
   if(g->is_symmetric == TRUE){
 #ifdef SCALABLE
     if( R_reserved_memory == R_NilValue){
@@ -49,6 +51,8 @@ SEXP DEN_CHECK_SCALED(NAME)(SEXP s_size, SEXP Rpassed_params, SEXP R_reserved_me
     
   }else{
     
+#endif
+
 #ifdef SCALABLE
     if( R_reserved_memory == R_NilValue){
       return(DEN_SAMPLE_SCALED(NAME)(s_size, Rpassed_params));
@@ -65,9 +69,9 @@ SEXP DEN_CHECK_SCALED(NAME)(SEXP s_size, SEXP Rpassed_params, SEXP R_reserved_me
       return(DEN_SAMPLE_CUSTOM_INPLACE(NAME)(R_reserved_memory));
     }
 #endif
-
+#ifndef NON_SYMMETRIC_DIST
   }
-  
+#endif
 }
   
 #endif

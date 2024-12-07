@@ -36,18 +36,18 @@
 #' print(samples)
 #'
 #' @export
-srgamma <- function(n) {
-  .Call(C_srgamma_custom, n)
+srgamma <- function(n = 1, x = NULL) {
+  .Call(C_srgamma_custom_check, n, x)
 }
 
 
 
 #' @export
-srgamma_optimize = function(shape = 1,
-                            rate = 1,
+srgamma_optimize = function(shape = NULL,
+                            rate = NULL,
                             xl = NULL,
                             xr = NULL,
-                            scale = 1 / rate,
+                            scale = NULL,
                             steps = 4091,
                             grid_range = NULL,
                             theta = NULL,
@@ -64,11 +64,15 @@ srgamma_optimize = function(shape = 1,
   
   grid_type = "custom"
   
+  if(is.null(scale)) scale <- 1 / rate
+  
   f_params <- list(shape = shape, scale = scale) # F L
   
-  modes <- dendata$set_modes(shape, scale)
+  f_params <- ifelse(sapply(f_params,is.null), 1, dendata$std_params)
   
-  f <- dendata$create_f(shape = shape, scale = scale)
+  modes <- dendata$set_modes(f_params$shape, f_params$scale)
+  
+  f <- dendata$create_f(shape = f_params$shape, scale = f_params$scale)
   
   grid_optimizer(
     dendata,

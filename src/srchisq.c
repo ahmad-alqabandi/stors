@@ -6,6 +6,8 @@
 
 #define CNUM 7
 
+#define NON_SYMMETRIC_DIST
+
 #define L_TAIL ARS
 
 #define R_TAIL ARS
@@ -17,9 +19,24 @@
 
 // =================================
 
+
+// =================================
+
+# define CUSTOM
+#include "stors_sample_scalable_custom.c"
+#include "scaled_custom_check.c"
+#undef CUSTOM
+
+// =================================
+
+#define INPLACE
+
 # define CUSTOM
 #include "stors_sample_scalable_custom.c"
 #undef CUSTOM
+
+#undef INPLACE
+
 
 
 
