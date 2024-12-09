@@ -34,9 +34,10 @@ pbgrids <- list(
       return(par)
     },
     create_f = function(mu, b) {
-      function(x) {
-        (1 / (2 * b)) * exp(-abs(x - mu) / b)
-      }
+      fun_txt <- paste0("function(x) { (1 / (2 *",b
+                        ,")) * exp(-abs(x -", mu,
+                        ") /", b,")}")
+      return(eval(parse(text = fun_txt)))
     },
     create_cdf = function(mu, b) {
       function(x) {
@@ -60,12 +61,8 @@ pbgrids <- list(
       return(par)
     },
     create_f = function(rate) {
-      function(x)
-      {
-        fx <- rate * exp(-rate * x)
-        fx <- ifelse(is.nan(fx), 0, fx)
-        return(fx)
-      }
+      fun_txt <- paste0( "function(x) { fx <-", rate," * exp(-",rate," * x) fx <- ifelse(is.nan(fx), 0, fx) return(fx) }")
+      return(eval(parse(text = fun_txt)))
     },
     create_cdf = function(rate) {
       function(x) {
@@ -82,13 +79,16 @@ pbgrids <- list(
       return(par)
     },
     create_f = function(df) {
-      function(x)
-      {
-        df <- df
-        fx <- (1 / (2 ^ (df / 2) * gamma(df / 2))) * x ^ (df / 2 - 1) * exp(-x / 2)
+      fun_txt <- paste0(
+       "function(x) { 
+       fx <- (1 / (2 ^ (",
+       df," / 2) * gamma(",
+       df," / 2))) * x ^ (",
+       df ,"/ 2 - 1) * exp(-x / 2)
         fx <- ifelse(is.nan(fx), 0, fx)
-        return(fx)
-      }
+       return(fx)}"
+      )
+      return(eval(parse(text = fun_txt)))
     },
     set_modes = function(df = 1) {
       max(df - 2, 0)
@@ -104,12 +104,15 @@ pbgrids <- list(
       return(par)
     },
     create_f = function(shape = 1, rate = 1, scale = 1/rate) {
-      function(x)
+      fun_txt <- paste0(
+      "function(x)
       {
-        fx <- ifelse(x < 0, 0, (1 / (gamma(shape) * scale ^ shape) * x ^ (shape - 1) * exp(-x / scale)))
+        fx <- ifelse(x < 0, 0, (1 / (gamma(", shape, ") * ", scale ,"^", shape, ") * x ^ (", shape, " - 1) * exp(-x /", scale ,")))
         fx <- ifelse(is.nan(fx), 0, fx)
         return(fx)
-      }
+      }"
+      )
+      return(eval(parse(text = fun_txt)))
     },
     set_modes = function(shape, scale) {
       if(shape < 1) 0 else (shape-1) * scale
@@ -154,20 +157,16 @@ stors_env <- new.env(parent = emptyenv())
   
   if(length(builtin_grids) == 0 ){
     
-    # here we have to optimize for all scalable grids
-    
+
      # for (name in names(pbgrids)) {
      # 
      # 
      #    fun_name <- paste0(name,'_optimize')
-     #    do.call(fun_name, list())
+     #    do.call(fun_name, list(steps = 4091))
      #    
      # }
     
   }else{
-    
-    #here we have to load all RDS files , check validation using digest
-    # cache all grids
     
     for(grid_name in builtin_grids){
       
