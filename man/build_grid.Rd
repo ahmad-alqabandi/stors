@@ -75,7 +75,7 @@ This method effectively covers the target distribution in a stepped pattern.
 
 
 The function \code{build_final_grid()} manages the construction of these steps and calculates values critical for the sampling process.
- When the resultant grid is used with the \code{stors()} function, these values are cached,
+When the resultant grid is used with the \code{stors()} function, these values are cached,
 significantly enhancing the computational efficiency and hence improving sampling speed.
  During the optimization process, we aim for a certain grid
 size based on L1-3 memory cache size. Therefore, we test the speed of grids of sizes \eqn{2^m} Kb.

@@ -4,7 +4,7 @@
 \alias{srgamma}
 \title{Sampling from Normal Distribution}
 \usage{
-srgamma(n)
+srgamma(n = 1, x = NULL)
 }
 \arguments{
 \item{n}{Integer sample size.}

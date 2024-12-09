@@ -5,9 +5,9 @@
 \alias{srexp_custom}
 \title{Sampling from Exponential Distribution}
 \usage{
-srexp(n, rate = 1)
+srexp(n = 1, rate = 1, x = NULL)
 
-srexp_custom(n)
+srexp_custom(n = 1, x = NULL)
 }
 \arguments{
 \item{n}{Integer sample size.}

@@ -1,117 +1,97 @@
 
-#' Sampling from Normal Distribution
+#' Sampling from the Normal Distribution
 #' @rdname srnorm
 #' @order 1
 #'
 #' @description
-#' Sampling from the Normal distribution using Stors.
+#' The \code{srnorm()} function generates random samples from a Normal distribution using the STORS algorithm. 
+#' It employs an optimized proposal distribution around the mode and Adaptive Rejection Sampling (ARS) for the tails.
 #'
 #' @details
-#' The function \code{srnorm()} is used for sampling from a standard Normal distribution (mean = 0, standard deviation = 1).
-#' 
-#' 
+#' By default, \code{srnorm()} samples from a standard Normal distribution (\code{mean = 0}, \code{sd = 1}). 
+#' The proposal distribution is pre-optimized at package load time using \code{srnorm_optimize()} with 
+#' \code{steps = 4091}, creating a scalable grid centered around the mode. 
 #'
-#' Normal distribution has the density:
-#' 
-#' \deqn{ f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{(x - \mean)^2}{2\sigma^2}} }
-#' 
-#' Where \eqn{\mean} is the mean and \eqn{\sigma} is the standard deviation.
+#' If \code{srnorm()} is called with custom \code{mean} or \code{sd} parameters, the samples are generated 
+#' from the standard Normal distribution and scaled accordingly.
 #'
+#' When \code{srnorm_optimize()} is explicitly called:
+#' - A grid is created and cached. If no parameters are provided, a standard grid is created (\code{mean = 0}, \code{sd = 1}).
+#' - Providing \code{mean} or \code{sd} creates a custom grid, which is cached for use with \code{srnorm_custom()}.
+#' - The optimization process can be controlled via parameters such as \code{steps}, \code{grid_range}, or 
+#'   \code{theta}. If no parameters are provided, the grid is optimized via brute force based on the 
+#'   \code{target_sample_size}.
 #'
-#' @param n Integer sample size.
+#' For efficiency, \code{srnorm_optimize()} also supports one-tailed grids via the \code{symmetric} argument. 
+#' This reduces memory usage for symmetrical distributions, though sampling may be slower for large samples 
+#' due to the additional computation required for symmetry checks.
+#'
+#' The Normal distribution has the density:
+#' 
+#' \deqn{ f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{(x - \mu)^2}{2\sigma^2}} }
+#' 
+#' where \eqn{\mu} is the mean and \eqn{\sigma} is the standard deviation.
+#'
+#' @param n Integer. Number of samples to draw.
+#' @param mean Numeric. Mean of the target Normal distribution.
+#' @param sd Numeric. Standard deviation of the target Normal distribution.
+#' @param x Numeric vector of length \eqn{n}. If provided, samples are stored in this vector to avoid memory 
+#' allocation, improving performance for repeated sampling of the same size.
 #'
 #' @return
-#' \code{srnorm()} returns a sample of size \code{n} from a standard normal distribution.
+#' A numeric vector of length \code{n} containing samples from the Normal distribution with the specified 
+#' \code{mean} and \code{sd}.
 #'
 #' @examples
-#' # Generating Samples from a Standard Normal Distribution
-#' # This example illustrates how to generate 10 samples from a standard normal distribution.
-#' # It first optimizes the grid for sampling using \code{grid_optimizer},
-#' # and then generates samples using \code{srnorm}.
-#'
-#' # Optimize the grid for the standard normal distribution
-#' grid_optimizer("srnorm")
-#'
-#' # Generate and print 10 samples from the standard normal distribution
+#' # Generate 10 samples from the standard Normal distribution
 #' samples <- srnorm(10)
 #' print(samples)
 #'
+#' # Generate 10 samples using a pre-allocated vector
+#' x <- numeric(10)
+#' srnorm(10, x = x)
+#' print(x)
+#'
+#' # Generate 10 samples from a Normal distribution with mean = 2 and sd = 3
+#' samples <- srnorm(10, mean = 2, sd = 3)
+#' print(samples)
 #'
 #' @export
 srnorm <- function(n = 1, mean = 0, sd = 1, x = NULL) {
-  # C_scaled_sampling_fun <- get("C_scaled_sampling_fun", envir = srnorm_fun_env)
   .Call(C_srnorm_scaled_check, n, c(mean, sd), x)
 }
 
 
 #' Sampling from Custom Normal Distribution
+#' @rdname srnorm
+#' @order 2
+#' 
 #' @export
 srnorm_custom <- function(n = 1, x = NULL) {
   .Call(C_srnorm_custom_check, n, x)
 }
 
 
-
-
- 
-# srnorm_truncate <- function(xl = -Inf, xr = Inf, mean = 0, sd = 1){
-# 
-#   dist_name <- 'srnorm'
-# 
-#   dendata <- pbgrids[[dist_name]]
-# 
-#   cnum_scalable <- dendata$Cnum
-#   cnum_custom <- dendata$Cnum + 1
-#   choosen_grid_num <- NULL
-# 
-#   scalable_info <-  cached_grid_info(cnum_scalable)
-#   custom_info <-  stors:::cached_grid_info(cnum_custom)
-# 
-#   res <- truncate_error_checking(xl, xr, dendata)
-#   xl <- res$xl; xr <- res$xr
-# 
-#   if( !is.null(custom_info) && all(custom_info[-1] == c(mean, sd)) ){
-#     choosen_grid_num <- cnum_custom
-#     Upper_cumsum <- .Call(C_srnorm_trunc_nav, xl, xr, choosen_grid_num)
-# 
-#   }else if( !is.null(scalable_info)){
-#     choosen_grid_num <- cnum_scalable
-#     Upper_cumsum <- .Call(C_srnorm_trunc_nav, xl, xr, choosen_grid_num)
-# 
-#   } else{
-#     .Call(C_grid_error,0,0)
-#     return(NULL)
-# 
-#   }
-# 
-# 
-#   stopifnot(
-#     "xl is has a CDF close to 1" = (Upper_cumsum[1] != 1),
-#     "xr is has a CDF close to 0" = (Upper_cumsum[2] != 0)
-#   )
-# 
-#   function_string <- paste0("function(n) { .Call(C_srnorm_trunc, n, ",
-#                             paste0(xl), ", ", paste0(xr), ", ", paste0(Upper_cumsum[1]),
-#                             ", ", paste0(Upper_cumsum[2]), ", ", paste0(as.integer(Upper_cumsum[3])), ", ",
-#                             paste0(as.integer(Upper_cumsum[4])),", ",
-#                             paste0(as.integer(choosen_grid_num)), ")}")
-# 
-#   function_expression <- parse(text = function_string)
-#   sampling_function <- eval(function_expression)
-# 
-#   return(sampling_function)
-# }
-
-
-
-
-
+#' Optimizing Normal Distribution Grid
+#' @rdname srnorm
+#' @order 3
+#' 
+#' @param xl Scalar lower bounds.
+#' @param xr Scalar upper bounds.
+#' @param steps Optional Scalar integer indicating the number of steps in the proposal distribution.
+#' @param grid_range Optional Vector of two elements specifying the start and end points for constructing steps along the x-axis.
+#' @param theta Optional Scalar defining the pre-acceptance threshold,
+#'  dictating when the proposal steps constructing break based on the probability of pre-acceptance.
+#' @param target_sample_size Scalar integer indicating the target sample size. The grid optimization process will take this number into account.
+#' @param verbose Boolean if set to True, a table detailing the optimization areas and steps will be displayed during grid optimization.
+#' @param symmetric Scalar can be set to distribution's mode to sample from one tiled grid.
+#' 
 #' @export
 srnorm_optimize = function(
   mean = NULL,
   sd = NULL,
-  xl = NULL,
-  xr = NULL,
+  xl = -Inf,
+  xr = Inf,
   steps = 4091,
   grid_range = NULL,
   theta = NULL,

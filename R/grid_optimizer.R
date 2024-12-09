@@ -352,8 +352,11 @@ find_optimal_grid <- function(gp) {
           })
         }
 # TODO take the area with the minimum of the means of alphas benchmark time for each steps.
+        
         free_cache_cnum_c(cnum)
+        
         steps_time = append(steps_time, stats::median(cost$time[cost$expr == "st"]))
+        
         if (verbose) {
           cat(sprintf("--- %10.9f ---   --- %10.2f ---\n", area_seq[j], steps_time[j]))
         }

@@ -4,7 +4,7 @@
 \alias{srchisq}
 \title{Sampling from Normal Distribution}
 \usage{
-srchisq(n)
+srchisq(n = 1, x = NULL)
 }
 \arguments{
 \item{n}{Integer sample size.}
