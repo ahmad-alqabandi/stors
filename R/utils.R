@@ -1,7 +1,33 @@
 #' @noRd
-adjust_mode <- function(mode, xl, xr){
-  if(xl <= mode && mode <= xr){return(mode)}else if(mode < xl){return(xl)} else return(xr)
-}
+adjust_modes <- function(mode, xl, xr, f){
+  
+  delta <- 0.0001
+  new_modes <- mode[mode >= xl & mode <= xr]
+  
+  if(length(new_modes) == 0){
+    if(all(mode <= xl)){
+      return(xl)
+      
+    }else if(all(mode >= xr)){
+      return(xr)
+      
+    }else{
+      if(f(xl) > f(xl + delta)){
+        
+        new_modes <- c(new_modes, xl)
+      }
+      if(f(xr) > f(xr - delta)){
+        
+        new_modes <- c(new_modes, xr)
+      }
+      return(new_modes)
+      
+    }
+  }else{
+    return(new_modes)
+  }
+  
+  }
 
 #' @noRd
 check_grid_optimization_criteria = function(symmetric, cnum, dendata) {

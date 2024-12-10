@@ -150,8 +150,7 @@ build_grid <- function(lb = -Inf,
     h_prime <- stors_prime(modes, h)
   }
   
-  
-  
+  modes <- adjust_modes(modes, lb, rb, f)
   
   grid_param <- list(
     target = list(
@@ -368,18 +367,18 @@ build_final_grid <- function(gp, opt_area = NULL) {
   if (identical(tails_method, "ARS")) {
     tails_area = tails_ars(final_grid, f, h, h_prime, modes, lb, rb)
     
-    if(modes == lb) proposal_areas[1] = 0 else  proposal_areas[1] <- tails_area$lta
+    if(modes[1] == lb) proposal_areas[1] = 0 else  proposal_areas[1] <- tails_area$lta
     
-    if(modes == rb) proposal_areas[3] = 0 else proposal_areas[3] <- tails_area$rta
+    if(modes[mode_n] == rb) proposal_areas[3] = 0 else proposal_areas[3] <- tails_area$rta
     
   } else{
-    if(modes == lb) {
+    if(modes[1] == lb) {
       proposal_areas[1] = 0
       } else{
         proposal_areas[1] <- cdf(x1) - cdf(lb)
       }
     
-    if(modes == rb)
+    if(modes[mode_n] == rb)
     {proposal_areas[3] = 0
     } else{
         proposal_areas[3] <- cdf(rb) - cdf(xm)}

@@ -24,76 +24,130 @@ To use the [stors] package, we need to differentiate between two phases. The fir
 
 ## Sampling from Built-in Distrubutions
 
-To sample from any built-in distribution, the user only needs to run the grid_optimizer() function once when the package is loaded for the first time. This creates an optimized grid and stores it in the internal R data directory, so it can be loaded and used for sampling when needed. Also, you can visualize the grid data using the plot() function.
+To sample from any built-in distribution, a proposal grid for each distribution is pre-optimized using 4091 steps when the package is loaded for the first time. This optimization process constructs the grid and stores it in the internal R data directory. The grid is then cached in memory for efficient sampling whenever needed.
 
-Here's an example of how to optimize a grid for the standard normal distribution:
+You can also visualize the grid data using the \code{plot()} function to better understand its structure.
+
+Here’s an example of optimizing a grid for the Normal distribution (note: this process is performed automatically when the package is installed and loaded for the first time):
 
 ```{r setup, echo = TRUE}
 
 library(stors)
 
-norm_grid = srnorm_optimize()
+# Optimize a grid for the Normal distribution with 4091 steps
+grid <- srnorm_optimize(steps = 4091)
 
+# Visualize the optimized grid
+plot(grid)
 ```
 
 
-With the optimized grid ready, sampling from the standard normal distribution can be easily achieved using the `srnorm` function. For more general normal distributions, where the mean and standard deviation are not zero and one respectively, the `srnorm_scaled` function can be used.
+With the optimized grid ready, sampling from a Normal distribution with specific \code{mean} and \code{sd} is straightforward using the \code{srnorm} function.
 
 ```{r , echo = TRUE}
 
-# Generating samples from the standard normal distribution
-standard_normal_samples = srnorm(10)
+# Generating 10 samples from the standard Normal distribution
+standard_normal_samples <- srnorm(10, mean = 2, sd = 1)
 print(standard_normal_samples)
 
-# Generating samples from a normal distribution with mean = 4 and standard deviation = 2
-# general_normal_samples = srnorm_scaled(10, mu = 4, sd = 2)
+# Generating 10 samples from a Normal distribution with mean = 4 and standard deviation = 2
+# Uncomment the following lines to generate these samples:
+# general_normal_samples <- srnorm(10, mean = 4, sd = 2)
 # print(general_normal_samples)
 
 ```
 
-One of the powerful features of the `stors` package is its ability to sample from truncated distributions efficiently. This is particularly useful when the area of interest in a distribution is limited to a specific range, and you want to avoid unnecessary computations outside this range. 
-
-The `stors` package simplifies the process of sampling from truncated distributions. For standard normal distributions, the `srnorm_truncate()` function enables this feature. Users just need to provide the truncation bounds, and the function returns a sampler that is confined to these bounds. This means that the sampling is focused only within the specified range, making the process more efficient, especially when the cumulative distribution function (CDF) does not need to be evaluated, which is the case for a grid with wide steps range covering most of the target density domain. 
-
-Here's an example of how to use `srnorm_truncate()` to create a sampler for a truncated normal distribution:
+On the other hand, users can optimize a proposal grid for a specific Normal distribution by calling \code{srnorm_optimize()} and passing the desired \code{mean} and \code{sd} arguments. In this case, a unique grid will be optimized and cached in memory. To sample from this custom grid, the user can use the \code{srnorm_custom()} function by simply specifying the sample size.
 
 ```{r , echo = TRUE}
 
-# Defining the truncation bounds
-lower_bound = -1
-upper_bound = 1
+# Optimize a custom proposal grid for N(3, 2)
+grid <- srnorm_optimize(mean = 3, sd = 2, steps = 2000)
 
-# Creating a sampling function for a truncated normal distribution
-truncated_normal_sampler = srnorm_truncate(xl = lower_bound, xr = upper_bound)
+# Generate a sample of size 10^3 from N(3, 2)
+sample <- srnorm_custom(10^3)
 
-# Generating samples from the truncated normal distribution
-truncated_samples = truncated_normal_sampler(1000)
-hist(truncated_samples)
+# Visualize the generated sample
+hist(sample, main = "Histogram of Samples from N(3, 2)", xlab = "Value", col = "skyblue", border = "white")
+
 
 ```
 
 
-The `grid_optimizer()` function not only optimizes the grid but also returns a list detailing the properties of the optimized grid. This list can be used to understand the grid's structure and properties. To view these details, you can use the base `print()` function. Additionally, the `plot()` function provides a visual representation of the grid.
+To sample from a truncated Normal distribution, users need to optimize either the scalable grid or a custom grid and specify the truncation bounds using the \code{xl} (lower bound) and \code{xr} (upper bound) arguments.
 
 ```{r , echo = TRUE}
 
-print(norm_grid)
+# Define the truncation bounds
+lower_bound <- -1
+upper_bound <- 1
 
-plot(norm_grid)
+# Optimize the scalable grid with truncation bounds
+grid <- srnorm_optimize(xl = lower_bound, xr = upper_bound, steps = 4091)
+
+# Generate samples from the truncated standard Normal distribution
+sample <- srnorm(10^3)
+hist(sample, main = "Truncated Standard Normal (-1, 1)", xlab = "Value", col = "lightblue", border = "white")
+
+# Generate samples from the truncated Normal distribution N(2, 1)
+sample <- srnorm(10^3, mean = 2)
+hist(sample, main = "Truncated Normal N(2, 1) (-1, 1)", xlab = "Value", col = "lightgreen", border = "white")
+
 
 ```
 
-In cases where the grid is very dense and challenging to visualize in its entirety, you can focus on a specific region of the grid. The `plot()` function allows you to specify the limits on the x-axis using `x_min` and `x_max` parameters. This can be particularly useful for zooming into areas of interest within the grid.
+The same process can be applied to a custom grid. A custom grid can be truncated and used for sampling by following this example:
 
 ```{r , echo = TRUE}
 
-plot(norm_grid, x_min = -0.1, x_max = 0)
+# Define the truncation bounds
+lower_bound <- 2
+upper_bound <- 6
+
+# Optimize a custom grid with truncation bounds and mean = 4
+grid <- srnorm_optimize(mean = 4, xl = lower_bound, xr = upper_bound, steps = 4091)
+
+# Generate samples from the truncated Normal distribution
+sample <- srnorm_custom(10^3)
+hist(sample, main = "Truncated Custom Normal (2, 6)", xlab = "Value", col = "lightblue", border = "white")
+
 
 ```
 
-These functionalists of the grid_optimizer() and the subsequent visualization tools provide users with in-depth insights into the characteristics of the generated grid, enabling them to understand and fine-tune the sampling process.
+The \code{grid_optimizer} functions not only optimize the grid but also return a detailed list describing the properties of the optimized grid. This list provides insights into the grid's structure and characteristics. You can use the base \code{print()} function to view these details or the \code{plot()} function to visualize the grid.
 
-If the user is not satisfied with the automatically optimized grid, the `grid_optimizer()` function offers several arguments for customization. One such argument is `target_sample_size`, which defaults to 1000. If the user wishes to optimize the grid for significantly larger or smaller sample sizes, this argument can be altered.
+```{r , echo = TRUE}
+
+# Optimize a grid for the Laplace distribution
+grid <- srlaplace_optimize(steps = 4091)
+
+# View the details of the optimized grid
+print(grid)
+
+# Visualize the grid
+plot(grid)
+
+```
+
+In cases where the grid is dense and difficult to visualize in its entirety, you can focus on a specific region by using the \code{plot()} function with the \code{x_min} and \code{x_max} parameters. These parameters allow you to set limits on the x-axis, making it easier to zoom in on areas of interest within the grid.
+
+```{r , echo = TRUE}
+
+# Optimize a grid for the Normal distribution
+grid <- srlaplace_optimize(steps = 1020)
+
+# Visualize the entire grid
+plot(grid, main = "Full Grid Visualization")
+
+# Focus on a specific region of the grid (e.g., x-axis range -2 to 2)
+plot(grid, x_min = -1, x_max = 1, main = "Zoomed-In Grid (-1, 1)")
+
+```
+
+These functionalists of the grid_optimizers and the subsequent visualization tools provide users with in-depth insights into the characteristics of the generated grid, enabling them to understand and fine-tune the sampling process.
+
+
+If the user is not satisfied with the automatically optimized grid, the grid_optimizers functions offers several arguments for customization. One such argument is `target_sample_size`, which defaults to 1000. If the user wishes to optimize the grid for significantly larger or smaller sample sizes, this argument can be altered.
 
 Another important argument is the pre-acceptance threshold `theta`, which essentially is the ratio between the lower and upper linear bounds for each step. This is typically set to a very small number close to zero. The reason is that the cost of rejecting samples, even in heavy-tailed distributions, is usually less than the cost of using alternative exact sampling methods (like Inverse Transform) for dense grids, as the probability of hitting these inefficient steps is low. However, for very large sample sizes (e.g., 10^9), these inefficient steps might be hit more frequently, leading to an increase in sampling time due to lower efficiency. In such cases, the user can set a higher pre-acceptance threshold using the `theta` parameter.
 
@@ -123,7 +177,7 @@ plot(custom_grid_range)
 
 ```
 
-In addition to the `target_sample_size`, `theta`, and `grid_range` parameters, users have the flexibility to directly control the number of steps in the proposal grid. This can be particularly useful when users have specific requirements or preferences for the granularity of the grid. To specify the number of steps, the `steps` argument can be passed to the `grid_optimizer()` function.
+In addition to the `target_sample_size`, `theta`, and `grid_range` parameters, users have the flexibility to directly control the number of steps in the proposal grid. This can be particularly useful when users have specific requirements or preferences for the granularity of the grid. To specify the number of steps, the `steps` argument can be passed to the grid_optimizer function.
 
 By setting the `steps` parameter, users can determine the resolution of the grid, which can impact the balance between computational efficiency and the granularity of the sampling. A higher number of steps typically provides a more detailed grid, potentially leading to more precise sampling, but at the cost of increased memory usage and possibly longer computation times.
 
@@ -143,10 +197,13 @@ There are many built-in functions in stors, the list below shows all available f
 
 ```{r, echo = FALSE}
 funcs = character()
-for( name in stors:::stors_env$grids$biultin$names){
+for( name in names(stors:::pbgrids)){
   funcs = cat(funcs," ",name)
 }
 ```
+
+For each built-in distribution, there is a corresponding proposal distribution optimizer that can be invoked using the format \code{"sampling_function_name"_optimize()}. This function optimizes the grid for the specified distribution, enabling efficient sampling.
+
 
 ## Sampling from Users' Distributions
 
@@ -177,6 +234,7 @@ h_prime_bi <- function(x) {
 
 bi_grid = build_grid(lb = -Inf, rb = Inf, modes = modes_bi, f = f_bi, h = h_bi, h_prime = h_prime_bi)
 
+plot(bi_grid)
 
 ```
 

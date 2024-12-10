@@ -41,7 +41,6 @@ srgamma <- function(n = 1, x = NULL) {
 }
 
 
-
 #' @export
 srgamma_optimize = function(shape = NULL,
                             rate = NULL,

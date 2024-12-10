@@ -63,7 +63,7 @@ grid_optimizer <- function(dendata,
   if( is.null(xr) || (xr < dendata$lb  && xr > dendata$rb) ) xr = dendata$rb
   if( !is.null(xr) && !is.null(xl) && xl > xr ) stop("xl must be smaller than xr.")
   
-  modes <- adjust_mode(modes, xl, xr)
+  modes <- adjust_modes(modes, xl, xr, f)
 
   
   grid_param <- list(
@@ -141,60 +141,62 @@ grid_optimizer <- function(dendata,
 }
 
 
-optimized_area_based_on_steps <- function(gp, target_steps, mode_n, alphas= 0.001, qualifier = 0.02){
+# optimized_area_based_on_steps <- function(gp, target_steps, mode_n, alphas= 0.001, qualifier = 0.02){
+# 
+#   total_steps <- 0
+#   counter <- 0
+#   
+# 
+#   repeat{
+#     
+#     max_left_stps = find_left_steps(
+#         gp = gp,
+#         area = alphas,
+#         mode_i = 1,
+#         steps_lim = Inf
+#       )$steps
+#       
+# 
+#       max_right_stps = find_right_steps(
+#         gp = gp,
+#         area = alphas,
+#         mode_i = mode_n,
+#         steps_lim = Inf
+#       )$steps
+# 
+#       total_steps <- max_left_stps + max_right_stps
+#       
+#       steps_diffrence <- total_steps - target_steps
+# 
+#         if ( steps_diffrence > 0  && steps_diffrence < 10) {
+#           return(alphas)
+#         }
+#       
+#     if(target_steps > total_steps ){
+#         alphas <- alphas * (1 - qualifier)
+# 
+# 
+#       }else{
+#         alphas <- alphas * (1 + qualifier)
+# 
+#       }
+#       
+#       counter <- counter + 1
+#       
+#       if(counter == 10){
+#         
+#        dist <- abs(target_steps - total_steps)
+#         
+#         if( dist < 100){
+#           qualifier <- min(qualifier * 0.75, 0.005)
+#         }
+#         
+#         counter <- 0
+#       }
+#   }
+# }
 
-  total_steps <- 0
-  counter <- 0
-  
 
-  repeat{
-    
-    max_left_stps = find_left_steps(
-        gp = gp,
-        area = alphas,
-        mode_i = 1,
-        steps_lim = Inf
-      )$steps
-      
-
-      max_right_stps = find_right_steps(
-        gp = gp,
-        area = alphas,
-        mode_i = mode_n,
-        steps_lim = Inf
-      )$steps
-
-      total_steps <- max_left_stps + max_right_stps
-      
-      steps_diffrence <- total_steps - target_steps
-
-        if ( steps_diffrence > 0  && steps_diffrence < 10) {
-          return(alphas)
-        }
-      
-    if(target_steps > total_steps ){
-        alphas <- alphas * (1 - qualifier)
-
-
-      }else{
-        alphas <- alphas * (1 + qualifier)
-
-      }
-      
-      counter <- counter + 1
-      
-      if(counter == 10){
-        
-       dist <- abs(target_steps - total_steps)
-        
-        if( dist < 100){
-          qualifier <- min(qualifier * 0.75, 0.005)
-        }
-        
-        counter <- 0
-      }
-  }
-}
 
 #' @importFrom microbenchmark microbenchmark
 find_optimal_grid <- function(gp) {
@@ -216,6 +218,7 @@ find_optimal_grid <- function(gp) {
   f_params <- gp$f_params
   density_fun <- NULL
   opt_area <- NULL
+  
   
   opt_alpha_length = 3
   opt_times = 10000
@@ -244,18 +247,20 @@ find_optimal_grid <- function(gp) {
     
     if(!is.null(steps))
     {
-      alphas <- 1 / steps * f_area
-      opt_area <- optimized_area_based_on_steps(gp = gp,
-                                                target_steps = steps,
-                                                alphas = alphas,
-                                                mode_n)
+      opt_area <- 1 / steps * f_area
+      # opt_area <- optimized_area_based_on_steps(gp = gp,
+      #                                           target_steps = steps,
+      #                                           alphas = alphas,
+      #                                           mode_n)
+
     }else{
-      alphas <- 1 / 4096 * f_area
+      opt_area <- 1 / 4096 * f_area
       
-      opt_area <- optimized_area_based_on_steps(gp = gp,
-                                                target_steps = 4096,
-                                                alphas = alphas,
-                                                mode_n)
+      # opt_area <- optimized_area_based_on_steps(gp = gp,
+      #                                           target_steps = 4096,
+      #                                           alphas = alphas,
+      #                                           mode_n)
+      
     }
     
     gdl <- find_left_steps(
