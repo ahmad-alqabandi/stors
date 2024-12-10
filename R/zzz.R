@@ -142,7 +142,7 @@ stors_env <- new.env(parent = emptyenv())
   if (!dir.exists(user_grids_dir))
     dir.create(user_grids_dir, recursive = TRUE)
   
-  user_cnum_counter <- 100
+  user_cnum_counter <- 101
   user_session_cached_grid_locks <- data.frame(lock = character(), cnum = numeric())
   
   assign("builtin_grids_dir", builtin_grids_dir, envir = stors_env)

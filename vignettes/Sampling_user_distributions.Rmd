@@ -71,7 +71,7 @@ Once the grid is configured and validated, it can be passed to the `stors()` fun
 bi_sampler = stors(bi_grid)
 
 # Generating samples from the target distribution
-samples = bi_sampler(1000)
+samples = bi_sampler(10^6)
 hist(samples)
 ```
 

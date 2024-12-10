@@ -257,9 +257,13 @@ Once the grid is configured and validated, it can be passed to the `stors()` fun
 # Creating a sampler function using the custom grid
 bi_sampler = stors(bi_grid)
 
+plot(bi_grid)
+
 # Generating samples from the target distribution
-samples = bi_sampler(10)
-print(samples)
+sample = bi_sampler(10^3)
+
+hist(sample, main = "Sample Generated From Multi-modal Distribution ", xlab = "Value", col = "lightblue", border = "white")
+
 
 ```
 

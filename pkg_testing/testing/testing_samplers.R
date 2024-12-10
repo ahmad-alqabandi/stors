@@ -23,6 +23,8 @@ plot(norm_grid)
 
 s <- stors(norm_grid)
 
+hist(s(10000))
+
 ? save_grid
 
 ? print_grids

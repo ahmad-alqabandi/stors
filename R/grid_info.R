@@ -206,6 +206,7 @@ print.grid <- function(x, ...) {
   cat("Steps range:     [", sprintf("%.6f", domain_start), ", ", sprintf("%.6f", domain_end), "]\n")
   cat(sprintf("Sampling efficiency: %.2f%%", sampling_efficiency), "\n")
   cat("=========================================\n\n")
+  
 }
 
 
@@ -255,11 +256,10 @@ print_grids <- function() {
                         full.names = TRUE)
     grids_details <- file.info(grids)
     grids_sizes <- grids_details[grids_details$isdir == FALSE, ]$size
-    print(stors_env$grids$user)
     grids_sizes <- formatC(sum(as.double(grids_sizes)) / 1028,
                            format = "f",
                            digits = 2)
-    cat("\n grids_size : ", grids_sizes, " KB")
+    cat("grids_size : ", grids_sizes, " KB")
   }
   
 }
@@ -342,11 +342,14 @@ save_grid <- function(grid, grid_name) {
 #' print_grids()
 #' 
 delete_grid <- function(grid_name) {
-  stopifnot("This grid does not exist." = grid_name %in% stors_env$grids$user$name)
   
-  file.remove(file.path(stors_env$user_dirs$data_dir, paste0(grid_name, ".rds")))
-  stors_env$grids$user = stors_env$grids$user[stors_env$grids$user$name != grid_name, ]
-  cat(grid_name, "grid has been deleted successfully")
+  user_grids <- list.files(stors:::stors_env$user_grids_dir)
+  grid_name <- paste0(grid_name,".rds")
+  
+  stopifnot("This grid does not exist." = grid_name %in% user_grids)
+  
+  file.remove(file.path(stors:::stors_env$user_grids_dir, grid_name))
+  cat(grid_name, "grid deleted successfully")
   
 }
 

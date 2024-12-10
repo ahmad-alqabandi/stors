@@ -82,13 +82,6 @@ stors <- function(grid, xl = grid$grid_bounds[1], xr = grid$grid_bounds[2]) {
 
   force(grid)
   
-  # if(!is_valid_grid(grid))
-  #   stop("This grid is not valid")
-  # 
-  # Cnum <- stors_env$user_cnum_counter
-  # 
-  # stors_env$user_cnum_counter <- stors_env$user_cnum_counter + 1
-  
   Cnum <- cache_user_grid_c(grid)
   
   print(paste0("cnum = ",Cnum))
