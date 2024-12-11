@@ -61,7 +61,9 @@ pbgrids <- list(
       return(par)
     },
     create_f = function(rate) {
-      fun_txt <- paste0( "function(x) { fx <-", rate," * exp(-",rate," * x) fx <- ifelse(is.nan(fx), 0, fx) return(fx) }")
+      fun_txt <- paste0( "function(x) { fx <-", rate," * exp(-",rate," * x)
+                         fx <- ifelse(is.nan(fx), 0, fx)
+                         return(fx) }")
       return(eval(parse(text = fun_txt)))
     },
     create_cdf = function(rate) {

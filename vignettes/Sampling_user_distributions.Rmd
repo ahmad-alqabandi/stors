@@ -22,6 +22,7 @@ In this vignette, we focus on how to use the `stors` package to sample from user
 
 To sample from user-defined distributions, you can create custom grids using the `build_grid()` function and then use the `stors()` function to create a sampler based on the custom grid.
 
+
 ## Sampling from User-Defined Distributions
 
 For distributions not covered by the built-in functions and that satisfy the log-concavity condition, users have the flexibility to create their own grids using the `build_grid()` function. This function is designed to handle a variety of distributions by accepting a range of parameters tailored to the specific needs of the distribution being sampled from.

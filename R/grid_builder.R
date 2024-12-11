@@ -454,7 +454,7 @@ find_left_steps <- function(gp, area, mode_i, steps_lim = Inf) {
   # to check if new constructed steps get less than mode_previous due to low density value compared to area
   mode_previous <- ifelse(mode_i == 1, NA, gp$target$modes[mode_i - 1])
   
-  init_memory_res <- (max(500, ceiling(1 / area)) + 500) * 2
+  init_memory_res <- (min(1000, ceiling(1 / area)) + 500) * 2
   
   x <- rep(NA, init_memory_res)
   s_upper <- rep(NA, init_memory_res)
@@ -525,7 +525,7 @@ find_right_steps <- function(gp,
   # to check if x_next exceeds mode_next due to low density value compared to area
   mode_next <- ifelse(mode_i == mode_n, NA, gp$target$modes[mode_i + 1])
   
-  init_memory_res <- (max(500, ceiling(1 / area)) + 500)
+  init_memory_res <- (min(1000, ceiling(1 / area)) + 500)
   
   x <- rep(NA, init_memory_res)
   s_upper <- rep(NA, init_memory_res)
