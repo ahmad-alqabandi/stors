@@ -189,6 +189,27 @@ plot(custom_grid_steps)
 
 ```
 
+
+The user can also create a symmetric proposal for built-in distributions by setting the \code{symmetric} argument to the value around which the target density is symmetric.
+
+Example: Creating a Symmetric Proposal for the Standard Normal Distribution
+
+In this example, we create a symmetric proposal for the standard Normal distribution. Before doing so, we first delete all previously constructed non-symmetric grids (both scaled and custom) using the \code{delete_build_in_grid()} function.
+```{r, echo = FALSE}
+
+# Delete all non-symmetric grids for the Normal distribution
+delete_build_in_grid(sampling_function = "srnorm", grid_type = "scaled")
+delete_build_in_grid(sampling_function = "srnorm", grid_type = "custom")
+
+# Create a symmetric proposal grid for the standard Normal distribution
+grid <- srnorm_optimize(symmetric = 0, steps = 2040)
+
+# Visualize the symmetric proposal grid
+plot(grid)
+
+```
+
+
 There are many built-in functions in stors, the list below shows all available functions that can be used directly by the user after optimizing the grids:
 
 ```{r, echo = FALSE}

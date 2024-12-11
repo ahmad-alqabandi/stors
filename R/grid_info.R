@@ -46,8 +46,10 @@ plot.grid <- function(x,
   grid <- x
   n = nrow(grid$grid_data)
   f <- eval(parse(text = grid$dens_func))
-  lf <- NULL
-  rf <- NULL
+  lf <- f
+  rf <- f
+  
+  
   
   if (grid$tails_method == "ARS") {
     if (!all(grid$lt_properties == 0)) {
@@ -59,10 +61,8 @@ plot.grid <- function(x,
       rf  <- function(x)
         exp(grid$rt_properties[5] * (x - grid$grid_data$x[n]) + grid$rt_properties[6])
     }
-  } else {
-    lf <- f
-    rf <- f
   }
+  
   
   if (is.finite(grid$grid_bounds[1])) {
     x_from <- grid$grid_bounds[1]

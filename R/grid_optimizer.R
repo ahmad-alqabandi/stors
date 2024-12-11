@@ -155,8 +155,8 @@ grid_optimizer <- function(dendata,
 #         mode_i = 1,
 #         steps_lim = Inf
 #       )$steps
-#       
 # 
+#       
 #       max_right_stps = find_right_steps(
 #         gp = gp,
 #         area = alphas,
