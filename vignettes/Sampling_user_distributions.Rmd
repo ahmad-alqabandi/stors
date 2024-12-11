@@ -76,6 +76,46 @@ samples = bi_sampler(10^6)
 hist(samples)
 ```
 
+Sampling from a Truncated User-Defined Distribution
+To sample from a truncated user-defined distribution, simply provide the lower and upper truncation bounds using the \code{lb} (lower bound) and \code{rb} (upper bound) arguments. Below, we demonstrate this process using a previously created multi-modal distribution.
+
+Example: Sampling from a Truncated Multi-Modal Distribution
+```{r , echo = TRUE}
+
+# Define modes for the multi-modal distribution
+modes_bi <- c(0.00134865, 3.99865)
+
+# Build a truncated grid for the multi-modal distribution
+bi_grid_trunc_grid <- build_grid(
+  lb = -1,
+  rb = 6,
+  modes = modes_bi,
+  f = f_bi,
+  h = h_bi,
+  h_prime = h_prime_bi,
+  steps = 2040
+)
+
+# Visualize the truncated grid
+plot(bi_grid_trunc_grid, main = "Truncated Multi-Modal Grid (-1, 6)", xlab = "Value", col = "skyblue")
+
+# Create a sampler for the truncated distribution
+bi_sampler_trunc_sampler <- stors(bi_grid_trunc_grid)
+
+# Generate 10^3 samples from the truncated distribution
+sample <- bi_sampler_trunc_sampler(10^3)
+
+# Generate 10^3 samples from the truncated distribution
+sample <- bi_sampler_trunc_sampler(10^3)
+
+# Visualize the generated samples
+hist(sample, main = "Histogram of Samples from Truncated Multi-Modal Distribution", 
+     xlab = "Value", col = "lightgreen", border = "white")
+
+
+
+```
+
 ## Saving, Loading, and Deleting User Grids
 
 The grid stored in `bi_grid` will not be preserved across sessions. Therefore, if you are satisfied with the sampling results and wish to store the grid for future use, you should save the grid using the `save_grid()` function. This function takes the optimized grid and a filename you choose to save the grid in the internal R data directory on your machine. This is recommended if you plan to use the grid frequently across sessions, to avoid re-optimizing the grid in future sessions.

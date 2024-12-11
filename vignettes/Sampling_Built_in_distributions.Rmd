@@ -210,6 +210,33 @@ plot(grid)
 ```
 
 
+Sampling from Truncated Distributions
+One of the standout features of STORS is its ability to sample efficiently from truncated distributions. To sample from a truncated distribution, the user simply needs to specify the upper and lower truncation bounds using the \code{xl} (lower bound) and \code{xr} (upper bound) arguments in the \code{grid_optimizer} function.
+
+Example: Sampling from a Truncated Standard Normal Distribution
+In this example, we demonstrate how to sample from a truncated standard Normal distribution with truncation bounds at \code{-1} and \code{1}.
+
+```{r, echo = FALSE}
+
+# Delete all non-symmetric grids for the Normal distribution
+delete_build_in_grid(sampling_function = "srnorm", grid_type = "scaled")
+delete_build_in_grid(sampling_function = "srnorm", grid_type = "custom")
+
+# Optimize the grid for a truncated standard Normal distribution
+grid <- srnorm_optimize(mean = 0, sd = 1, xl = -1, xr = 1, steps = 4020)
+
+# Visualize the truncated grid
+plot(grid, main = "Truncated Standard Normal Grid (-1, 1)", xlab = "Value", col = "lightblue")
+
+# Generate 10^4 samples from the truncated distribution
+sample <- srnorm_custom(10^4)
+
+# Visualize the generated samples
+hist(sample, main = "Histogram of Samples from Truncated Standard Normal", 
+     xlab = "Value", col = "lightgreen", border = "white")
+
+```
+
 There are many built-in functions in stors, the list below shows all available functions that can be used directly by the user after optimizing the grids:
 
 ```{r, echo = FALSE}

@@ -252,10 +252,9 @@ find_optimal_grid <- function(gp) {
       #                                           target_steps = steps,
       #                                           alphas = alphas,
       #                                           mode_n)
-
+      
     }else{
       opt_area <- 1 / 4096 * f_area
-      
       # opt_area <- optimized_area_based_on_steps(gp = gp,
       #                                           target_steps = 4096,
       #                                           alphas = alphas,

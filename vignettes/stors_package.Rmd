@@ -212,6 +212,34 @@ plot(grid)
 
 ```
 
+Sampling from Truncated Distributions
+One of the standout features of STORS is its ability to sample efficiently from truncated distributions. To sample from a truncated distribution, the user simply needs to specify the upper and lower truncation bounds using the \code{xl} (lower bound) and \code{xr} (upper bound) arguments in the \code{grid_optimizer} function.
+
+Example: Sampling from a Truncated Standard Normal Distribution
+In this example, we demonstrate how to sample from a truncated standard Normal distribution with truncation bounds at \code{-1} and \code{1}.
+
+```{r, echo = FALSE}
+
+# Delete all non-symmetric grids for the Normal distribution
+delete_build_in_grid(sampling_function = "srnorm", grid_type = "scaled")
+delete_build_in_grid(sampling_function = "srnorm", grid_type = "custom")
+
+# Optimize the grid for a truncated standard Normal distribution
+grid <- srnorm_optimize(mean = 0, sd = 1, xl = -1, xr = 1, steps = 4020)
+
+# Visualize the truncated grid
+plot(grid, main = "Truncated Standard Normal Grid (-1, 1)", xlab = "Value", col = "lightblue")
+
+# Generate 10^4 samples from the truncated distribution
+sample <- srnorm_custom(10^4)
+
+# Visualize the generated samples
+hist(sample, main = "Histogram of Samples from Truncated Standard Normal", 
+     xlab = "Value", col = "lightgreen", border = "white")
+
+```
+
+
 
 There are many built-in functions in stors, the list below shows all available functions that can be used directly by the user after optimizing the grids:
 
@@ -287,6 +315,47 @@ hist(sample, main = "Sample Generated From Multi-modal Distribution ", xlab = "V
 
 ```
 
+Sampling from a Truncated User-Defined Distribution
+To sample from a truncated user-defined distribution, simply provide the lower and upper truncation bounds using the \code{lb} (lower bound) and \code{rb} (upper bound) arguments. Below, we demonstrate this process using a previously created multi-modal distribution.
+
+Example: Sampling from a Truncated Multi-Modal Distribution
+```{r , echo = TRUE}
+
+# Define modes for the multi-modal distribution
+modes_bi <- c(0.00134865, 3.99865)
+
+# Build a truncated grid for the multi-modal distribution
+bi_grid_trunc_grid <- build_grid(
+  lb = -1,
+  rb = 6,
+  modes = modes_bi,
+  f = f_bi,
+  h = h_bi,
+  h_prime = h_prime_bi,
+  steps = 2040
+)
+
+# Visualize the truncated grid
+plot(bi_grid_trunc_grid, main = "Truncated Multi-Modal Grid (-1, 6)", xlab = "Value", col = "skyblue")
+
+# Create a sampler for the truncated distribution
+bi_sampler_trunc_sampler <- stors(bi_grid_trunc_grid)
+
+# Generate 10^3 samples from the truncated distribution
+sample <- bi_sampler_trunc_sampler(10^3)
+
+# Generate 10^3 samples from the truncated distribution
+sample <- bi_sampler_trunc_sampler(10^3)
+
+# Visualize the generated samples
+hist(sample, main = "Histogram of Samples from Truncated Multi-Modal Distribution", 
+     xlab = "Value", col = "lightgreen", border = "white")
+
+
+
+```
+
+
 ## Saving, Loading and Deleting Users' Grids
 
 The grid stored in `bi_grid` will not be preserved across sessions. Therefore, if the user is satisfied with the sampling results and wishes to store the grid for future use, they should save the grid using the `save_grid()` function. This function takes the optimized grid and a filename chosen by the user to save the grid in the internal R data directory on their machine. This is recommended if the user plans to use the grid frequently across sessions, to avoid re-optimizing the grid in future sessions.
@@ -294,7 +363,6 @@ The grid stored in `bi_grid` will not be preserved across sessions. Therefore, i
 ```{r , echo = TRUE}
 
 save_grid(bi_grid,"bimodal_grid")
-
 
 ```
 
