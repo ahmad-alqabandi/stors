@@ -121,6 +121,27 @@ pbgrids <- list(
     },
     lb = 0,
     rb = Inf
+  ),  srbeta = list(
+    Cnum = 11,
+    tails_method = "ARS",
+    scalable = FALSE,
+    std_params = list(shape1 = 1.1, shape2 = 2),
+    transform_params = function(par){
+      return(par)
+    },
+    create_f = function(shape1, shape2) {
+      fun_txt <- paste0(
+        "function(x){
+        fx <- (x^(",shape1,"-1) * (1 - x)^(",shape2," - 1)) / beta(",shape1,",",shape2,")
+        return(fx)
+        }")
+      return(eval(parse(text = fun_txt)))
+    },
+    set_modes = function(shape1 , shape2){
+      return((shape1 - 1) / (shape1 + shape2 - 2))
+    },
+    lb = 0,
+    rb = 1
   )
 )
 
@@ -153,20 +174,18 @@ stors_env <- new.env(parent = emptyenv())
   assign("user_session_cached_grid_locks", user_session_cached_grid_locks, envir = stors_env)
   
   
-  #  stors_grids_path <- file.path(builtin_grids_dir, "grids.rds")
-  
   builtin_grids <- list.files(builtin_grids_dir)
   
   if(length(builtin_grids) == 0 ){
     
 
-     # for (name in names(pbgrids)) {
-     # 
-     # 
-     #    fun_name <- paste0(name,'_optimize')
-     #    do.call(fun_name, list(steps = 4091))
-     #    
-     # }
+     for (name in names(pbgrids)) {
+
+
+        fun_name <- paste0(name,'_optimize')
+        do.call(fun_name, list(steps = 4091))
+
+     }
     
   }else{
     

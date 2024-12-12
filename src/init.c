@@ -7,6 +7,7 @@
 #include "srchisq.h"
 #include "srgamma.h"
 #include "grid_utils.h"
+#include "srbeta.h"
 #include "err.h"
 
 
@@ -80,19 +81,14 @@ static const R_CallMethodDef callMethods[]  = {
   {"srgamma_custom_check", (DL_FUNC) &srgamma_custom_check, 2},
   
   
-  // {"srgamma_custom", (DL_FUNC) &srgamma_custom, 1},
-
-  // {"old_srnorm", (DL_FUNC) &old_srnorm, 1},
-  // {"old_srnorm_trunc_nav", (DL_FUNC) &old_srnorm_trunc_nav, 2},
-  // {"old_srnorm_trunc", (DL_FUNC) &old_srnorm_trunc, 8},
-  // {"srexp", (DL_FUNC) &srexp, 2},
-  // {"srchisq", (DL_FUNC) &srchisq, 2},
-  // {"srchisq_trunc_nav", (DL_FUNC) &srchisq_trunc_nav, 2},
-  // {"srchisq_trunc", (DL_FUNC) &srchisq_trunc, 7},
-  // {"srgamma", (DL_FUNC) &srgamma, 2},
-  // {"srgamma_trunc_nav", (DL_FUNC) &srgamma_trunc_nav, 2},
-  // {"srgamma_trunc", (DL_FUNC) &srgamma_trunc, 7},
+  // BETA
   
+  
+  {"srbeta_custom", (DL_FUNC) &srbeta_custom, 1},
+  {"srbeta_custom_inplace", (DL_FUNC) &srbeta_custom_inplace, 1},
+  {"srbeta_custom_check", (DL_FUNC) &srbeta_custom_check, 2},
+  
+
   {NULL, NULL, 0}
 };
 

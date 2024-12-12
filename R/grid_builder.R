@@ -455,6 +455,7 @@ find_left_steps <- function(gp, area, mode_i, steps_lim = Inf) {
   mode_previous <- ifelse(mode_i == 1, NA, gp$target$modes[mode_i - 1])
   
   init_memory_res <- (min(1000, ceiling(1 / area)) + 500) * 2
+  # TODO replace 1 by the area of f
   
   x <- rep(NA, init_memory_res)
   s_upper <- rep(NA, init_memory_res)

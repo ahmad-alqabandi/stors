@@ -64,9 +64,24 @@ srchisq_optimize = function(
   
   dendata <- pbgrids[[dist_name]]
   
-  cnum <- dendata$Cnum + 1
-  
-  grid_type = "custom"
+  if(dendata$scalable){
+    
+    isnull <- sapply(f_params, is.null)
+    
+    if(all(isnull)){
+      cnum <- dendata$Cnum
+      grid_type = "scaled"
+    }else{
+      cnum <- dendata$Cnum + 1
+      grid_type = "custom"
+    }
+    
+    f_params <- ifelse(isnull, dendata$std_params, f_params)
+    
+  }else{
+    cnum <- dendata$Cnum + 1
+    grid_type = "custom"
+  }
   
   if (df == 1) {
     message("Grid building is not available for df = 1. You can square the result of srnorm() to sample from this distribution.")
