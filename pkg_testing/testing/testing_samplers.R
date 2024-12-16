@@ -147,7 +147,7 @@ hist(srlaplace(n))
 tl = srlaplace_truncate(-2,3.3)
 
 trunc_sample = tl(n)
-  
+
 hist(trunc_sample)
 
 
@@ -193,5 +193,9 @@ microbenchmark::microbenchmark(
   times = 100
 )
 
+l <- list(a1 = 1 )
 
+l$a
+a <- c()
+for( i in seq_along(a)) print("1")
 

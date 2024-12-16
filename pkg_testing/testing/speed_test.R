@@ -83,3 +83,12 @@ microbenchmark::microbenchmark(
   times = times
 )
 
+
+m <- 10^5
+
+microbenchmark::microbenchmark(
+  srbeta_custom(m),
+  rbeta(m,shape1 = 2,shape2 = 3),
+  times = 10
+)
+
