@@ -4,39 +4,40 @@
 
 pbgrids <- list(
   srnorm = list(
-    Cnum = 1,
+    c_num = 1,
     tails_method = "ARS",
     scalable = TRUE,
     std_params = list(mean = 0, sd = 1),
-    transform_params = function(par){
-      par$sd <- 1/par$sd
+    transform_params = function(par) {
+      par$sd <- 1 / par$sd
       return(par)
     },
     create_f = function(mu, sd) {
       fun_txt <- paste0(
         "function(x){((1.0 / (",
         sd, ")*exp(-0.5 * ((x -"
-        ,mu ,")/", sd,
+        , mu, ")/", sd,
         ")*((x - ", mu,
-        ") / ",sd,"))))}")
+        ") / ", sd, "))))}")
       return(eval(parse(text = fun_txt)))
     },
-    set_modes = function(mu = 0)
-      mu,
+    set_modes <- function(mu = 0) {
+      mu
+      },
     lb = -Inf,
     rb = Inf
   ), srlaplace = list(
-    Cnum = 3,
+    c_num = 3,
     tails_method = "IT",
     scalable = TRUE,
-    std_params = list(mu = 0, b =1),
-    transform_params = function(par){
+    std_params = list(mu = 0, b = 1),
+    transform_params = function(par) {
       return(par)
     },
     create_f = function(mu, b) {
-      fun_txt <- paste0("function(x) { (1 / (2 *",b
-                        ,")) * exp(-abs(x -", mu,
-                        ") /", b,")}")
+      fun_txt <- paste0("function(x) { (1 / (2 *", b
+                        , ")) * exp(-abs(x -", mu,
+                        ") /", b, ")}")
       return(eval(parse(text = fun_txt)))
     },
     create_cdf = function(mu, b) {
@@ -48,20 +49,21 @@ pbgrids <- list(
         }
       }
     },
-    set_modes = function(mu = 0)
-      mu,
+    set_modes = function(mu = 0) {
+      mu
+      },
     lb = -Inf,
     rb = Inf
   ), srexp = list(
-    Cnum = 5,
+    c_num = 5,
     tails_method = "IT",
     scalable = TRUE,
     std_params = list(rate = 1),
-    transform_params = function(par){
+    transform_params = function(par) {
       return(par)
     },
     create_f = function(rate) {
-      fun_txt <- paste0( "function(x) { fx <-", rate," * exp(-",rate," * x)
+      fun_txt <- paste0("function(x) { fx <-", rate, " * exp(-", rate, " * x)
                          fx <- ifelse(is.nan(fx), 0, fx)
                          return(fx) }")
       return(eval(parse(text = fun_txt)))
@@ -74,19 +76,19 @@ pbgrids <- list(
     lb = 0,
     rb = Inf
   ), srchisq = list(
-    Cnum = 7,
+    c_num = 7,
     tails_method = "ARS",
     scalable = FALSE,
-    transform_params = function(par){
+    transform_params = function(par) {
       return(par)
     },
     create_f = function(df) {
       fun_txt <- paste0(
-       "function(x) { 
+       "function(x) {
        fx <- (1 / (2 ^ (",
-       df," / 2) * gamma(",
-       df," / 2))) * x ^ (",
-       df ,"/ 2 - 1) * exp(-x / 2)
+       df, " / 2) * gamma(",
+       df, " / 2))) * x ^ (",
+       df, "/ 2 - 1) * exp(-x / 2)
         fx <- ifelse(is.nan(fx), 0, fx)
        return(fx)}"
       )
@@ -98,18 +100,17 @@ pbgrids <- list(
     lb = 0,
     rb = Inf
   ), srgamma = list(
-    Cnum = 9,
+    c_num = 9,
     std_params = list(shape = 1, scale = 1),
     tails_method = "ARS",
     scalable = FALSE,
-    transform_params = function(par){
+    transform_params = function(par) {
       return(par)
     },
-    create_f = function(shape = 1, rate = 1, scale = 1/rate) {
+    create_f = function(shape = 1, rate = 1, scale = 1 / rate) {
       fun_txt <- paste0(
-      "function(x)
-      {
-        fx <- ifelse(x < 0, 0, (1 / (gamma(", shape, ") * ", scale ,"^", shape, ") * x ^ (", shape, " - 1) * exp(-x /", scale ,")))
+      "function(x) {
+        fx <- ifelse(x < 0, 0, (1 / (gamma(", shape, ") * ", scale, "^", shape, ") * x ^ (", shape, " - 1) * exp(-x /", scale, ")))
         fx <- ifelse(is.nan(fx), 0, fx)
         return(fx)
       }"
@@ -117,27 +118,27 @@ pbgrids <- list(
       return(eval(parse(text = fun_txt)))
     },
     set_modes = function(shape, scale) {
-      if(shape < 1) 0 else (shape-1) * scale
+      if (shape < 1) 0 else (shape - 1) * scale
     },
     lb = 0,
     rb = Inf
   ),  srbeta = list(
-    Cnum = 11,
+    c_num = 11,
     tails_method = "ARS",
     scalable = FALSE,
     std_params = list(shape1 = 1.1, shape2 = 2),
-    transform_params = function(par){
+    transform_params = function(par) {
       return(par)
     },
     create_f = function(shape1, shape2) {
       fun_txt <- paste0(
         "function(x){
-        fx <- (x^(",shape1,"-1) * (1 - x)^(",shape2," - 1)) / beta(",shape1,",",shape2,")
+        fx <- (x^(", shape1, "-1) * (1 - x)^(", shape2, " - 1)) / beta(", shape1, ",", shape2, ")
         return(fx)
         }")
       return(eval(parse(text = fun_txt)))
     },
-    set_modes = function(shape1 , shape2){
+    set_modes = function(shape1, shape2) {
       return((shape1 - 1) / (shape1 + shape2 - 2))
     },
     lb = 0,
@@ -149,60 +150,60 @@ stors_env <- new.env(parent = emptyenv())
 
 
 .onLoad <- function(lib, pkg) {
-  
+
 
   data_dir <- tools::R_user_dir("stors", "data")
-  
+
   builtin_grids_dir <- file.path(data_dir, "builtin_grids")
-  
+
   user_grids_dir <- file.path(data_dir, "user_grids")
-  
-  
+
+
   if (!dir.exists(builtin_grids_dir))
     dir.create(builtin_grids_dir, recursive = TRUE)
-  
-  
+
+
   if (!dir.exists(user_grids_dir))
     dir.create(user_grids_dir, recursive = TRUE)
-  
+
   user_cnum_counter <- 101
   user_session_cached_grid_locks <- data.frame(lock = character(), cnum = numeric())
-  
+
   assign("builtin_grids_dir", builtin_grids_dir, envir = stors_env)
   assign("user_grids_dir", user_grids_dir, envir = stors_env)
   assign("user_cnum_counter", user_cnum_counter, envir = stors_env)
   assign("user_session_cached_grid_locks", user_session_cached_grid_locks, envir = stors_env)
-  
-  
+
+
   builtin_grids <- list.files(builtin_grids_dir)
-  
-  if(length(builtin_grids) == 0 ){
-    
+
+  if (length(builtin_grids) == 0) {
+
 
      for (name in names(pbgrids)) {
 
 
-        fun_name <- paste0(name,'_optimize')
+        fun_name <- paste0(name, "_optimize")
         do.call(fun_name, list(steps = 4091))
 
      }
-    
-  }else{
-    
-    for(grid_name in builtin_grids){
-      
+
+  } else {
+
+    for (grid_name in builtin_grids) {
+
       grid_path <- file.path(builtin_grids_dir, grid_name)
       grid <- readRDS(grid_path)
-      
-      if(is_valid_grid(grid))
+
+      if (is_valid_grid(grid))
         cache_grid_c(grid$cnum, grid)
-      
-      
-      
+
+
+
     }
-    
+
   }
-  
+
 }
 
 

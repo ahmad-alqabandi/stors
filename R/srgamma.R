@@ -42,7 +42,7 @@ srgamma <- function(n = 1, x = NULL) {
 
 
 #' @export
-srgamma_optimize = function(shape = NULL,
+srgamma_optimize <- function(shape = NULL,
                             rate = NULL,
                             xl = NULL,
                             xr = NULL,
@@ -52,27 +52,24 @@ srgamma_optimize = function(shape = NULL,
                             theta = NULL,
                             target_sample_size = 1000,
                             verbose = FALSE) {
-  
-  dist_name <- 'srgamma'
-  
+
+  dist_name <- "srgamma"
+
   symmetric <- NULL
-  
+
   dendata <- pbgrids[[dist_name]]
-  
-  cnum <- dendata$Cnum + 1
-  
-  grid_type = "custom"
-  
-  if(is.null(scale)) scale <- 1 / rate
-  
+
+  cnum <- dendata$c_num + 1
+
+  grid_type <- "custom"
+
+  if (is.null(scale)) scale <- 1 / rate
+
   f_params <- list(shape = shape, scale = scale) # F L
-  
-  f_params <- ifelse(sapply(f_params,is.null), 1, dendata$std_params)
-  
+  f_params <- ifelse(sapply(f_params, is.null), 1, dendata$std_params)
   modes <- dendata$set_modes(f_params$shape, f_params$scale)
-  
   f <- dendata$create_f(shape = f_params$shape, scale = f_params$scale)
-  
+
   grid_optimizer(
     dendata,
     dist_name,
@@ -90,5 +87,5 @@ srgamma_optimize = function(shape = NULL,
     cnum,
     verbose
   )
-  
+
 }

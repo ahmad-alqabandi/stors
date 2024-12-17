@@ -12,13 +12,12 @@
 #' @param x_min A scalar that represents the left cropping of the chart on the x-axis.
 #' @param x_max A scalar that represents the right cropping of the chart on the x-axis.
 #' @param ... Additional arguments passed to the \code{plot} function.
-#' 
 #' @return A plot of the target density and proposal. If \code{ggplot2} is available, it returns a \code{ggplot} object representing the plot. otherwise, it uses the base \code{plot()} function.
 #'
 #' @seealso
 #' \code{\link{print.grid}}
-#' 
-#' 
+#'
+#'
 #' @examples
 #' # Define the density function, its logarithm,
 #' # and its derivative for the standard normal distribution
@@ -36,7 +35,7 @@
 #'
 #' # To visualize the grid in a cropped area between -0.1 and 0
 #' plot(norm_grid, x_min = -0.1, x_max = 0)
-#' 
+#'
 #'@method plot grid
 #' @export
 plot.grid <- function(x,
@@ -44,35 +43,33 @@ plot.grid <- function(x,
                       x_max = NA,
                       ...) {
   grid <- x
-  n = nrow(grid$grid_data)
+  n <- nrow(grid$grid_data)
   f <- eval(parse(text = grid$dens_func))
   lf <- f
   rf <- f
-  
-  
-  
+
+
+
   if (grid$tails_method == "ARS") {
     if (!all(grid$lt_properties == 0)) {
-      lf  <- function(x)
-        exp(grid$lt_properties[5] * (x - grid$grid_data$x[1]) + grid$lt_properties[3])
+      lf  <- function(x) exp(grid$lt_properties[5] * (x - grid$grid_data$x[1]) + grid$lt_properties[3])
     }
-    
+
     if (!all(grid$rt_properties == 0)) {
-      rf  <- function(x)
-        exp(grid$rt_properties[5] * (x - grid$grid_data$x[n]) + grid$rt_properties[6])
+      rf  <- function(x) exp(grid$rt_properties[5] * (x - grid$grid_data$x[n]) + grid$rt_properties[6])
     }
   }
-  
-  
+
+
   if (is.finite(grid$grid_bounds[1])) {
     x_from <- grid$grid_bounds[1]
-  } else{
+  } else {
     x_from <- grid$grid_data$x[1] - 5
   }
-  
+
   if (is.finite(grid$grid_bounds[2])) {
     x_to <- grid$grid_bounds[2]
-  } else{
+  } else {
    x_to <- grid$grid_data$x[n] + 5
   }
 
@@ -82,36 +79,36 @@ plot.grid <- function(x,
     by = min(0.01, grid$alpha)
   )
   xl <- seq(
-    from = x_from ,
+    from = x_from,
     to = grid$grid_data$x[1],
     by = 0.01
   )
   xr <- seq(
-    from = grid$grid_data$x[n] ,
+    from = grid$grid_data$x[n],
     to = x_to,
     by = 0.01
   )
-  xs = c(xl, xx, xr)
-  
+  xs <- c(xl, xx, xr)
+
   yy <- f(xx)
   yl <- lf(xl)
   yr <- rf(xr)
-  ys = c(yl, yy, yr)
-  
+  ys <- c(yl, yy, yr)
+
   if (is.na(x_max))
-    x_max = xr[length(xr)]
-  
+    x_max <- xr[length(xr)]
+
   if (is.na(x_min))
-    x_min = xl[1]
-  
-  y_max = max(ys[x_min <= xs &  xs <= x_max])
-  y_min = min(ys[x_min <= xs &  xs <= x_max])
-  
-  grid$grid_data$s_upper[n] = yr[1]
-  grid$grid_data = rbind(c(grid$grid_data$x[1], yl[length(yl)], NA, NA), grid$grid_data)
-  
+    x_min <- xl[1]
+
+  y_max <- max(ys[x_min <= xs &  xs <= x_max])
+  y_min <- min(ys[x_min <= xs &  xs <= x_max])
+
+  grid$grid_data$s_upper[n] <- yr[1]
+  grid$grid_data <- rbind(c(grid$grid_data$x[1], yl[length(yl)], NA, NA), grid$grid_data)
+
   n <- n + 1
-  
+
   if (requireNamespace("ggplot2", quietly = TRUE)) {
     suppressWarnings({
     ggplot2::ggplot() +
@@ -125,8 +122,8 @@ plot.grid <- function(x,
         color = "green"
       ) +
       ggplot2::geom_line(ggplot2::aes(x = xx, y = yy), color = "black")  +
-      ggplot2::geom_line(ggplot2::aes(x = xl, y = yl), color = "red", linetype="dotted") +
-      ggplot2::geom_line(ggplot2::aes(x = xr, y = yr), color = "red", linetype="dotted") +
+      ggplot2::geom_line(ggplot2::aes(x = xl, y = yl), color = "red", linetype = "dotted") +
+      ggplot2::geom_line(ggplot2::aes(x = xr, y = yr), color = "red", linetype = "dotted") +
       ggplot2::geom_segment(
         ggplot2::aes(
           x = grid$grid_data$x[(n - 1)],
@@ -141,11 +138,11 @@ plot.grid <- function(x,
       ggplot2::coord_cartesian(xlim = c(x_min, x_max),
                                ylim = c(y_min, y_max))
     })
-  } else{
+  } else {
     class(grid) <- "list"
     plot(grid, ...)
   }
-  
+
 }
 
 
@@ -161,7 +158,7 @@ plot.grid <- function(x,
 #'
 #' @param x A list generated using STORS' \code{build_grid()} or \code{grid_optimizer()} functions.
 #' @param ... Additional arguments passed to the \code{print} function.
-#' 
+#'
 #' @return Prints a summary of the grid's properties, but does not return any value.
 #'
 #' @examples
@@ -182,22 +179,20 @@ plot.grid <- function(x,
 #' @export
 #' @method print grid
 print.grid <- function(x, ...) {
-  
+
   grid <- x
-  
+
   # Format the number of steps with commas and without scientific notation
   formatted_steps <- format(grid$steps_number, big.mark = ",", scientific = FALSE)
-  
+
   # Calculate the domain range
   domain_start <- grid$grid_data$x[1]
   n <- length(grid$grid_data$x)
   domain_end <- grid$grid_data$x[n]
 
-  if(!is.null(grid$symmetric)) mul = 2 else mul = 1
-  
   # Calculate sampling efficiency
   sampling_efficiency <- (grid$target_function_area / (sum(grid$areas))) * 100
-  
+
   # Improved printing with clearer structure
   cat("\n=========================================\n")
   cat("Grid Summary\n")
@@ -206,7 +201,7 @@ print.grid <- function(x, ...) {
   cat("Steps range:     [", sprintf("%.6f", domain_start), ", ", sprintf("%.6f", domain_end), "]\n")
   cat(sprintf("Sampling efficiency: %.2f%%", sampling_efficiency), "\n")
   cat("=========================================\n\n")
-  
+
 }
 
 
@@ -233,7 +228,7 @@ print.grid <- function(x, ...) {
 #'
 #' # Example 2: Create and Save a Grid for a Bimodal Distribution
 #' f_bimodal <- function(x) {
-#'   0.5 * (1 / sqrt(2 * pi)) * exp(-(x^2) / 2) + 
+#'   0.5 * (1 / sqrt(2 * pi)) * exp(-(x^2) / 2) +
 #'   0.5 * (1 / sqrt(2 * pi)) * exp(-((x - 4)^2) / 2)
 #' }
 #' modes_bimodal = c(0, 4)
@@ -243,7 +238,7 @@ print.grid <- function(x, ...) {
 #'
 #' # To print all stored grids after saving bimodal_grid
 #' print_grids()
-#' 
+#'
 #' @export
 print_grids <- function() {
 
@@ -251,7 +246,7 @@ print_grids <- function() {
 
   if (length(user_grids) == 0) {
     message("No grids are currently stored.")
-  } else{
+  } else {
     grids <- list.files(path = stors_env$user_grids_dir,
                         full.names = TRUE)
     grids_details <- file.info(grids)
@@ -261,7 +256,7 @@ print_grids <- function() {
                            digits = 2)
     cat("grids_size : ", grids_sizes, " KB")
   }
-  
+
 }
 
 
@@ -281,10 +276,10 @@ print_grids <- function() {
 #' @return
 #' This function will produce an error if the grid is not generated by the \code{build_grid()} function. Otherwise, it successfully saves the grid without returning any value upon completion.
 #' @export
-#' 
-#' 
+#'
+#'
 #' @import digest digest
-#' 
+#'
 #' @examples
 #' # First, let's create a grid to sample from a standard normal distribution
 #' f_normal <- function(x) { 0.3989423 * exp( -0.5 * x^2) }
@@ -298,14 +293,13 @@ print_grids <- function() {
 #' # To make sure the `normal_grid` has been stored in R's internal data directory,
 #' # we can print all saved grids using `print_grids()`
 #' print_grids()
-#' 
+#'
 save_grid <- function(grid, grid_name) {
-  if(!is_valid_grid(grid))
+  if (!is_valid_grid(grid))
     stop("This grid is not valid")
-  
+
   grids_file_path <- file.path(stors_env$user_grids_dir, paste0(grid_name, ".rds"))
   saveRDS(grid, grids_file_path)
-  efficiency <- (1 / sum(grid$areas))
 }
 
 
@@ -340,17 +334,17 @@ save_grid <- function(grid, grid_name) {
 #'
 #' # Now, when we print all stored grids, the "normal" grid will no longer be listed
 #' print_grids()
-#' 
+#'
 delete_grid <- function(grid_name) {
-  
+
   user_grids <- list.files(stors:::stors_env$user_grids_dir)
-  grid_name <- paste0(grid_name,".rds")
-  
+  grid_name <- paste0(grid_name, ".rds")
+
   stopifnot("This grid does not exist." = grid_name %in% user_grids)
-  
+
   file.remove(file.path(stors:::stors_env$user_grids_dir, grid_name))
   cat(grid_name, "grid deleted successfully")
-  
+
 }
 
 
@@ -379,33 +373,30 @@ delete_grid <- function(grid_name) {
 #' # it can be loaded from the machine as follows:
 #' loaded_normal_grid <- load_grid("normal")
 #' print(loaded_normal_grid)
-#'  
+#'
 load_grid <- function(grid_name) {
-  
-  grid_name <- paste0(grid_name,".rds")
-  
+
+  grid_name <- paste0(grid_name, ".rds")
+
   user_grids <- list.files(stors_env$user_grids_dir)
-  
-  if(grid_name %in% user_grids){
-    
-    grid_path <- file.path(stors_env$user_grids_dir,grid_name)
-    
+
+  if (grid_name %in% user_grids) {
+
+    grid_path <- file.path(stors_env$user_grids_dir, grid_name)
+
     grid <- readRDS(grid_path)
-    
-    if(!is_valid_grid(grid))
+
+    if (!is_valid_grid(grid))
       stop("This grid is not valid")
-    
+
     return(grid)
-    
-    
-  }else{
+
+
+  }else {
     stop("There is no grid named '",
          grid_name,
          "' stored on your machine.")
   }
-  
-  
+
+
 }
-
-
-

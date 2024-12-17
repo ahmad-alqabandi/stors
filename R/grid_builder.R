@@ -207,9 +207,7 @@ build_grid <- function(lb = -Inf,
 
 
 
-construct_left_and_right_steps <- function(gp, opt_area, mode_n){
-
-
+construct_left_and_right_steps <- function(gp, opt_area, mode_n) {
   total_steps <- gp$proposal$steps
   lstpsp <- gp$proposal$left_steps_proportion
   rstpsp <- gp$proposal$right_steps_proportion
@@ -219,8 +217,7 @@ construct_left_and_right_steps <- function(gp, opt_area, mode_n){
 
 
   for (mode_i in  (1:mode_n)) {
-    if ((mode_i != 1) || is.null(lstpsp))
-    {
+    if ((mode_i != 1) || is.null(lstpsp)) {
       left_steps[[mode_i]] <- find_left_steps(
         gp = gp,
         area = opt_area,
@@ -230,8 +227,7 @@ construct_left_and_right_steps <- function(gp, opt_area, mode_n){
       if (!is.null(lstpsp))
         total_steps <- total_steps -  left_steps[[mode_i]]$steps
     }
-    if ((mode_i != mode_n) || is.null(rstpsp))
-    {
+    if ((mode_i != mode_n) || is.null(rstpsp)) {
       right_steps[[mode_i]] <- find_right_steps(
         gp = gp,
         area = opt_area,
@@ -244,16 +240,15 @@ construct_left_and_right_steps <- function(gp, opt_area, mode_n){
     }
   }
 
-  if (!is.null(rstpsp) || !is.null(lstpsp))
-  {
-    steps_lim_left = round(lstpsp * total_steps)
+  if (!is.null(rstpsp) || !is.null(lstpsp)) {
+    steps_lim_left <- round(lstpsp * total_steps)
     left_steps[[1]] <- find_left_steps(
       gp = gp,
       area = opt_area,
       mode_i = 1,
       steps_lim = steps_lim_left
     )
-    steps_lim_right = total_steps - steps_lim_left
+    steps_lim_right <- total_steps - steps_lim_left
     right_steps[[mode_n]] <- find_right_steps(
       gp = gp,
       area = opt_area,
@@ -276,7 +271,6 @@ construct_left_and_right_steps <- function(gp, opt_area, mode_n){
 
 #' @importFrom utils head
 build_final_grid <- function(gp, opt_area = NULL) {
-
   if (is.null(opt_area))
     opt_area <- gp$proposal$optimal_step_area
 
@@ -295,12 +289,6 @@ build_final_grid <- function(gp, opt_area = NULL) {
   cnum <- gp$cnum
   f_area <- gp$target$estimated_area
 
-
-  if(gp$built_in){
-    density_name = gp$density_name
-  }else{
-    density_name = NULL
-  }
 
 
   grid_bounds <- rep(NA, 2)
@@ -354,7 +342,7 @@ build_final_grid <- function(gp, opt_area = NULL) {
       }
     }
 
-  }else{
+  } else {
     final_grid <- grids[[1]]$data
     proposal_areas[2] <- grids[[1]]$steps * opt_area
     g_len[length(g_len) + 1] <- grids[[1]]$steps
@@ -365,26 +353,34 @@ build_final_grid <- function(gp, opt_area = NULL) {
   xm <- final_grid$x[steps_number + 1]
 
 
-   if(!is.null(symmetric)) steps_number = steps_number * 2
+  if (!is.null(symmetric))
+    steps_number <- steps_number * 2
 
   if (identical(tails_method, "ARS")) {
-    tails_area = tails_ars(final_grid, f, h, h_prime, modes, lb, rb)
+    tails_area <- tails_ars(final_grid, f, h, h_prime, modes, lb, rb)
 
-    if(modes[1] == lb) proposal_areas[1] = 0 else  proposal_areas[1] <- tails_area$lta
+    if (modes[1] == lb)
+      proposal_areas[1] <- 0
+    else
+      proposal_areas[1] <- tails_area$lta
 
-    if(modes[mode_n] == rb) proposal_areas[3] = 0 else proposal_areas[3] <- tails_area$rta
+    if (modes[mode_n] == rb)
+      proposal_areas[3] <- 0
+    else
+      proposal_areas[3] <- tails_area$rta
 
-  } else{
-    if(modes[1] == lb) {
-      proposal_areas[1] = 0
-      } else{
-        proposal_areas[1] <- cdf(x1) - cdf(lb)
-      }
+  } else {
+    if (modes[1] == lb) {
+      proposal_areas[1] <- 0
+    } else {
+      proposal_areas[1] <- cdf(x1) - cdf(lb)
+    }
 
-    if(modes[mode_n] == rb)
-    {proposal_areas[3] = 0
-    } else{
-        proposal_areas[3] <- cdf(rb) - cdf(xm)}
+    if (modes[mode_n] == rb) {
+      proposal_areas[3] <- 0
+    } else {
+      proposal_areas[3] <- cdf(rb) - cdf(xm)
+    }
   }
 
   normalizing_con <- sum(proposal_areas)
@@ -397,11 +393,13 @@ build_final_grid <- function(gp, opt_area = NULL) {
 
   if (identical(tails_method, "ARS")) {
     if (proposal_areas[1] != 0) {
-      lt_properties <- c(exp(h_upper(x1, lb, h_prime, h)),
-                         normalizing_con * h_prime(x1),
-                         h(x1),
-                         1 / h_prime(x1),
-                         h_prime(x1))
+      lt_properties <- c(
+        exp(h_upper(x1, lb, h_prime, h)),
+        normalizing_con * h_prime(x1),
+        h(x1),
+        1 / h_prime(x1),
+        h_prime(x1)
+      )
     }
 
     if (proposal_areas[3] != 0) {
@@ -416,10 +414,13 @@ build_final_grid <- function(gp, opt_area = NULL) {
     }
   }
 
-  grid_bounds[1] = lb
-  grid_bounds[2] = rb
+  grid_bounds[1] <- lb
+  grid_bounds[2] <- rb
 
-  if(is.null(symmetric)) is_symmetric = FALSE else is_symmetric = TRUE
+  if (is.null(symmetric))
+    is_symmetric <- FALSE
+  else
+    is_symmetric <- TRUE
 
   invisible(
     list(
@@ -448,9 +449,7 @@ build_final_grid <- function(gp, opt_area = NULL) {
 #' @noRd
 find_left_steps <- function(gp, area, mode_i, steps_lim = Inf) {
   lb <- gp$target$left_bound
-  rb <- gp$target$right_bound
   mode <- gp$target$modes[mode_i]
-  mode_n <- gp$target$modes_count
   f <- gp$target$density
   theta <- gp$proposal$pre_acceptance_threshold
   grid_range <- gp$proposal$grid_range
@@ -473,18 +472,19 @@ find_left_steps <- function(gp, area, mode_i, steps_lim = Inf) {
     f_x_previous <- f(x_previous)
     while (TRUE) {
       x_c <- x_previous - area / f_x_previous
+
       if (i >= steps_lim ||
           x_c < lb ||
           (mode_i == 1 &&
-           ((f(x_c) / f_x_previous  <= theta) ||
-            x_previous < grid_range[1]))) {
+           ((f(x_c) / f_x_previous  <= theta) || x_previous < grid_range[1])))
         break
-      }
+
       f_x <- f(x_c)
+
       if (f(x_c) > f_x_previous ||
-          (!is.na(mode_previous) && x_c <  mode_previous)) {
+          (!is.na(mode_previous) && x_c <  mode_previous))
         break
-      }
+
       i <- i + 1
       x[i] <- x_c
       s_upper[i] <- f_x_previous
@@ -503,7 +503,7 @@ find_left_steps <- function(gp, area, mode_i, steps_lim = Inf) {
     s_upper_lower = s_upper_lower
   )
 
-  d <- d[rev(1:nrow(d)), ]
+  d <- d[rev(seq_along(row(d))), ]
 
   d <- subset(d, rowSums(is.na(d)) != ncol(d))
 
@@ -512,13 +512,7 @@ find_left_steps <- function(gp, area, mode_i, steps_lim = Inf) {
 
 
 #' @noRd
-find_right_steps <- function(gp,
-                             area,
-                             mode_i,
-                             steps_lim = Inf
-                             ) {
-
-  lb <- gp$target$left_bound
+find_right_steps <- function(gp, area, mode_i, steps_lim = Inf) {
   rb <- gp$target$right_bound
   mode <- gp$target$modes[mode_i]
   mode_n <- gp$target$modes_count
@@ -558,7 +552,6 @@ find_right_steps <- function(gp,
           (!is.na(mode_next) && x_next >  mode_next)) {
         x[r] <- x_c
         s_upper[r] <- f_x
-        r_tail_area <- 0
         s_lower[r] <- s_upper_lower[r] <- p_a[r] <- NA
         break
       }
@@ -594,26 +587,26 @@ h_upper <- function(grid_point, val, h_prime, h) {
 
 #' @noRd
 tails_ars <- function(grid, f, h, h_prime, modes, lb, rb) {
-  steps = length(grid$x)
-  modes_n = length(modes)
+  steps <- length(grid$x)
+  modes_n <- length(modes)
   # left tail
   if (lb == Inf) {
     l_tail_area <- (1 / h_prime(grid$x[1])) * f(grid$x[1])
-  } else{
-    if(modes[1] == grid$x[1]){
+  } else {
+    if (modes[1] == grid$x[1]) {
       l_tail_area <- 0
-    }else{
-    l_tail_area <- (1 / h_prime(grid$x[1])) * (f(grid$x[1]) - exp(h_upper(grid$x[1], lb, h_prime, h)))
+    } else {
+      l_tail_area <- (1 / h_prime(grid$x[1])) * (f(grid$x[1]) - exp(h_upper(grid$x[1], lb, h_prime, h)))
     }
   }
   #right tails
   if (rb == Inf) {
     r_tail_area <- (1 / h_prime(grid$x[steps])) * -f(grid$x[steps])
   } else {
-    if(modes[modes_n] == grid$x[steps]){
+    if (modes[modes_n] == grid$x[steps]) {
       r_tail_area <- 0
-    }else{
-    r_tail_area <- (1 / h_prime(grid$x[steps])) * (exp(h_upper(grid$x[steps], rb, h_prime, h)) - f(grid$x[steps]))
+    } else {
+      r_tail_area <- (1 / h_prime(grid$x[steps])) * (exp(h_upper(grid$x[steps], rb, h_prime, h)) - f(grid$x[steps]))
     }
   }
 
@@ -625,13 +618,15 @@ tails_ars <- function(grid, f, h, h_prime, modes, lb, rb) {
 stors_prime <- function(mode, h) {
   function(x) {
     if (x < mode[1]) {
-      x0 = x + 0.0000001
+      x0 <- x + 0.0000001
     } else if (x > utils::tail(mode, 1)) {
-      x0 = x - 0.0000001
-    } else{
-      if(x == mode[1])
-        warning("First step in the grid starts at mode[1].\nNo Adaptive Rejection Sampling (ARS) for left tail.")
-      if(x == utils::tail(mode, 1))
+      x0 <- x - 0.0000001
+    } else {
+      if (x == mode[1])
+        warning(
+          "First step in the grid starts at mode[1].\nNo Adaptive Rejection Sampling (ARS) for left tail."
+        )
+      if (x == utils::tail(mode, 1))
         warning("Last step in the grid ends at mode[n].\nNo ARS for right tail.")
 
       return(0)
@@ -640,4 +635,3 @@ stors_prime <- function(mode, h) {
   }
 
 }
-

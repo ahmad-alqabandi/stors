@@ -107,7 +107,7 @@ srnorm_custom <- function(n = 1, x = NULL) {
 #' @param symmetric (optional) Logical if True then only one half of the grid is built ti the left to the mode and a coin toss is used to determine weather to reflect around the mode, this allows a dencer grid for the same memory at the cost of an additional uniform draw "default is `FALSE`"
 #'
 #' @export
-srnorm_optimize = function(
+srnorm_optimize <- function(
   mean = NULL,
   sd = NULL,
   xl = -Inf,
@@ -119,29 +119,28 @@ srnorm_optimize = function(
   verbose = FALSE,
   symmetric = NULL) {
 
-  dist_name <- 'srnorm'
+  dist_name <- "srnorm"
 
   dendata <- pbgrids[[dist_name]]
 
   f_params <- list(mean = mean, sd = sd)
 
-  if(dendata$scalable){
-
+  if (dendata$scalable) {
     isnull <- sapply(f_params, is.null)
 
-    if(all(isnull)){
-      cnum <- dendata$Cnum
-      grid_type = "scaled"
-    }else{
-      cnum <- dendata$Cnum + 1
-      grid_type = "custom"
+    if (all(isnull)) {
+      cnum <- dendata$c_num
+      grid_type <- "scaled"
+    } else {
+      cnum <- dendata$c_num + 1
+      grid_type <- "custom"
     }
 
     f_params <- ifelse(isnull, dendata$std_params, f_params)
 
-  }else{
-    cnum <- dendata$Cnum + 1
-    grid_type = "custom"
+  } else {
+    cnum <- dendata$c_num + 1
+    grid_type <- "custom"
   }
 
   modes <- dendata$set_modes(f_params$mean)

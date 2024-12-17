@@ -38,7 +38,7 @@ To sample from the tails of \( f(x) \) using ARS, we need the log transformation
 ```{r , echo = TRUE}
 library(stors)
 
-modes_bi = c(0.00134865, 3.99865)
+modes_bi <- c(0.00134865, 3.99865)
 
 f_bi <- function(x) {
   0.5 * dnorm(x, mean = 0, sd = 1) + 0.5 * dnorm(x, mean = 4, sd = 1)
@@ -47,12 +47,12 @@ f_bi <- function(x) {
 h_bi <- function(x) log(f_bi(x))
 
 h_prime_bi <- function(x) {
-  num = -0.5 * x * dnorm(x, mean = 0, sd = 1) - 0.5 * (x - 4) * dnorm(x, mean = 4, sd = 1)
-  den = f_bi(x)
+  num <- -0.5 * x * dnorm(x, mean = 0, sd = 1) - 0.5 * (x - 4) * dnorm(x, mean = 4, sd = 1)
+  den <- f_bi(x)
   num / den
 }
 
-bi_grid = build_grid(lb = -Inf, rb = Inf, modes = modes_bi, f =f_bi, h = h_bi, h_prime = h_prime_bi)
+bi_grid <- build_grid(lb = -Inf, rb = Inf, modes = modes_bi, f = f_bi, h = h_bi, h_prime = h_prime_bi)
 ```
 
 After building the desired grid with `build_grid()`, you can explore its properties using the `print()` function and visualize its structure using the `plot()` function. This step is similar to what was done previously with the built-in grid and helps in understanding the grid's configuration and ensuring that it aligns with the requirements of the target distribution.
@@ -69,10 +69,10 @@ Once the grid is configured and validated, it can be passed to the `stors()` fun
 
 ```{r , echo = TRUE}
 # Creating a sampler function using the custom grid
-bi_sampler = stors(bi_grid)
+bi_sampler <- stors(bi_grid)
 
 # Generating samples from the target distribution
-samples = bi_sampler(10^6)
+samples <- bi_sampler(10^6)
 hist(samples)
 ```
 
@@ -81,6 +81,7 @@ To sample from a truncated user-defined distribution, simply provide the lower a
 
 Example: Sampling from a Truncated Multi-Modal Distribution
 ```{r , echo = TRUE}
+
 
 # Define modes for the multi-modal distribution
 modes_bi <- c(0.00134865, 3.99865)
@@ -97,20 +98,30 @@ bi_grid_trunc_grid <- build_grid(
 )
 
 # Visualize the truncated grid
-plot(bi_grid_trunc_grid, main = "Truncated Multi-Modal Grid (-1, 6)", xlab = "Value", col = "skyblue")
+plot(
+  bi_grid_trunc_grid,
+  main = "Truncated Multi-Modal Grid (-1, 6)",
+  xlab = "Value",
+  col = "skyblue"
+)
 
 # Create a sampler for the truncated distribution
 bi_sampler_trunc_sampler <- stors(bi_grid_trunc_grid)
 
 # Generate 10^3 samples from the truncated distribution
-sample <- bi_sampler_trunc_sampler(10^3)
+sample <- bi_sampler_trunc_sampler(10 ^ 3)
 
 # Generate 10^3 samples from the truncated distribution
-sample <- bi_sampler_trunc_sampler(10^3)
+sample <- bi_sampler_trunc_sampler(10 ^ 3)
 
 # Visualize the generated samples
-hist(sample, main = "Histogram of Samples from Truncated Multi-Modal Distribution", 
-     xlab = "Value", col = "lightgreen", border = "white")
+hist(
+  sample,
+  main = "Histogram of Samples from Truncated Multi-Modal Distribution",
+  xlab = "Value",
+  col = "lightgreen",
+  border = "white"
+)
 
 
 
@@ -127,7 +138,7 @@ save_grid(bi_grid, "bimodal_grid")
 To load and use the grid in future sessions, you only need to use the `load_grid()` function.
 
 ```{r , echo = TRUE}
-bi_grid = load_grid("bimodal_grid")
+bi_grid <- load_grid("bimodal_grid")
 ```
 
 In case you want to view a list of all previously stored grids, the `print_grids()` function will provide you with all stored grids.

@@ -50,11 +50,6 @@ With the optimized grid ready, sampling from a Normal distribution with specific
 standard_normal_samples <- srnorm(10, mean = 2, sd = 1)
 print(standard_normal_samples)
 
-# Generating 10 samples from a Normal distribution with mean = 4 and standard deviation = 2
-# Uncomment the following lines to generate these samples:
-# general_normal_samples <- srnorm(10, mean = 4, sd = 2)
-# print(general_normal_samples)
-
 ```
 
 On the other hand, users can optimize a proposal grid for a specific Normal distribution by calling \code{srnorm_optimize()} and passing the desired \code{mean} and \code{sd} arguments. In this case, a unique grid will be optimized and cached in memory. To sample from this custom grid, the user can use the \code{srnorm_custom()} function by simply specifying the sample size.
@@ -155,21 +150,21 @@ For users who are less familiar with the target distribution, or want to focus o
 
 ```{r , echo = TRUE}
 # Customizing the grid for a specific sample size
-custom_grid = srnorm_optimize(target_sample_size = 10000)
+custom_grid <- srnorm_optimize(target_sample_size = 10000)
 
 print(custom_grid)
 
 plot(custom_grid)
 
 # Customizing the grid with a specific pre-acceptance threshold
-custom_grid_high_theta = srnorm_optimize(theta = 0.9)
+custom_grid_high_theta <- srnorm_optimize(theta = 0.9)
 
 print(custom_grid_high_theta)
 
 plot(custom_grid_high_theta)
 
 # Customizing the grid within a specific range
-custom_grid_range = srnorm_optimize(grid_range = c(-1, 1))
+custom_grid_range <- srnorm_optimize(grid_range = c(-1, 1))
 
 print(custom_grid_range)
 
@@ -183,11 +178,11 @@ By setting the `steps` parameter, users can determine the resolution of the grid
 
 ```{r , echo = TRUE}
 # Customizing the grid with a specific number of steps
-custom_grid_steps = srnorm_optimize(steps = 50)
+custom_grid_steps <- srnorm_optimize(steps = 50)
 
 plot(custom_grid_steps)
 
-custom_grid_steps = srnorm_optimize( steps = 500)
+custom_grid_steps <- srnorm_optimize(steps = 500)
 
 plot(custom_grid_steps)
 
@@ -234,8 +229,7 @@ plot(grid, main = "Truncated Standard Normal Grid (-1, 1)", xlab = "Value", col 
 sample <- srnorm_custom(10^4)
 
 # Visualize the generated samples
-hist(sample, main = "Histogram of Samples from Truncated Standard Normal", 
-     xlab = "Value", col = "lightgreen", border = "white")
+hist(sample, main = "Histogram of Samples from Truncated Standard Normal", xlab = "Value", col = "lightgreen", border = "white")
 
 ```
 
@@ -244,9 +238,9 @@ hist(sample, main = "Histogram of Samples from Truncated Standard Normal",
 There are many built-in functions in stors, the list below shows all available functions that can be used directly by the user after optimizing the grids:
 
 ```{r, echo = FALSE}
-funcs = character()
-for( name in names(stors:::pbgrids)){
-  funcs = cat(funcs," ",name)
+funcs <- character()
+for (name in names(stors:::pbgrids)) {
+  funcs <- cat(funcs, " ", name)
 }
 ```
 
@@ -267,20 +261,20 @@ To sample from the tails of $f(x)$ using ARS, we need the log transformation of 
 
 ```{r , echo = TRUE}
 
-modes_bi = c(0.00134865,3.99865)
+modes_bi <- c(0.00134865, 3.99865)
 
 f_bi <- function(x) {
-  0.5 * (sqrt(2 * pi))^(-1) * exp(-(x^2)/2) + 0.5 * ( sqrt(2 * pi))^(-1) * exp(-((x - 4)^2)/2)
+  0.5 * (sqrt(2 * pi))^(-1) * exp(-(x^2) / 2) + 0.5 * (sqrt(2 * pi))^(-1) * exp(-((x - 4)^2) / 2)
 }
 
 h_bi <- function(x) log(f_bi(x))
 
 
 h_prime_bi <- function(x) {
-  (-(exp(-1/2 * (-4 + x)^2) * 0.5 * (-4 + x))/sqrt(2 * pi) - (exp(-x^2/2) * 0.5 * x)/sqrt(2 * pi))/((exp(-x^2/2) * 0.5)/sqrt(2 * pi) + (exp(-1/2 * (-4 + x)^2) * 0.5)/sqrt(2 * pi))
+  (-(exp(-1 / 2 * (-4 + x)^2) * 0.5 * (-4 + x)) / sqrt(2 * pi) - (exp(-x^2 / 2) * 0.5 * x) / sqrt(2 *  pi)) / ((exp(-x^2 / 2) * 0.5) / sqrt(2 * pi) + (exp(-1 / 2 * (-4 + x)^2) * 0.5) / sqrt(2 * pi))
 }
 
-bi_grid = build_grid(lb = -Inf, rb = Inf, modes = modes_bi, f = f_bi, h = h_bi, h_prime = h_prime_bi)
+bi_grid <- build_grid(lb = -Inf, rb = Inf, modes = modes_bi, f = f_bi, h = h_bi, h_prime = h_prime_bi)
 
 plot(bi_grid)
 
@@ -303,12 +297,12 @@ Once the grid is configured and validated, it can be passed to the `stors()` fun
 ```{r , echo = TRUE}
 
 # Creating a sampler function using the custom grid
-bi_sampler = stors(bi_grid)
+bi_sampler <- stors(bi_grid)
 
 plot(bi_grid)
 
 # Generating samples from the target distribution
-sample = bi_sampler(10^3)
+sample <- bi_sampler(10^3)
 
 hist(sample, main = "Sample Generated From Multi-modal Distribution ", xlab = "Value", col = "lightblue", border = "white")
 
@@ -348,8 +342,13 @@ sample <- bi_sampler_trunc_sampler(10^3)
 sample <- bi_sampler_trunc_sampler(10^3)
 
 # Visualize the generated samples
-hist(sample, main = "Histogram of Samples from Truncated Multi-Modal Distribution", 
-     xlab = "Value", col = "lightgreen", border = "white")
+hist(
+  sample,
+  main = "Histogram of Samples from Truncated Multi-Modal Distribution",
+  xlab = "Value",
+  col = "lightgreen",
+  border = "white"
+)
 
 
 
@@ -362,13 +361,13 @@ The grid stored in `bi_grid` will not be preserved across sessions. Therefore, i
 
 ```{r , echo = TRUE}
 
-save_grid(bi_grid,"bimodal_grid")
+save_grid(bi_grid, "bimodal_grid")
 
 ```
 
 ```{r , include = FALSE}
 for (i in 1:3) {
-  save_grid(bi_grid,paste0("bimodal_grid_",i))
+  save_grid(bi_grid, paste0("bimodal_grid_", i))
 }
 
 ```
@@ -377,7 +376,7 @@ To load and use the grid in future sessions, the user only needs to use the `loa
 
 ```{r , echo = TRUE}
 
-bi_grid = load_grid("bimodal_grid")
+bi_grid <- load_grid("bimodal_grid")
 
 ```
 
@@ -401,7 +400,6 @@ print_grids()
 
 ```{r , include = FALSE}
 for (i in 1:3) {
-  delete_grid(paste0("bimodal_grid_",i))
+  delete_grid(paste0("bimodal_grid_", i))
 }
-
 ```

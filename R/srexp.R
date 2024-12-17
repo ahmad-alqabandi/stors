@@ -18,10 +18,8 @@
 #' \code{srexp()} returns a sample of size \code{n} from a standard exponential distribution.
 #'
 #' @examples
-#' 
 #' # Optimize the grid for Exponential distribution
 #' grid_optimizer("srexp")
-#' 
 #' # Generating Samples from a Standard Exponential Distribution
 #' # This example illustrates how to generate 10 samples,
 #' # from a standard exponential distribution.
@@ -44,7 +42,7 @@ srexp_custom <- function(n = 1, x = NULL) {
 
 
 #' @export
-srexp_optimize = function(
+srexp_optimize <- function(
     rate = NULL,
     xl = NULL,
     xr = NULL,
@@ -54,42 +52,42 @@ srexp_optimize = function(
     target_sample_size = 1000,
     verbose = FALSE
     ) {
-  
-  dist_name <- 'srexp'
+
+  dist_name <- "srexp"
   symmetric <- NULL
-  
+
   dendata <- pbgrids[[dist_name]]
-  
+
   f_params <- list(rate = rate)
-  
-  if(dendata$scalable){
-    
+
+  if (dendata$scalable) {
+
     isnull <- sapply(f_params, is.null)
-    
-    if(all(isnull)){
-      cnum <- dendata$Cnum
-      grid_type = "scaled"
-    }else{
-      cnum <- dendata$Cnum + 1
-      grid_type = "custom"
+
+    if (all(isnull)) {
+      cnum <- dendata$c_num
+      grid_type <- "scaled"
+    } else {
+      cnum <- dendata$c_num + 1
+      grid_type <- "custom"
     }
-    
+
     f_params <- ifelse(isnull, dendata$std_params, f_params)
-    
-  }else{
-    
-    cnum <- dendata$Cnum + 1
+
+  } else {
+
+    cnum <- dendata$c_num + 1
     grid_type <- "custom"
   }
-  
-  
+
+
   modes <- 0
-  
+
   f <- dendata$create_f(f_params$rate)
-  
-  
+
+
   grid_optimizer(dendata, dist_name, xl, xr, f, modes, f_params, steps,
                  grid_range, theta, target_sample_size, grid_type,
                  symmetric, cnum, verbose)
-  
+
 }
