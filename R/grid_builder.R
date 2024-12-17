@@ -215,7 +215,6 @@ construct_left_and_right_steps <- function(gp, opt_area, mode_n) {
   right_steps <- list()
   grids <- list()
 
-
   for (mode_i in  (1:mode_n)) {
     if ((mode_i != 1) || is.null(lstpsp)) {
       left_steps[[mode_i]] <- find_left_steps(
@@ -448,6 +447,7 @@ build_final_grid <- function(gp, opt_area = NULL) {
 
 #' @noRd
 find_left_steps <- function(gp, area, mode_i, steps_lim = Inf) {
+  estimated_area <- gp$target$estimated_area
   lb <- gp$target$left_bound
   mode <- gp$target$modes[mode_i]
   f <- gp$target$density
@@ -456,8 +456,7 @@ find_left_steps <- function(gp, area, mode_i, steps_lim = Inf) {
   # to check if new constructed steps get less than mode_previous due to low density value compared to area
   mode_previous <- ifelse(mode_i == 1, NA, gp$target$modes[mode_i - 1])
 
-  init_memory_res <- (min(1000, ceiling(1 / area)) + 500) * 2
-  # TODO replace 1 by the area of f
+  init_memory_res <- (min(1000, ceiling(estimated_area / area)) + 500) * 2
 
   x <- rep(NA, init_memory_res)
   s_upper <- rep(NA, init_memory_res)
@@ -476,7 +475,8 @@ find_left_steps <- function(gp, area, mode_i, steps_lim = Inf) {
       if (i >= steps_lim ||
           x_c < lb ||
           (mode_i == 1 &&
-           ((f(x_c) / f_x_previous  <= theta) || x_previous < grid_range[1])))
+           ((f(x_c) / f_x_previous  <= theta) ||
+            x_previous < grid_range[1])))
         break
 
       f_x <- f(x_c)
@@ -513,6 +513,7 @@ find_left_steps <- function(gp, area, mode_i, steps_lim = Inf) {
 
 #' @noRd
 find_right_steps <- function(gp, area, mode_i, steps_lim = Inf) {
+  estimated_area <- gp$target$estimated_area
   rb <- gp$target$right_bound
   mode <- gp$target$modes[mode_i]
   mode_n <- gp$target$modes_count
@@ -523,7 +524,7 @@ find_right_steps <- function(gp, area, mode_i, steps_lim = Inf) {
   # to check if x_next exceeds mode_next due to low density value compared to area
   mode_next <- ifelse(mode_i == mode_n, NA, gp$target$modes[mode_i + 1])
 
-  init_memory_res <- (min(1000, ceiling(1 / area)) + 500)
+  init_memory_res <- (min(1000, ceiling(estimated_area / area)) + 500)
 
   x <- rep(NA, init_memory_res)
   s_upper <- rep(NA, init_memory_res)

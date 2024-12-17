@@ -21,8 +21,8 @@ pbgrids <- list(
         ") / ", sd, "))))}")
       return(eval(parse(text = fun_txt)))
     },
-    set_modes <- function(mu = 0) {
-      mu
+    set_modes = function(mu = 0) {
+      return(mu)
       },
     lb = -Inf,
     rb = Inf

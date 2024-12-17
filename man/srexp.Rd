@@ -26,10 +26,8 @@ Exponential distribution has the density:
 Where \eqn{\lambda} is the rate parameter.
 }
 \examples{
-
 # Optimize the grid for Exponential distribution
 grid_optimizer("srexp")
-
 # Generating Samples from a Standard Exponential Distribution
 # This example illustrates how to generate 10 samples,
 # from a standard exponential distribution.

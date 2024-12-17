@@ -34,10 +34,8 @@ Laplace distribution has the density:
 Where \eqn{\mu} is the location parameter and \eqn{b} is the scale parameter.
 }
 \examples{
-
 # Optimize the grid for the Laplace distribution
 grid_optimizer("srlaplace")
-
 # Generating Samples from a Standard Laplace Distribution
 # This example illustrates how to generate 10 samples from a standard Laplace distribution.
 samples <- srlaplace(10)

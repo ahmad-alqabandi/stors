@@ -3,25 +3,11 @@
 \name{srnorm}
 \alias{srnorm}
 \alias{srnorm_custom}
-\alias{srnorm_optimize}
 \title{Sampling from the Normal Distribution}
 \usage{
 srnorm(n = 1, mean = 0, sd = 1, x = NULL)
 
 srnorm_custom(n = 1, x = NULL)
-
-srnorm_optimize(
-  mean = NULL,
-  sd = NULL,
-  xl = -Inf,
-  xr = Inf,
-  steps = NULL,
-  grid_range = NULL,
-  theta = NULL,
-  target_sample_size = 1000,
-  verbose = FALSE,
-  symmetric = NULL
-)
 }
 \arguments{
 \item{n}{Integer, length 1. Number of samples to draw.}
@@ -32,66 +18,45 @@ srnorm_optimize(
 
 \item{x}{(optional) Numeric vector of length \eqn{n}. If provided, this vector is over
 written in place to avoid any memory allocation.}
-
-\item{xl}{(optional) Scalar lower bounds.}
-
-\item{xr}{(optional) Scalar upper bounds.}
-
-\item{steps}{(optional) Scalar integer indicating the number of steps in the proposal distribution.}
-
-\item{grid_range}{(optional) Optional Vector of two elements specifying the start and end points for constructing steps along the x-axis.}
-
-\item{theta}{(optional) the minimum acceptable pre-acceptance value for the grid which indirectly determine the number of steps. Can not be specified at the same time as `steps`.}
-
-\item{target_sample_size}{(optional) Scalar integer indicating the target sample size optimizer will simulate batches of this size when benchmarking.}
-
-\item{verbose}{(optional) Logical if set to `TRUE`, a table detailing the optimization areas and steps will be displayed during grid optimization.}
-
-\item{symmetric}{(optional) Logical if True then only one half of the grid is built ti the left to the mode and a coin toss is used to determine weather to reflect around the mode, this allows a dencer grid for the same memory at the cost of an additional uniform draw "default is `FALSE`"}
 }
 \value{
-A numeric vector of length \code{n} containing samples from the Normal distribution with the specified 
+A numeric vector of length \code{n} containing samples from the Normal distribution with the specified
 #TODO this is ok but when splitting. \describe{ \item{. ...}} for the grid optimizer
 \code{mean} and \code{sd}.
 
-# TODO **NOTE:** when the x parameter is specified then for performance reason x is updated inplace with the simultion
-
-# TODO add @seealso to include optimize for sample and sample for optimize (for the same distribution)
+**NOTE:** when the x parameter is specified then for performance reason x is updated in-place with the simulation
 }
 \description{
-The \code{srnorm()} function generates random samples from a Normal distribution using the STORS algorithm. 
+The \code{srnorm()} function generates random samples from a Normal distribution using the STORS algorithm.
 It employs an optimized proposal distribution around the mode and Adaptive Rejection Sampling (ARS) for the tails.
 }
 \details{
-These two function are for sampling using the STORS algorithm based on the grid that has been constructed using \code{\link{srnorm_optimize()}}.
-
-By default, \code{srnorm()} samples from a standard Normal distribution (\code{mean = 0}, \code{sd = 1}). 
-The proposal distribution is pre-optimized at package load time using \code{srnorm_optimize()} with 
-\code{steps = 4091}, creating a scalable grid centered around the mode. 
-
-If \code{srnorm()} is called with custom \code{mean} or \code{sd} parameters, the samples are generated 
-from the standard Normal distribution, then scaled and location shifted accordingly.
-
-# TODO hot to do bullet points in roxygen
-When \code{srnorm_optimize()} is explicitly called:
-- A grid is created and cached. If no parameters are provided, a standard grid is created (\code{mean = 0}, \code{sd = 1}).
-- Providing \code{mean} or \code{sd} creates a custom grid, which is cached for use with \code{srnorm_custom()}.
-- The optimization process can be controlled via parameters such as \code{steps}, \code{grid_range}, or 
-  \code{theta}. If no parameters are provided, the grid is optimized via brute force based on the 
-  \code{target_sample_size}.
-
-For efficiency, \code{srnorm_optimize()} also supports one-tailed grids via the \code{symmetric} argument. 
-This reduces memory usage for symmetrical distributions, though sampling may be slower for large samples 
-due to the additional computation required for symmetry checks.
-
-# TODO move this to top of details
 The Normal distribution has the density:
-
 \deqn{ f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{(x - \mu)^2}{2\sigma^2}} }
-
 where \eqn{\mu} is the mean and \eqn{\sigma} is the standard deviation.
 
-##TODO be more precise explaining arguments
+These two function are for sampling using the STORS algorithm based on the grid that has been constructed using \code{\link{srnorm_optimize}}.
+
+By default, \code{srnorm()} samples from a standard Normal distribution (\code{mean = 0}, \code{sd = 1}).
+The proposal distribution is pre-optimized at package load time using \code{srnorm_optimize()} with
+\code{steps = 4091}, creating a scalable grid centered around the mode.
+
+If \code{srnorm()} is called with custom \code{mean} or \code{sd} parameters, the samples are generated
+from the standard Normal distribution, then scaled and location shifted accordingly.
+
+\section{When \code{srnorm_optimize()} is explicitly called:}{
+\itemize{
+ \item A grid is created and cached. If no parameters are provided, a standard grid is created (\code{mean = 0}, \code{sd = 1}).
+ \item Providing \code{mean} or \code{sd} creates a custom grid, which is cached for use with \code{srnorm_custom()}.
+ \item The optimization process can be controlled via parameters such as \code{steps}, \code{grid_range}, or
+  \code{theta}. If no parameters are provided, the grid is optimized via brute force based on the.
+  \code{target_sample_size}.
+}
+}
+
+For efficiency, \code{srnorm_optimize()} also supports one-tailed grids via the \code{symmetric} argument.
+This reduces memory usage for symmetrical distributions, though sampling may be slower for large samples
+due to the additional computation required for symmetry checks.
 }
 \examples{
 # Generate 10 samples from the standard Normal distribution
@@ -107,4 +72,7 @@ print(x)
 samples <- srnorm(10, mean = 2, sd = 3)
 print(samples)
 
+}
+\seealso{
+\code{\link{srnorm_optimize}} to optimize the custom or the scaled proposal grid.
 }

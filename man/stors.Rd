@@ -14,20 +14,20 @@ stors(grid, xl = grid$grid_bounds[1], xr = grid$grid_bounds[2])
 \item{xr}{The upper bound for truncation. Default is the right bound of the grid.}
 }
 \value{
-Returns a function that can be used to generate samples from the specified \code{grid}. If \code{xl} and \code{xr} are provided, 
+Returns a function that can be used to generate samples from the specified \code{grid}. If \code{xl} and \code{xr} are provided,
 the samples are drawn from the truncated distribution within these bounds.
 }
 \description{
-This function generates a sampling function based on a grid created by the user using the \code{build_grid()} function. 
+This function generates a sampling function based on a grid created by the user using the \code{build_grid()} function.
 The resulting sampling function can then be used to produce samples, including those from truncated distributions.
 }
 \details{
 After a user creates a proposal grid for their desired sampling function using \code{build_grid()},
-this grid must be passed to \code{stors()} to create a sampling function for the target distribution. 
-\code{stors()} first checks whether the grid was indeed created using \code{build_grid()}. If the user has altered 
-or modified the grid returned from \code{build_grid()}, \code{stors()} will reject the altered grid; therefore, 
-no changes should be made to the grid after its creation. Once the grid is accepted by \code{stors()}, it is 
-cached in memory, allowing fast access to grid data for the compiled C code and reducing memory access latency. 
+this grid must be passed to \code{stors()} to create a sampling function for the target distribution.
+\code{stors()} first checks whether the grid was indeed created using \code{build_grid()}. If the user has altered
+or modified the grid returned from \code{build_grid()}, \code{stors()} will reject the altered grid; therefore,
+no changes should be made to the grid after its creation. Once the grid is accepted by \code{stors()}, it is
+cached in memory, allowing fast access to grid data for the compiled C code and reducing memory access latency.
 Subsequently, \code{stors()} returns a function that can be utilized to generate samples from the target distribution,
 optionally truncated between \code{xl} and \code{xr}. The truncation in \code{stors()} is achieved by truncating the proposal grid itself,
 ensuring that samples are always produced within the truncation range [\code{xl}, \code{xr}]. Therefore, if the truncation values fall within

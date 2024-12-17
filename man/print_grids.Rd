@@ -25,7 +25,7 @@ print_grids()
 
 # Example 2: Create and Save a Grid for a Bimodal Distribution
 f_bimodal <- function(x) {
-  0.5 * (1 / sqrt(2 * pi)) * exp(-(x^2) / 2) + 
+  0.5 * (1 / sqrt(2 * pi)) * exp(-(x^2) / 2) +
   0.5 * (1 / sqrt(2 * pi)) * exp(-((x - 4)^2) / 2)
 }
 modes_bimodal = c(0, 4)
