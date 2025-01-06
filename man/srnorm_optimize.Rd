@@ -14,30 +14,98 @@ srnorm_optimize(
   theta = NULL,
   target_sample_size = 1000,
   verbose = FALSE,
-  symmetric = NULL
+  symmetric = FALSE
 )
 }
 \arguments{
-\item{mean}{Numeric. Mean parameter of the Normal distribution.}
+\item{mean}{(optional) Numeric. Mean parameter of the Normal distribution. Defaults to \code{NULL}, which implies a scalable grid with \code{mean = 0}.}
 
-\item{sd}{Numeric. Standard deviation of the target Normal distribution.}
+\item{sd}{(optional) Numeric. Standard deviation of the target Normal distribution. Defaults to \code{NULL}, which implies a scalable grid with \code{sd = 1}.}
 
-\item{xl}{(optional) Scalar lower bounds.}
+\item{xl}{Numeric. Left truncation bound for the target distribution. Defaults to \code{-Inf}, representing no left truncation.}
 
-\item{xr}{(optional) Scalar upper bounds.}
+\item{xr}{Numeric. Right truncation bound for the target distribution. Defaults to \code{Inf}, representing no right truncation.}
 
-\item{steps}{(optional) Scalar integer indicating the number of steps in the proposal distribution.}
+\item{steps}{(optional) Integer. Desired number of steps in the proposal grid. Defaults to \code{NULL}, which means the number of steps is determined automatically during optimization.}
 
-\item{grid_range}{(optional) Optional Vector of two elements specifying the start and end points for constructing steps along the x-axis.}
+\item{grid_range}{(optional) Numeric vector. Specifies the range for optimizing the steps part of the proposal grid. Defaults to \code{NULL}, indicating automatic range selection.}
 
-\item{theta}{(optional) the minimum acceptable pre-acceptance value for the grid which indirectly determine the number of steps. Can not be specified at the same time as `steps`.}
+\item{theta}{(optional) Numeric. A parameter for grid optimization. Defaults to \code{NULL}.}
 
-\item{target_sample_size}{(optional) Scalar integer indicating the target sample size optimizer will simulate batches of this size when benchmarking.}
+\item{target_sample_size}{(optional) Integer. Target sample size for grid optimization. Defaults to \code{1000}.}
 
-\item{verbose}{(optional) Logical if set to `TRUE`, a table detailing the optimization areas and steps will be displayed during grid optimization.}
+\item{verbose}{Boolean. If \code{TRUE}, detailed optimization information, including areas and steps, will be displayed. Defaults to \code{FALSE}.}
 
-\item{symmetric}{(optional) Logical if True then only one half of the grid is built ti the left to the mode and a coin toss is used to determine weather to reflect around the mode, this allows a dencer grid for the same memory at the cost of an additional uniform draw "default is `FALSE`"}
+\item{symmetric}{Boolean. If \code{TRUE}, the proposal will target only the right tail of the distribution, reducing the size of the cached grid and making sampling more memory-efficient.
+An additional uniform random number will be sampled to determine the sample's position relative to the mode of the distribution.
+ While this improves memory efficiency, the extra sampling may slightly impact performance, especially when the grid efficiency is close to 1. Defaults to \code{FALSE}.}
+}
+\value{
+A list containing the optimized grid and related parameters for the specified built-in distribution:
+\describe{
+  \item{\code{grid_data}}{A data frame with detailed information about the grid steps, including:
+  \describe{
+    \item{\code{x}}{The start point of each step on the x-axis.}
+    \item{\code{s_upper}}{The height of each step on the y-axis.}
+    \item{\code{p_a}}{Pre-acceptance probability for each step.}
+    \item{\code{s_upper_lower}}{A vector used to scale the uniform random number when the sample is accepted.}
+  }}
+  \item{\code{areas}}{A numeric vector containing the areas under:
+  \describe{
+    \item{\code{left_tail}}{The left tail bound.}
+    \item{\code{steps}}{The middle steps.}
+    \item{\code{right_tail}}{The right tail bound.}
+  }}
+  \item{\code{steps_number}}{An integer specifying the number of steps in the proposal.}
+  \item{\code{sampling_probabilities}}{A numeric vector with:
+  \describe{
+    \item{\code{left_tail}}{The probability of sampling from the left tail.}
+    \item{\code{left_and_middle}}{The combined probability of sampling from the left tail and middle steps.}
+  }}
+  \item{\code{unif_scaler}}{A numeric scalar, the inverse probability of sampling from the steps part of the proposal (\eqn{\frac{1}{p(lb < x < rb)}}). Used for scaling uniform random values.}
+  \item{\code{lt_properties}}{A numeric vector of 5 values required for Adaptive Rejection Sampling (ARS) in the left tail.}
+  \item{\code{rt_properties}}{A numeric vector of 6 values required for ARS in the right tail.}
+  \item{\code{alpha}}{A numeric scalar representing the uniform step area.}
+  \item{\code{tails_method}}{A string, either \code{"ARS"} (Adaptive Rejection Sampling) or \code{"IT"} (Inverse Transform), indicating the sampling method for the tails.}
+  \item{\code{grid_bounds}}{A numeric vector specifying the left and right bounds of the target density.}
+  \item{\code{cnum}}{An integer representing the cache number of the created grid in memory.}
+  \item{\code{symmetric}}{A numeric scalar indicating the symmetry point of the grid, or \code{NULL} if not symmetric.}
+  \item{\code{f_params}}{A list of parameters for the target density that the proposal grid is designed for.}
+  \describe{
+    \item{\code{mean}}{The mean of the target distribution.}
+    \item{\code{sd}}{The standard deviation of the target distribution.}
+  }
+  \item{\code{is_symmetric}}{A logical value indicating whether the proposal grid is symmetric.}
+  \item{\code{grid_type}}{A string indicating the type of the generated grid:
+  \describe{
+    \item{\code{"scaled"}}{The grid is "scalable" and standardized with \code{mean = 0} and \code{sd = 1}. This is used when parameters \code{mean} and \code{sd} are either \code{NULL} or not provided. Scalable grids are compatible with \code{\link{srnorm}}.}
+    \item{\code{"custom"}}{The grid is "custom" when either \code{mean} or \code{sd} is provided. Custom grids are compatible with \code{\link{srnorm_custom}}.}
+  }}
+  \item{\code{target_function_area}}{A numeric scalar estimating the area of the target distribution.}
+  \item{\code{dens_func}}{A string containing the hardcoded density function.}
+  \item{\code{density_name}}{A string specifying the name of the target density distribution.}
+  \item{\code{lock}}{An identifier used for saving and loading the grid from disk.}
+}
 }
 \description{
-Optimizing Normal Distribution Grid
+When \code{srnorm_optimize()} is explicitly called:
+\itemize{
+ \item A grid is created and cached. If no parameters are provided, a standard grid is created (\code{mean = 0}, \code{sd = 1}).
+ \item Providing \code{mean} or \code{sd} creates a custom grid, which is cached for use with \code{srnorm_custom()}.
+ \item The optimization process can be controlled via parameters such as \code{steps}, \code{grid_range}, or
+  \code{theta}. If no parameters are provided, the grid is optimized via brute force based on the.
+  \code{target_sample_size}.
+}
+}
+\examples{
+# Generate scalable grid that with mean = 0 and sd = 1, that has 4096 steps
+scalable_grid <- srnorm_optimize(steps = 4096)
+
+# Generate custom grid that with mean = 2 and sd = 1
+scalable_grid <- srnorm_optimize(mean = 2, sd = 1)
+
+}
+\seealso{
+\code{\link{srnorm}}: Function to sample from a scalable grid generated by \code{srnorm_optimize()}.
+\code{\link{srnorm_custom}}: Function to sample from a custom grid tailored to user specifications.
 }

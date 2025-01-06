@@ -43,20 +43,6 @@ The proposal distribution is pre-optimized at package load time using \code{srno
 
 If \code{srnorm()} is called with custom \code{mean} or \code{sd} parameters, the samples are generated
 from the standard Normal distribution, then scaled and location shifted accordingly.
-
-\section{When \code{srnorm_optimize()} is explicitly called:}{
-\itemize{
- \item A grid is created and cached. If no parameters are provided, a standard grid is created (\code{mean = 0}, \code{sd = 1}).
- \item Providing \code{mean} or \code{sd} creates a custom grid, which is cached for use with \code{srnorm_custom()}.
- \item The optimization process can be controlled via parameters such as \code{steps}, \code{grid_range}, or
-  \code{theta}. If no parameters are provided, the grid is optimized via brute force based on the.
-  \code{target_sample_size}.
-}
-}
-
-For efficiency, \code{srnorm_optimize()} also supports one-tailed grids via the \code{symmetric} argument.
-This reduces memory usage for symmetrical distributions, though sampling may be slower for large samples
-due to the additional computation required for symmetry checks.
 }
 \examples{
 # Generate 10 samples from the standard Normal distribution
