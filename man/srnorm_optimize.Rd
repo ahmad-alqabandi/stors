@@ -41,6 +41,8 @@ An additional uniform random number will be sampled to determine the sample's po
  While this improves memory efficiency, the extra sampling may slightly impact performance, especially when the grid efficiency is close to 1. Defaults to \code{FALSE}.}
 }
 \value{
+The user does not need to store the returned value, because the package internally cashes the grid. However, we explain here the full returned grid for advanced users.
+
 A list containing the optimized grid and related parameters for the specified built-in distribution:
 \describe{
   \item{\code{grid_data}}{A data frame with detailed information about the grid steps, including:
@@ -88,6 +90,10 @@ A list containing the optimized grid and related parameters for the specified bu
 }
 }
 \description{
+The \code{srnorm_optimize()} function generates an optimized proposal grid for a targeted Normal distribution.
+ The grid can be customized and adjusted based on various options provided by the user.
+}
+\details{
 When \code{srnorm_optimize()} is explicitly called:
 \itemize{
  \item A grid is created and cached. If no parameters are provided, a standard grid is created (\code{mean = 0}, \code{sd = 1}).

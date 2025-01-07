@@ -21,10 +21,9 @@ written in place to avoid any memory allocation.}
 }
 \value{
 A numeric vector of length \code{n} containing samples from the Normal distribution with the specified
-#TODO this is ok but when splitting. \describe{ \item{. ...}} for the grid optimizer
 \code{mean} and \code{sd}.
 
-**NOTE:** when the x parameter is specified then for performance reason x is updated in-place with the simulation
+\bold{NOTE:} When the \code{x} parameter is specified, it is updated in-place with the simulation for performance reasons.
 }
 \description{
 The \code{srnorm()} function generates random samples from a Normal distribution using the STORS algorithm.

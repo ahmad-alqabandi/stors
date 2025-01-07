@@ -1,9 +1,3 @@
-# TODO finish all documentations. and make sure you are passing the check
-# TODO get structure for the paper (look at computational paper structures) is jss
-# TODO re-read the old STORS related papers
-# TODO when you finish the documentation let Louis know via email so he can test it
-
-
 #' Sampling from the Normal Distribution
 #' @rdname srnorm
 #' @order 1
@@ -36,10 +30,9 @@
 #'
 #' @return
 #' A numeric vector of length \code{n} containing samples from the Normal distribution with the specified
-#' #TODO this is ok but when splitting. \describe{ \item{. ...}} for the grid optimizer
 #' \code{mean} and \code{sd}.
 #'
-#'**NOTE:** when the x parameter is specified then for performance reason x is updated in-place with the simulation
+#' \bold{NOTE:} When the \code{x} parameter is specified, it is updated in-place with the simulation for performance reasons.
 #'
 #' @seealso
 #' \code{\link{srnorm_optimize}} to optimize the custom or the scaled proposal grid.
@@ -63,7 +56,6 @@ srnorm <- function(n = 1, mean = 0, sd = 1, x = NULL) {
   .Call(C_srnorm_scaled_check, n, c(mean, sd), x)
 }
 
-
 #' Sampling from Custom Normal Distribution
 #' @rdname srnorm
 #' @order 2
@@ -75,7 +67,11 @@ srnorm_custom <- function(n = 1, x = NULL) {
 
 #' Optimizing Normal Distribution Grid
 #' @description
+#' The \code{srnorm_optimize()} function generates an optimized proposal grid for a targeted Normal distribution.
+#'  The grid can be customized and adjusted based on various options provided by the user.
 #'
+#'
+#' @details
 #'When \code{srnorm_optimize()} is explicitly called:
 #'\itemize{
 #'  \item A grid is created and cached. If no parameters are provided, a standard grid is created (\code{mean = 0}, \code{sd = 1}).
@@ -100,6 +96,8 @@ srnorm_custom <- function(n = 1, x = NULL) {
 #'
 #'
 #' @return
+#' The user does not need to store the returned value, because the package internally cashes the grid. However, we explain here the full returned grid for advanced users.
+#'
 #' A list containing the optimized grid and related parameters for the specified built-in distribution:
 #' \describe{
 #'   \item{\code{grid_data}}{A data frame with detailed information about the grid steps, including:
