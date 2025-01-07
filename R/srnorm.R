@@ -197,15 +197,16 @@ srnorm_optimize <- function(
 
   modes <- dendata$set_modes(f_params$mean)
 
-  if(symmetric){
+  if (symmetric) {
     symmetric <- modes
-  }else{
-    symmetric <- NULL}
+  } else {
+    symmetric <- NULL
+    }
 
   f <- dendata$create_f(f_params$mean, f_params$sd)
 
 
-  check_grid_optimization_criteria(symmetric, cnum, dendata)
+  check_grid_opt_criteria(symmetric, cnum, dendata)
 
   grid_optimizer(dendata, dist_name, xl, xr, f, modes, f_params, steps,
                  grid_range, theta, target_sample_size,

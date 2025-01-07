@@ -27,7 +27,7 @@ adjust_modes <- function(mode, xl, xr, f) {
 }
 
 #' @noRd
-check_grid_optimization_criteria <- function(symmetric, cnum, dendata) {
+check_grid_opt_criteria <- function(symmetric, cnum, dendata) {
   if (dendata$scalable) {
     std_symmetric <- !is.null(symmetric)
 
@@ -217,6 +217,8 @@ grid_check_symmetric <- function(gp) {
     # gp$target$left_bound <- center
     # gp$proposal$grid_range <- grid_range
     # gp$target$modes_count <- length(gp$target$modes)
+    grid_range <- gp$proposal$grid_range
+    center <- gp$target$modes
 
     gp$target$left_bound <- center
     gp$proposal$grid_range <- c(center, grid_range[2])
@@ -265,7 +267,7 @@ get_buildin_sampling_function <- function(cnum, name) {
 
 
 #' @noRd
-built_in_parameters_transformation <- function(f_params, cnum) {
+built_in_pars_trans <- function(f_params, cnum) {
   for (name in names(pbgrids)) {
     if (pbgrids[[name]]$c_num == cnum ||
         pbgrids[[name]]$c_num + 1 == cnum) {
@@ -283,7 +285,7 @@ cache_grid_c <- function(c_num, grid) {
   if (n_params == 0) {
     f_params <- 0
   } else {
-    f_params <- built_in_parameters_transformation(grid$f_params, c_num)
+    f_params <- built_in_pars_trans(grid$f_params, c_num)
 
     f_params <- unlist(grid$f_params)
   }

@@ -102,7 +102,7 @@ srlaplace_optimize <- function(
 
   f <- dendata$create_f(f_params$mu, f_params$b)
 
-  check_grid_optimization_criteria(symmetric, cnum, dendata)
+  check_grid_opt_criteria(symmetric, cnum, dendata)
 
   grid_optimizer(dendata, dist_name, xl, xr, f, modes, f_params, steps,
                  grid_range, theta, target_sample_size,
