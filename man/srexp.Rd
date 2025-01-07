@@ -3,35 +3,63 @@
 \name{srexp}
 \alias{srexp}
 \alias{srexp_custom}
-\title{Sampling from Exponential Distribution}
+\title{Sampling from the Exponential Distribution}
 \usage{
 srexp(n = 1, rate = 1, x = NULL)
 
 srexp_custom(n = 1, x = NULL)
 }
 \arguments{
-\item{n}{Integer sample size.}
+\item{n}{Integer, length 1. Number of samples to draw.}
+
+\item{rate}{Numeric. is the rate parameter of the Exponential Distribution.}
+
+\item{x}{(optional) Numeric vector of length \eqn{n}. If provided, this vector is over
+written in place to avoid any memory allocation.}
 }
 \value{
-\code{srexp()} returns a sample of size \code{n} from a standard exponential distribution.
+A numeric vector of length \code{n} containing samples from the Exponential Distribution with the specified
+\code{rate}.
+
+\bold{NOTE:} When the \code{x} parameter is specified, it is updated in-place with the simulation for performance reasons.
 }
 \description{
-Sampling from the exponential distribution using Stors.
+The \code{srexp()} function generates random samples from a Exponential Distribution using the STORS algorithm.
+It employs an optimized proposal distribution around the mode and Inverse Transform (IT) method for the tails.
 }
 \details{
-The function \code{srexp()} is used for sampling from a standard exponential distribution with a rate parameter of 1.
+The Exponential distribution has the probability density function (PDF):
+\eqn{f(x | \lambda) = \lambda \exp(-\lambda x), \quad x \geq 0,}
+where:
+\itemize{
+  \item{\eqn{\lambda}}{is the rate parameter (\eqn{\lambda > 0}), which determines the rate of decay of the distribution.}
+}
+The Exponential distribution is commonly used to model the time between independent events that occur at a constant average rate.
 
-Exponential distribution has the density:
-\deqn{ f(x; \lambda) = \lambda e^{-\lambda x} }
-Where \eqn{\lambda} is the rate parameter.
+These two functions are for sampling using the STORS algorithm based on the grid that has been constructed using \code{\link{srexp_optimize}}.
+
+By default, \code{srexp()} samples from a standard Exponential Distribution \code{rate = 1}.
+The proposal distribution is pre-optimized at package load time using \code{srexp_optimize()} with
+\code{steps = 4091}, creating a scalable grid centered around the mode.
+
+If \code{srexp()} is called with custom \code{rate} parameter, the samples are generated
+from the standard Exponential Distribution, then scaled accordingly.
 }
 \examples{
-# Optimize the grid for Exponential distribution
-grid_optimizer("srexp")
-# Generating Samples from a Standard Exponential Distribution
-# This example illustrates how to generate 10 samples,
-# from a standard exponential distribution.
+# Generate 10 samples from the standard Exponential Distribution
 samples <- srexp(10)
 print(samples)
 
+# Generate 10 samples using a pre-allocated vector
+x <- numeric(10)
+srexp(10, x = x)
+print(x)
+
+# Generate 10 samples from a Exponential Distribution with rate = 4
+samples <- srexp(10, rate = 4)
+print(samples)
+
+}
+\seealso{
+\code{\link{srexp_optimize}} to optimize the custom or the scaled proposal grid.
 }
