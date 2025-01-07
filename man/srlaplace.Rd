@@ -3,49 +3,65 @@
 \name{srlaplace}
 \alias{srlaplace}
 \alias{srlaplace_custom}
-\title{Sampling from Laplace Distribution}
+\title{Sampling from the Laplace Distribution}
 \usage{
 srlaplace(n = 1, mu = 0, b = 1, x = NULL)
 
 srlaplace_custom(n = 1, x = NULL)
 }
 \arguments{
-\item{n}{Integer sample size.}
+\item{n}{Integer, length 1. Number of samples to draw.}
 
-\item{mu}{Scalar location parameter.}
+\item{mu}{Numeric, location parameter.}
 
-\item{b}{Scalar scale parameter.}
+\item{b}{Numeric, scale parameter.}
+
+\item{x}{(optional) Numeric vector of length \eqn{n}. If provided, this vector is over
+written in place to avoid any memory allocation.}
 }
 \value{
-\code{srlaplace()} returns a sample of size \code{n} from a standard Laplace distribution.
+A numeric vector of length \code{n} containing samples from the Laplace Distribution with the specified
+\code{mu} and \code{b}.
 
-\code{srlaplace_scaled()} returns a sample of size \code{n} from a Laplace distribution with location \eqn{\mu} and scale \eqn{b}.
+\bold{NOTE:} When the \code{x} parameter is specified, it is updated in-place with the simulation for performance reasons.
 }
 \description{
-Sampling from the Laplace distribution using Stors.
-
-Sampling from any Laplace distribution specifying the location and scale.
+The \code{srlaplace()} function generates random samples from a Laplace Distribution using the STORS algorithm.
+It employs an optimized proposal distribution around the mode and Inverse Transform (IT) method for the tails.
 }
 \details{
-The function \code{srlaplace()} is used for sampling from a standard Laplace distribution (location = 0, scale = 1).
+The Laplace distribution has the probability density function (PDF):
+\eqn{f(x | \mu, b) = \frac{1}{2b} \exp\left(-\frac{|x - \mu|}{b}\right),}
+where:
+\itemize{
+  \item{\eqn{\mu}}{is the location parameter (mean of the distribution).}
+  \item{\code{b}}{is the scale parameter, which controls the spread of the distribution (\code{b > 0}).}
+}
 
-Laplace distribution has the density:
-\deqn{ f(x | \mu, b) = \frac{1}{2b} \exp\left(-\frac{|x - \mu|}{b}\right) }
-Where \eqn{\mu} is the location parameter and \eqn{b} is the scale parameter.
+These two functions are for sampling using the STORS algorithm based on the grid that has been constructed using \code{\link{srlaplace_optimize}}.
+
+By default, \code{srlaplace()} samples from a standard Laplace Distribution (\code{mu = 0}, \code{b = 1}).
+The proposal distribution is pre-optimized at package load time using \code{srlaplace_optimize()} with
+\code{steps = 4091}, creating a scalable grid centered around the mode.
+
+If \code{srlaplace()} is called with custom \code{mu} or \code{b} parameters, the samples are generated
+from the standard Laplace Distribution, then scaled and location shifted accordingly.
 }
 \examples{
-# Optimize the grid for the Laplace distribution
-grid_optimizer("srlaplace")
-# Generating Samples from a Standard Laplace Distribution
-# This example illustrates how to generate 10 samples from a standard Laplace distribution.
+# Generate 10 samples from the standard Laplace Distribution
 samples <- srlaplace(10)
 print(samples)
 
+# Generate 10 samples using a pre-allocated vector
+x <- numeric(10)
+srlaplace(10, x = x)
+print(x)
 
-# This example demonstrates how to generate 10,
-# Generating Samples from a Laplace Distribution with Specific Location and Scale
-# samples from a Laplace distribution with location = 2 and scale = 3.
-samples <- srlaplace_scaled(n = 10, mu = 2, b = 3)
+# Generate 10 samples from a Laplace Distribution with mu = 2 and b = 3
+samples <- srlaplace(10, mu = 2, b = 3)
 print(samples)
 
+}
+\seealso{
+\code{\link{srlaplace_optimize}} to optimize the custom or the scaled proposal grid.
 }

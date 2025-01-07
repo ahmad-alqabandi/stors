@@ -8,11 +8,15 @@
 #'
 #' @details
 #'
-#' The Normal distribution has the density:
-#' \deqn{ f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{(x - \mu)^2}{2\sigma^2}} }
-#' where \eqn{\mu} is the mean and \eqn{\sigma} is the standard deviation.
+#' The Normal distribution has the probability density function (PDF):
+#' \eqn{f(x | \mu, \sigma) = \frac{1}{\sigma\sqrt{2\pi}} \exp\left(-\frac{(x - \mu)^2}{2\sigma^2}\right),}
+#' where:
+#' \itemize{
+#'   \item{\eqn{\mu}}{ is the mean of the distribution, which determines the center of the bell curve.}
+#'   \item{\eqn{\sigma}}{ is the standard deviation, which controls the spread of the distribution (\eqn{\sigma > 0}).}
+#' }
 #'
-#' These two function are for sampling using the STORS algorithm based on the grid that has been constructed using \code{\link{srnorm_optimize}}.
+#' These two functions are for sampling using the STORS algorithm based on the grid that has been constructed using \code{\link{srnorm_optimize}}.
 #'
 #' By default, \code{srnorm()} samples from a standard Normal distribution (\code{mean = 0}, \code{sd = 1}).
 #' The proposal distribution is pre-optimized at package load time using \code{srnorm_optimize()} with
@@ -56,6 +60,7 @@ srnorm <- function(n = 1, mean = 0, sd = 1, x = NULL) {
   .Call(C_srnorm_scaled_check, n, c(mean, sd), x)
 }
 
+
 #' Sampling from Custom Normal Distribution
 #' @rdname srnorm
 #' @order 2
@@ -64,6 +69,7 @@ srnorm <- function(n = 1, mean = 0, sd = 1, x = NULL) {
 srnorm_custom <- function(n = 1, x = NULL) {
   .Call(C_srnorm_custom_check, n, x)
 }
+
 
 #' Optimizing Normal Distribution Grid
 #' @description
