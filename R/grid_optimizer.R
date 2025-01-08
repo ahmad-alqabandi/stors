@@ -55,16 +55,16 @@ grid_optimizer <- function(dendata,
                            symmetric = NULL,
                            cnum = NULL,
                            verbose = FALSE) {
+
   free_cache_cnum_c(cnum)
 
-  if (is.null(xl) ||
-      (xl < dendata$lb  && xl > dendata$rb))
+  if ((is.null(xl) || (xl < dendata$lb)))
     xl <- dendata$lb
-  if (is.null(xr) ||
-      (xr < dendata$lb  && xr > dendata$rb))
+
+  if (is.null(xr) ||(xr > dendata$rb))
     xr <- dendata$rb
-  if (!is.null(xr) &&
-      !is.null(xl) && xl > xr)
+
+  if (xl > xr)
     stop("xl must be smaller than xr.")
 
   modes <- adjust_modes(modes, xl, xr, f)

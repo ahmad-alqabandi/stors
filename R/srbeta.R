@@ -1,4 +1,3 @@
-
 #' Sampling from the Beta Distribution
 #' @rdname srbeta_custom
 #'
@@ -55,9 +54,6 @@ srbeta_custom <- function(n = 1, x = NULL) {
 }
 
 
-
-
-
 #' Optimizing Beta Distribution Grid
 #' @description
 #' The \code{srbeta_optimize()} function generates an optimized proposal grid for a targeted Beta distribution.
@@ -104,8 +100,8 @@ srbeta_custom <- function(n = 1, x = NULL) {
 #'
 #' @export
 srbeta_optimize <- function(
-    shape1 = NULL,
-    shape2 = NULL,
+    shape1 = 2,
+    shape2 = 2,
     xl = 0,
     xr = 1,
     steps = NULL,
@@ -114,9 +110,9 @@ srbeta_optimize <- function(
     target_sample_size = 1000,
     verbose = FALSE) {
 
-  symmetric <- NULL
-
   dist_name <- "srbeta"
+
+  symmetric <- NULL
 
   dendata <- pbgrids[[dist_name]]
 
@@ -125,35 +121,19 @@ srbeta_optimize <- function(
     return()
   }
 
+  cnum <- dendata$c_num + 1
+
+  grid_type <- "custom"
+
   f_params <- list(shape1 = shape2, shape2 = shape2)
-
-  if (dendata$scalable) {
-
-    isnull <- sapply(f_params, is.null)
-
-    if (all(isnull)) {
-      cnum <- dendata$c_num
-      grid_type <- "scaled"
-    } else {
-      cnum <- dendata$c_num + 1
-      grid_type <- "custom"
-    }
-
-    f_params <- ifelse(isnull, dendata$std_params, f_params)
-
-  } else {
-    cnum <- dendata$c_num + 1
-    grid_type <- "custom"
-  }
 
   modes <- dendata$set_modes(f_params$shape1, f_params$shape2)
 
   f <- dendata$create_f(f_params$shape1, f_params$shape2)
 
-  check_grid_opt_criteria(symmetric, cnum, dendata)
+  # check_grid_opt_criteria(symmetric, cnum, dendata)
 
   grid_optimizer(dendata, dist_name, xl, xr, f, modes, f_params, steps,
                  grid_range, theta, target_sample_size,
                  grid_type, symmetric, cnum, verbose)
-
 }

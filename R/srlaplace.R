@@ -61,7 +61,6 @@ srlaplace <- function(n = 1, mu = 0, b = 1, x = NULL) {
 }
 
 
-#' @export
 #' #' Sampling from Custom Laplace Distribution
 #' @rdname srlaplace
 #' @order 2

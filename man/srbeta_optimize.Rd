@@ -5,8 +5,8 @@
 \title{Optimizing Beta Distribution Grid}
 \usage{
 srbeta_optimize(
-  shape1 = NULL,
-  shape2 = NULL,
+  shape1 = 1,
+  shape2 = 1,
   xl = 0,
   xr = 1,
   steps = NULL,

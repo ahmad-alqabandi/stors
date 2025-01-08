@@ -357,7 +357,7 @@ save_builtin_grid <- function(c_num, grid) {
   saveRDS(grid, grids_file_path)
 }
 
-#' @export
+#' @noRd
 cached_grid_info <- function(cnum) {
   .Call(C_grid_info, cnum)
 }

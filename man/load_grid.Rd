@@ -28,5 +28,4 @@ save_grid(normal_grid, "normal")
 # it can be loaded from the machine as follows:
 loaded_normal_grid <- load_grid("normal")
 print(loaded_normal_grid)
-
 }

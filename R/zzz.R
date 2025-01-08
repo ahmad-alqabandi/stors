@@ -126,7 +126,7 @@ pbgrids <- list(
     c_num = 11,
     tails_method = "ARS",
     scalable = FALSE,
-    std_params = list(shape1 = 1.1, shape2 = 2),
+    std_params = list(shape1 = 2, shape2 = 2),
     transform_params = function(par) {
       return(par)
     },
@@ -205,8 +205,6 @@ stors_env <- new.env(parent = emptyenv())
   }
 
 }
-
-
 
 .onUnload <- function(...) {
   .Call(C_free_cache)

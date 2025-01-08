@@ -5,7 +5,7 @@
 \title{Optimizing Chi-squared Distribution Grid}
 \usage{
 srchisq_optimize(
-  df = NULL,
+  df = 2,
   xl = NULL,
   xr = NULL,
   steps = 4091,

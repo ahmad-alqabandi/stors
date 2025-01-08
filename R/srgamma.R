@@ -123,8 +123,11 @@ srgamma_optimize <- function(shape = NULL,
   if (is.null(scale)) scale <- 1 / rate
 
   f_params <- list(shape = shape, scale = scale) # F L
+
   f_params <- ifelse(sapply(f_params, is.null), 1, dendata$std_params)
+
   modes <- dendata$set_modes(f_params$shape, f_params$scale)
+
   f <- dendata$create_f(shape = f_params$shape, scale = f_params$scale)
 
   grid_optimizer(

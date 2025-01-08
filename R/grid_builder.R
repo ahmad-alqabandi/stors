@@ -55,24 +55,55 @@
 #' x-axis, they can do so by specifying the proposal grid limits using the \code{grid_range} argument.
 #'
 #' @return
-#' A list containing the following elements related to the proposal distribution:
-#' \item{grid_data}{A data frame including the created steps information, such as \code{x} (the beginning of each step on the x-axis),
-#'  \code{s_upper} (the step height on the y-axis), \code{p_a} (pre-acceptance probability for each step), and \code{s_upper_lower} (a vector used to re-scale the uniform random number when the sample is accepted).}
-#' \item{areas}{A vector containing the areas under the left tail bound, the steps in the middle, and the right tail bound.}
-#' \item{steps_number}{A scalar representing the number of steps in the proposal.}
-#' \item{sampling_probabilities}{A vector containing the areas under the left tail and the combined area of the left tail and middle steps.}
-#' \item{unif_scaler}{A scalar representing the inverse probability of sampling from the step part of the proposal, \eqn{\frac{1}{p(lb < x < rb)}}.
-#'  Similar to \code{s_upper_lower} in the \code{grid_data} data frame, this value is used to scale the uniform random value when sampling from the steps part of the proposal.}
-#' \item{lt_properties}{A vector including 5 values used when sampling under the proposal's left tail using the ARS (Adaptive Rejection Sampling) method.}
-#' \item{rt_properties}{A vector including 6 values used when sampling under the proposal's right tail using the ARS method.}
-#' \item{alpha}{A scalar representing the uniform step area.}
-#' \item{tails_method}{A string representing the tails sampling method, either 'ARS' for Adaptive Rejection Sampling or 'IT' for Inverse Transform.}
-#' \item{grid_bounds}{A vector including the left and right bounds of the target density.}
-#' \item{dens_func}{The function passed by the user for the target density \code{f}.}
+#' The returned list must be stored by the user, as it is required to be passed to the \code{\link{stors}} function.
+#' The \code{stors} function uses the grid's properties to build and return a sampling function.
+#'
+#' A list containing the optimized grid and related parameters for the specified built-in distribution:
+#' \describe{
+#'   \item{\code{grid_data}}{A data frame with detailed information about the grid steps, including:
+#'   \describe{
+#'     \item{\code{x}}{The start point of each step on the x-axis.}
+#'     \item{\code{s_upper}}{The height of each step on the y-axis.}
+#'     \item{\code{p_a}}{Pre-acceptance probability for each step.}
+#'     \item{\code{s_upper_lower}}{A vector used to scale the uniform random number when the sample is accepted.}
+#'   }}
+#'   \item{\code{areas}}{A numeric vector containing the areas under:
+#'   \describe{
+#'     \item{\code{left_tail}}{The left tail bound.}
+#'     \item{\code{steps}}{The middle steps.}
+#'     \item{\code{right_tail}}{The right tail bound.}
+#'   }}
+#'   \item{\code{steps_number}}{An integer specifying the number of steps in the proposal.}
+#'   \item{\code{sampling_probabilities}}{A numeric vector with:
+#'   \describe{
+#'     \item{\code{left_tail}}{The probability of sampling from the left tail.}
+#'     \item{\code{left_and_middle}}{The combined probability of sampling from the left tail and middle steps.}
+#'   }}
+#'   \item{\code{unif_scaler}}{A numeric scalar, the inverse probability of sampling from the steps part of the proposal (\eqn{\frac{1}{p(lb < x < rb)}}). Used for scaling uniform random values.}
+#'   \item{\code{lt_properties}}{A numeric vector of 5 values required for Adaptive Rejection Sampling (ARS) in the left tail.}
+#'   \item{\code{rt_properties}}{A numeric vector of 6 values required for ARS in the right tail.}
+#'   \item{\code{alpha}}{A numeric scalar representing the uniform step area.}
+#'   \item{\code{tails_method}}{A string, either \code{"ARS"} (Adaptive Rejection Sampling) or \code{"IT"} (Inverse Transform), indicating the sampling method for the tails.}
+#'   \item{\code{grid_bounds}}{A numeric vector specifying the left and right bounds of the target density.}
+#'   \item{\code{cnum}}{An integer representing the cache number of the created grid in memory.}
+#'   \item{\code{symmetric}}{A numeric scalar indicating the symmetry point of the grid, or \code{NULL} if not symmetric.}
+#'   \item{\code{f_params}}{A list of parameters for the target density that the proposal grid is designed for.}
+#'   \item{\code{is_symmetric}}{A logical value indicating whether the proposal grid is symmetric.}
+#'   \item{\code{grid_type}}{A string indicating the type of the generated grid:
+#'   \describe{
+#'     \item{\code{"scaled"}}{The grid is "scalable" and standardized with \code{rate = 1}. This is used when parameter \code{rate} is either \code{NULL} or not provided. Scalable grids are compatible with \code{\link{srexp}}.}
+#'     \item{\code{"custom"}}{The grid is "custom" when \code{rate} is provided. Custom grids are compatible with \code{\link{srexp_custom}}.}
+#'   }}
+#'   \item{\code{target_function_area}}{A numeric scalar estimating the area of the target distribution.}
+#'   \item{\code{dens_func}}{A string containing the hardcoded density function.}
+#'   \item{\code{density_name}}{A string specifying the name of the target density distribution.}
+#'   \item{\code{lock}}{An identifier used for saving and loading the grid from disk.}
+#' }
 #'
 #'
 #' @seealso
-#' \code{\link{stors}}
+#' \code{\link{stors}}: Function to build and return a sampling function based on the provided grid properties.
+#'
 #'
 #' @examples
 #'
@@ -163,7 +194,8 @@ build_grid <- function(lb = -Inf,
       between_minima = NULL,
       right_bound = rb,
       left_bound = lb,
-      estimated_area = NULL
+      estimated_area = NULL,
+      symmetric = NULL
     ),
     proposal = list(
       grid_range = grid_range,

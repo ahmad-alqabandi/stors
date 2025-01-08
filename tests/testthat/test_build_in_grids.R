@@ -3,7 +3,13 @@
 test_that("Built_in smpling functions returns a sample of correct size and seeds", {
 
   for (name in names(stors:::pbgrids)) {
-    srname_txt <- paste0(name, "(10)")
+
+    if(stors:::pbgrids[[name]]$scalable){
+      srname_txt <- paste0(name, "(10)")
+    }else{
+      srname_txt <- paste0(name, "_custom(10)")
+    }
+
     srname_exp <- parse(text = srname_txt)
     x <- eval(srname_exp)
     n <- length(x)
@@ -40,7 +46,14 @@ test_that("Built_in sampling functions, samples properties tests", {
     g <- eval(parse(text = paste0(name, "_optimize( xl = ", l_trunc, ",xr = ", u_trunc, ")")))
 
 
-    x <- eval(parse(text = paste0(name, "(1000)")))
+    if(stors:::pbgrids[[name]]$scalable){
+      srname_txt <- paste0(name, "(1000)")
+    }else{
+      srname_txt <- paste0(name, "_custom(1000)")
+    }
+
+    srname_exp <- parse(text = srname_txt)
+    x <- eval(srname_exp)
 
     expect_true((min(x) >= l_trunc) && (max(x) <= u_trunc), info = paste0("generated samples must be within ",
                                                                            name, " distrebution\'s TRUNCATION BOUNDS"))

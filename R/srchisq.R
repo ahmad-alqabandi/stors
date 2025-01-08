@@ -142,7 +142,7 @@ srchisq_custom <- function(n = 1, x = NULL) {
 #' scalable_grid <- srchisq_optimize(df = 4)
 #'
 #' @export
-srchisq_optimize <- function(df = NULL,
+srchisq_optimize <- function(df = 2,
                             xl = NULL,
                             xr = NULL,
                             steps = 4091,
@@ -150,8 +150,6 @@ srchisq_optimize <- function(df = NULL,
                             theta = NULL,
                             target_sample_size = 1000,
                             verbose = FALSE) {
-  if (is.null(df))
-    df <- 2
 
   dist_name <- "srchisq"
 
