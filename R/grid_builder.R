@@ -1,3 +1,6 @@
+# TODO: in case the user provided not precise value of the mode, can we create a function to get better estimation.
+# We might be able to use the documented code in the symmetry check function to achieve this.
+
 #' Build User Grid
 #'
 #' @description
@@ -288,13 +291,16 @@ construct_left_and_right_steps <- function(gp, opt_area, mode_n) {
     )
   }
 
+  left_steps[[mode_i]]$data
+
   for (mode_i in (1:mode_n)) {
     grids[[mode_i]] <- list(
       data = rbind(left_steps[[mode_i]]$data, right_steps[[mode_i]]$data),
       steps = left_steps[[mode_i]]$steps + right_steps[[mode_i]]$steps
     )
   }
-
+  grids[[1]]$data$x %>% length()
+  grids[[1]]$steps
   return(grids)
 
 }
@@ -453,6 +459,8 @@ build_final_grid <- function(gp, opt_area = NULL) {
   else
     is_symmetric <- TRUE
 
+  # if(steps_number != length(final_grid$x) - 1 ) stop("ERROR: STEPS NUMBER")
+
   invisible(
     list(
       grid_data = final_grid,
@@ -597,6 +605,9 @@ find_right_steps <- function(gp, area, mode_i, steps_lim = Inf) {
       x_c <- x_next
       r <- r + 1
     }
+  } else{
+    x[r] <- mode
+    s_upper[r] <- s_lower[r] <- s_upper_lower[r] <-  p_a[r] <- 0
   }
 
   d <- data.frame(

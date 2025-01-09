@@ -195,6 +195,7 @@ find_optimal_grid <- function(gp) {
   if ((theta == 0 &&
        identical(grid_range, c(lb, rb))) ||
       !is.null(steps)) {
+
     if (!is.null(steps)) {
       opt_area <- 1 / steps * f_area
     } else {
