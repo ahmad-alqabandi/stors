@@ -39,6 +39,7 @@
 #' \code{\link{srchisq_optimize}} to optimize the custom grid.
 #'
 #' @examples
+#'
 #' # Genedf 10 samples from Chi-squared Distribution
 #' samples <- srchisq_custom(10)
 #' print(samples)

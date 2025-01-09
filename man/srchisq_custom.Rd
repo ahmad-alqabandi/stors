@@ -42,6 +42,7 @@ The proposal distribution is pre-optimized at package load time using \code{srch
 \code{steps = 4091}, creating a scalable grid centered around the mode.
 }
 \examples{
+
 # Genedf 10 samples from Chi-squared Distribution
 samples <- srchisq_custom(10)
 print(samples)

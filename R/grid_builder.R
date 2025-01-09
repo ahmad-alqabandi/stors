@@ -291,16 +291,12 @@ construct_left_and_right_steps <- function(gp, opt_area, mode_n) {
     )
   }
 
-  left_steps[[mode_i]]$data
-
   for (mode_i in (1:mode_n)) {
     grids[[mode_i]] <- list(
       data = rbind(left_steps[[mode_i]]$data, right_steps[[mode_i]]$data),
       steps = left_steps[[mode_i]]$steps + right_steps[[mode_i]]$steps
     )
   }
-  grids[[1]]$data$x %>% length()
-  grids[[1]]$steps
   return(grids)
 
 }

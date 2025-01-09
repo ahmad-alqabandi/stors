@@ -1,45 +1,4 @@
-#' Optimize Built-in Grid
-#'
-#' @description
-#' This function optimizes and stores the sampling grid for STROS built-in distributions.
-#'
-#' @param steps Optional Scalar integer indicating the number of steps in the proposal distribution.
-#' @param grid_range Optional Vector of two elements specifying the start and end points for constructing steps along the x-axis.
-#' @param theta Optional Scalar defining the pre-acceptance threshold, dictating when the proposal steps constructing break based on the probability of pre-acceptance.
-#' @param target_sample_size Scalar integer indicating the target sample size. The grid optimization process will take this number into account.
-#' @param verbose Boolean if set to True, a table detailing the optimization areas and steps will be displayed during grid optimization.
-#'
-#' @details
-#' Before sampling from built-in distributions in the STROS package,
-#'  it is necessary to first optimize the sampling grid for the specific distribution using \code{grid_optimizer()}.
-#'  This function calculates and stores an optimized grid based on the given parameters or defaults.
-#'  The optimization primarily focuses on balancing memory usage and computational efficiency,
-#'  ensuring that the grid is both space-efficient and capable of facilitating fast sampling.
-#'
-#' For optimal grid configuration, it is advised that users refrain from manually setting the \code{Theta}, \code{steps}, or \code{grid_range} parameters, as \code{grid_optimizer()} automatically determines the best settings.
-#'  However, users can provide their own values for these parameters to customize the grid according to specific requirements. For more detailed information about these arguments and optimization process, please refer to the manual page of \code{build_final_grid()}.
-#'
-#'
-#' @examples
-#' # Optimize grid for sampling from the normal distribution
-#' library(stors)
-#' grid_optimizer("srnorm")
-#' # Generate 10 samples from the optimized standard normal distribution
-#' srnorm(10)
-#'
-#' @return
-#' This function generates and stores and return an optimized grid for the specified built-in distribution in R's internal data directory.
-#'\item{"grid_data"}{A data frame including the created steps information, such as \code{x} (the beginning of each step on the x-axis), \code{s_upper} (the step height on the y-axis), \code{p_a} (pre-acceptance probability for each step), and \code{s_upper_lower} (a vector used to re-scale the uniform random number when the sample is accepted).}
-#'\item{"areas"}{A vector containing the areas under the left tail bound, the steps in the middle, and the right tail bound.}
-#'\item{"steps_number"}{A scalar representing the number of steps in the proposal.}
-#'\item{"sampling_probabilities"}{A vector containing the areas under the left tail and the combined area of the left tail and middle steps.}
-#'\item{"unif_scaler"}{A scalar representing the inverse probability of sampling from the step part of the proposal, \eqn{\frac{1}{p(lb < x < rb)}}. Similar to 's_upper_lower' in the 'grid_data' data frame, this value is used to scale the uniform random value when sampling from the steps part of the proposal.}
-#'\item{"lt_properties"}{A vector including 5 values used when sampling under the proposal's left tail using the ARS (Adaptive Rejection Sampling) method.}
-#'\item{"rt_properties"}{A vector including 6 values used when sampling under the proposal's right tail using the ARS method.}
-#'\item{"alpha"}{A scalar representing the uniform step area.}
-#'\item{"tails_method"}{A string representing the tails sampling method, either 'ARS' for Adaptive Rejection Sampling or 'IT' for Inverse Transform.}
-#'\item{"grid_bounds"}{A vector including the left and right bounds of the target density.}
-#'\item{"dens_func"}{The function passed by the user for the target density \code{f}.}
+#' @noRd
 grid_optimizer <- function(dendata,
                            density_name,
                            xl = NULL,

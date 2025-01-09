@@ -36,10 +36,6 @@
 #' sample_normal <- stors(normal_grid)
 #' hist(sample_normal(100), main = "Normal Distribution Samples")
 #'
-#' # To sample from a truncated standard normal distribution between -1 and 1
-#' sample_truncated_normal <- stors(normal_grid, xl = -1, xr = 1)
-#' hist(sample_truncated_normal(100), main = "Truncated Normal Distribution Samples")
-#'
 #'
 #' # Example 2
 #' # Let's consider a bimodal distribution composed of two normal distributions:
@@ -64,12 +60,16 @@
 #' bimodal_samples <- sample_bimodal(1000)
 #' hist(bimodal_samples, breaks = 30, main = "Bimodal Distribution Samples")
 #'
-#' # Create the truncated sampling function using \code{stors()} with truncation bounds [0.5, 6]
-#' sample_truncated_bimodal <- stors(bimodal_grid, xl = 0.5, xr = 6)
+#' # Create the truncated sampling function using \code{stors()} with truncation bounds [-0.5, 6]
+#' truncated_bimodal_grid <- build_grid(f = f_bimodal, modes = modes_bimodal, lb = -0.5, rb = 6, steps = 1000)
+#'
+#' # Create the sampling function using \code{stors()}
+#' sample_truncated_bimodal <- stors(truncated_bimodal_grid)
 #'
 #' # Generate and plot samples from the truncated bimodal distribution
-#' truncated_bimodal_samples <- sample_truncated_bimodal(1000)
-#' hist(truncated_bimodal_samples, breaks = 30, main = "Truncated Bimodal Distribution Samples")
+#' truncated_sample <- sample_truncated_bimodal(1000)
+#' hist(truncated_sample, breaks = 30, main = "Truncated Bimodal Distribution Samples")
+#'
 #'
 #' @import digest digest
 #' @export
