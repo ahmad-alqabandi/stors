@@ -107,8 +107,10 @@ When \code{srnorm_optimize()} is explicitly called:
 # Generate scalable grid that with mean = 0 and sd = 1, that has 4096 steps
 scalable_grid <- srnorm_optimize(steps = 4096)
 
+
 # Generate custom grid that with mean = 2 and sd = 1
 scalable_grid <- srnorm_optimize(mean = 2, sd = 1)
+
 
 }
 \seealso{

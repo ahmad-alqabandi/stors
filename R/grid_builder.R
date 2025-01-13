@@ -1,6 +1,3 @@
-# TODO: in case the user provided not precise value of the mode, can we create a function to get better estimation.
-# We might be able to use the documented code in the symmetry check function to achieve this.
-
 #' Build User Grid
 #'
 #' @description

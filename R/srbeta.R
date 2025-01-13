@@ -1,4 +1,4 @@
-#' Sampling from the Beta Distribution
+#' Sampling from Beta Distribution
 #' @rdname srbeta_custom
 #'
 #' @description
@@ -12,7 +12,7 @@
 #' The Beta distribution has the probability density function (PDF):
 #' \deqn{f(x | \alpha, \beta) = \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha)\Gamma(\beta)} x^{\alpha - 1} (1 - x)^{\beta - 1}, \quad 0 \leq x \leq 1,}
 #' where:
-#' \itemize{
+#' \describe{
 #'   \item{\eqn{\alpha}}{is the first shape parameter (\eqn{\alpha > 0}).}
 #'   \item{\eqn{\beta}}{is the second shape parameter (\eqn{\beta > 0}).}
 #' }
@@ -25,8 +25,6 @@
 #' \code{steps = 4091}, creating a scalable grid centered around the mode.
 #'
 #' @param n Integer, length 1. Number of samples to draw.
-#' @param shape1 Numeric. The first shape parameter (\eqn{\alpha}) of the Beta distribution.
-#' @param shape2 Numeric. The second shape parameter (\eqn{\beta}) of the Beta distribution.
 #' @param x (optional) Numeric vector of length \eqn{n}. If provided, this vector is overwritten in place to avoid any memory allocation.
 #'
 #' @return
@@ -34,6 +32,9 @@
 #' The \code{shape1} and \code{shape2} parameters are specified during the optimization process using \code{srbeta_optimize()}.
 #'
 #' \bold{NOTE:} When the \code{x} parameter is specified, it is updated in-place with the simulation for performance reasons.
+#'
+#' @note
+#' This function is not scalable. Therefore, only the \code{srbeta_custom()} version is available, which requires the grid to be pre-optimized using \code{srbeta_optimize()} before calling this function.
 #'
 #' @seealso
 #' \code{\link{srbeta_optimize}} to optimize the custom grid.

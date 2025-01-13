@@ -2,7 +2,7 @@
 % Please edit documentation in R/srchisq.R
 \name{srchisq_custom}
 \alias{srchisq_custom}
-\title{Sampling from the Chi-squared Distribution}
+\title{Sampling from Chi-squared Distribution}
 \usage{
 srchisq_custom(n = 1, x = NULL)
 }
@@ -11,13 +11,10 @@ srchisq_custom(n = 1, x = NULL)
 
 \item{x}{(optional) Numeric vector of length \eqn{n}. If provided, this vector is over
 written in place to avoid any memory allocation.}
-
-\item{df}{Numeric. is the the degrees of freedom parameter of the Chi-squared Distribution.}
 }
 \value{
 A numeric vector of length \code{n} containing random samples from the Chi-squared distribution.
 The degrees of freedom (\code{df}) for the distribution are specified during the optimization process using \code{srchisq_optimize()}.
-
 \bold{NOTE:} When the \code{x} parameter is specified, it is updated in-place with the simulation for performance reasons.
 }
 \description{
@@ -30,7 +27,7 @@ The Chi-squared Distribution
 The Chi-squared distribution has the probability density function (PDF):
 \deqn{f(x | k) = \frac{1}{2^{k/2} \Gamma(k/2)} x^{(k/2) - 1} \exp(-x/2), \quad x \geq 0,}
 where:
-\itemize{
+\describe{
   \item{\eqn{k}}{ is the degrees of freedom (\eqn{k > 0}), which determines the shape of the distribution.}
 }
 The Chi-squared distribution is widely used in hypothesis testing and constructing confidence intervals, particularly in the context of variance estimation.
@@ -40,6 +37,9 @@ this function is sampling from grid that has been constructed using \code{\link{
 By default, \code{srchisq_custom()} samples from Chi-squared Distribution \code{df = 2}.
 The proposal distribution is pre-optimized at package load time using \code{srchisq_optimize()} with
 \code{steps = 4091}, creating a scalable grid centered around the mode.
+}
+\note{
+This function is not scalable. Therefore, only the \code{srchisq_custom()} version is available, which requires the grid to be pre-optimized using \code{srchisq_optimize()} before calling this function.
 }
 \examples{
 

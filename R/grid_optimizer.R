@@ -111,6 +111,7 @@ grid_optimizer <- function(dendata,
 
 
 #' @importFrom microbenchmark microbenchmark
+#' @importFrom stats integrate
 find_optimal_grid <- function(gp) {
   target_sample_size <- gp$proposal$target_sample_size
   theta <- gp$proposal$pre_acceptance_threshold

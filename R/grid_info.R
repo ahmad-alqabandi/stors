@@ -194,13 +194,13 @@ print.grid <- function(x, ...) {
   sampling_efficiency <- (grid$target_function_area / (sum(grid$areas))) * 100
 
   # Improved printing with clearer structure
-  cat("\n=========================================\n")
-  cat("Grid Summary\n")
-  cat("-----------------------------------------\n")
-  cat("Total steps:      ", formatted_steps, "\n")
-  cat("Steps range:     [", sprintf("%.6f", domain_start), ", ", sprintf("%.6f", domain_end), "]\n")
-  cat(sprintf("Sampling efficiency: %.2f%%", sampling_efficiency), "\n")
-  cat("=========================================\n\n")
+  message("\n=========================================\n")
+  message("Grid Summary\n")
+  message("-----------------------------------------\n")
+  message("Total steps:      ", formatted_steps, "\n")
+  message("Steps range:     [", sprintf("%.6f", domain_start), ", ", sprintf("%.6f", domain_end), "]\n")
+  message(sprintf("Sampling efficiency: %.2f%%", sampling_efficiency), "\n")
+  message("=========================================\n\n")
 
 }
 
@@ -254,7 +254,7 @@ print_grids <- function() {
     grids_sizes <- formatC(sum(as.double(grids_sizes)) / 1028,
                            format = "f",
                            digits = 2)
-    cat("grids_size : ", grids_sizes, " KB")
+    message("grids_size : ", grids_sizes, " KB")
   }
 
 }
@@ -336,13 +336,13 @@ save_grid <- function(grid, grid_name) {
 #'
 delete_grid <- function(grid_name) {
 
-  user_grids <- list.files(stors:::stors_env$user_grids_dir)
+  user_grids <- list.files(stors_env$user_grids_dir)
   grid_name <- paste0(grid_name, ".rds")
 
   stopifnot("This grid does not exist." = grid_name %in% user_grids)
 
-  file.remove(file.path(stors:::stors_env$user_grids_dir, grid_name))
-  cat(grid_name, "grid deleted successfully")
+  file.remove(file.path(stors_env$user_grids_dir, grid_name))
+  message(grid_name, "grid deleted successfully")
 
 }
 

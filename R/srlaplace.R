@@ -1,4 +1,4 @@
-#' Sampling from the Laplace Distribution
+#' Sampling from Laplace Distribution
 #' @rdname srlaplace
 #' @order 1
 #'
@@ -11,7 +11,7 @@
 #' The Laplace distribution has the probability density function (PDF):
 #' \eqn{f(x | \mu, b) = \frac{1}{2b} \exp\left(-\frac{|x - \mu|}{b}\right),}
 #' where:
-#' \itemize{
+#' \describe{
 #'   \item{\eqn{\mu}}{is the location parameter (mean of the distribution).}
 #'   \item{\code{b}}{is the scale parameter, which controls the spread of the distribution (\code{b > 0}).}
 #' }

@@ -26,6 +26,8 @@ srgamma_optimize(
 
 \item{xr}{Numeric. Right truncation bound for the target distribution. Defaults to \code{Inf}, representing no right truncation.}
 
+\item{scale}{(optional) Numeric. The scale parameter of the Gamma distribution. Defaults to \code{1}.}
+
 \item{steps}{(optional) Integer. Desired number of steps in the proposal grid. Defaults to \code{4091}.}
 
 \item{grid_range}{(optional) Numeric vector. Specifies the range for optimizing the steps part of the proposal grid. Defaults to \code{NULL}, indicating automatic range selection.}

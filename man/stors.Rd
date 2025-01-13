@@ -68,7 +68,8 @@ bimodal_samples <- sample_bimodal(1000)
 hist(bimodal_samples, breaks = 30, main = "Bimodal Distribution Samples")
 
 # Create the truncated sampling function using \code{stors()} with truncation bounds [-0.5, 6]
-truncated_bimodal_grid <- build_grid(f = f_bimodal, modes = modes_bimodal, lb = -0.5, rb = 6, steps = 1000)
+truncated_bimodal_grid <- build_grid(f = f_bimodal,
+ modes = modes_bimodal, lb = -0.5, rb = 6, steps = 1000)
 
 # Create the sampling function using \code{stors()}
 sample_truncated_bimodal <- stors(truncated_bimodal_grid)

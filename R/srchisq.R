@@ -1,4 +1,4 @@
-#' Sampling from the Chi-squared Distribution
+#' Sampling from Chi-squared Distribution
 #' @rdname srchisq_custom
 #'
 #' @description
@@ -12,7 +12,7 @@
 #' The Chi-squared distribution has the probability density function (PDF):
 #' \deqn{f(x | k) = \frac{1}{2^{k/2} \Gamma(k/2)} x^{(k/2) - 1} \exp(-x/2), \quad x \geq 0,}
 #' where:
-#' \itemize{
+#' \describe{
 #'   \item{\eqn{k}}{ is the degrees of freedom (\eqn{k > 0}), which determines the shape of the distribution.}
 #' }
 #' The Chi-squared distribution is widely used in hypothesis testing and constructing confidence intervals, particularly in the context of variance estimation.
@@ -25,15 +25,16 @@
 #'
 #'
 #' @param n Integer, length 1. Number of samples to draw.
-#' @param df Numeric. is the the degrees of freedom parameter of the Chi-squared Distribution.
 #' @param x (optional) Numeric vector of length \eqn{n}. If provided, this vector is over
 #' written in place to avoid any memory allocation.
 #'
 #' @return
 #' A numeric vector of length \code{n} containing random samples from the Chi-squared distribution.
 #' The degrees of freedom (\code{df}) for the distribution are specified during the optimization process using \code{srchisq_optimize()}.
-#'
 #' \bold{NOTE:} When the \code{x} parameter is specified, it is updated in-place with the simulation for performance reasons.
+#'
+#' @note
+#' This function is not scalable. Therefore, only the \code{srchisq_custom()} version is available, which requires the grid to be pre-optimized using \code{srchisq_optimize()} before calling this function.
 #'
 #' @seealso
 #' \code{\link{srchisq_optimize}} to optimize the custom grid.
@@ -66,7 +67,7 @@ srchisq_custom <- function(n = 1, x = NULL) {
 #'
 #' @details
 #'When \code{srchisq_optimize()} is explicitly called:
-#'\itemize{
+#' \itemize{
 #'  \item A grid is created and cached. If no parameters are provided, a standard grid is created with \code{df = 2}.
 #'  \item Providing \code{df} creates a custom grid, which is cached for use with \code{srchisq_custom()}.
 #'  \item The optimization process can be controlled via parameters such as \code{steps}, \code{grid_range}, or

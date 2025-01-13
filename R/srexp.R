@@ -1,4 +1,4 @@
-#' Sampling from the Exponential Distribution
+#' Sampling from Exponential Distribution
 #' @rdname srexp
 #' @order 1
 #'
@@ -11,7 +11,7 @@
 #' The Exponential distribution has the probability density function (PDF):
 #' \eqn{f(x | \lambda) = \lambda \exp(-\lambda x), \quad x \geq 0,}
 #' where:
-#' \itemize{
+#' \describe{
 #'   \item{\eqn{\lambda}}{is the rate parameter (\eqn{\lambda > 0}), which determines the rate of decay of the distribution.}
 #' }
 #' The Exponential distribution is commonly used to model the time between independent events that occur at a constant average rate.

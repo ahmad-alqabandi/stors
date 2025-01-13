@@ -1,4 +1,4 @@
-#' Sampling from the Normal Distribution
+#' Sampling from Normal Distribution
 #' @rdname srnorm
 #' @order 1
 #'
@@ -11,7 +11,7 @@
 #' The Normal distribution has the probability density function (PDF):
 #' \eqn{f(x | \mu, \sigma) = \frac{1}{\sigma\sqrt{2\pi}} \exp\left(-\frac{(x - \mu)^2}{2\sigma^2}\right),}
 #' where:
-#' \itemize{
+#' \describe{
 #'   \item{\eqn{\mu}}{ is the mean of the distribution, which determines the center of the bell curve.}
 #'   \item{\eqn{\sigma}}{ is the standard deviation, which controls the spread of the distribution (\eqn{\sigma > 0}).}
 #' }
@@ -159,8 +159,10 @@ srnorm_custom <- function(n = 1, x = NULL) {
 #' # Generate scalable grid that with mean = 0 and sd = 1, that has 4096 steps
 #' scalable_grid <- srnorm_optimize(steps = 4096)
 #'
+#'
 #' # Generate custom grid that with mean = 2 and sd = 1
 #' scalable_grid <- srnorm_optimize(mean = 2, sd = 1)
+#'
 #'
 #' @export
 srnorm_optimize <- function(

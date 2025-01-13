@@ -3,7 +3,7 @@
 \name{srlaplace}
 \alias{srlaplace}
 \alias{srlaplace_custom}
-\title{Sampling from the Laplace Distribution}
+\title{Sampling from Laplace Distribution}
 \usage{
 srlaplace(n = 1, mu = 0, b = 1, x = NULL)
 
@@ -33,7 +33,7 @@ It employs an optimized proposal distribution around the mode and Inverse Transf
 The Laplace distribution has the probability density function (PDF):
 \eqn{f(x | \mu, b) = \frac{1}{2b} \exp\left(-\frac{|x - \mu|}{b}\right),}
 where:
-\itemize{
+\describe{
   \item{\eqn{\mu}}{is the location parameter (mean of the distribution).}
   \item{\code{b}}{is the scale parameter, which controls the spread of the distribution (\code{b > 0}).}
 }

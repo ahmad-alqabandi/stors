@@ -11,7 +11,7 @@
 #   choosen_grid_num <- NULL
 #
 #   scalable_info <-  cached_grid_info(cnum_scalable)
-#   custom_info <-  stors:::cached_grid_info(cnum_custom)
+#   custom_info <-  cached_grid_info(cnum_custom)
 #
 #   res <- truncate_error_checking(xl, xr, dendata)
 #   xl <- res$xl; xr <- res$xr

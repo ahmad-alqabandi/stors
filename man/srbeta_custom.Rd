@@ -2,7 +2,7 @@
 % Please edit documentation in R/srbeta.R
 \name{srbeta_custom}
 \alias{srbeta_custom}
-\title{Sampling from the Beta Distribution}
+\title{Sampling from Beta Distribution}
 \usage{
 srbeta_custom(n = 1, x = NULL)
 }
@@ -10,10 +10,6 @@ srbeta_custom(n = 1, x = NULL)
 \item{n}{Integer, length 1. Number of samples to draw.}
 
 \item{x}{(optional) Numeric vector of length \eqn{n}. If provided, this vector is overwritten in place to avoid any memory allocation.}
-
-\item{shape1}{Numeric. The first shape parameter (\eqn{\alpha}) of the Beta distribution.}
-
-\item{shape2}{Numeric. The second shape parameter (\eqn{\beta}) of the Beta distribution.}
 }
 \value{
 A numeric vector of length \code{n} containing random samples from the Beta distribution.
@@ -31,7 +27,7 @@ The Beta Distribution
 The Beta distribution has the probability density function (PDF):
 \deqn{f(x | \alpha, \beta) = \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha)\Gamma(\beta)} x^{\alpha - 1} (1 - x)^{\beta - 1}, \quad 0 \leq x \leq 1,}
 where:
-\itemize{
+\describe{
   \item{\eqn{\alpha}}{is the first shape parameter (\eqn{\alpha > 0}).}
   \item{\eqn{\beta}}{is the second shape parameter (\eqn{\beta > 0}).}
 }
@@ -42,6 +38,9 @@ This function samples from a grid constructed using \code{\link{srbeta_optimize}
 By default, \code{srbeta_custom()} samples from the standard Beta distribution with \code{shape1 = 1} and \code{shape2 = 1}.
 The proposal distribution is pre-optimized at package load time using \code{srbeta_optimize()} with
 \code{steps = 4091}, creating a scalable grid centered around the mode.
+}
+\note{
+This function is not scalable. Therefore, only the \code{srbeta_custom()} version is available, which requires the grid to be pre-optimized using \code{srbeta_optimize()} before calling this function.
 }
 \examples{
 # Generate 10 samples from Beta Distribution

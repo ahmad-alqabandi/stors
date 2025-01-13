@@ -61,7 +61,8 @@
 #' hist(bimodal_samples, breaks = 30, main = "Bimodal Distribution Samples")
 #'
 #' # Create the truncated sampling function using \code{stors()} with truncation bounds [-0.5, 6]
-#' truncated_bimodal_grid <- build_grid(f = f_bimodal, modes = modes_bimodal, lb = -0.5, rb = 6, steps = 1000)
+#' truncated_bimodal_grid <- build_grid(f = f_bimodal,
+#'  modes = modes_bimodal, lb = -0.5, rb = 6, steps = 1000)
 #'
 #' # Create the sampling function using \code{stors()}
 #' sample_truncated_bimodal <- stors(truncated_bimodal_grid)
@@ -78,8 +79,6 @@ stors <- function(grid) {
   force(grid)
   is_valid_grid(grid)
   c_num <- cache_user_grid_c(grid)
-
-  # print(paste0("cnum = ", c_num))
 
   # if (xl != grid$grid_bounds[1] || xr != grid$grid_bounds[2]) {
   #   stopifnot(

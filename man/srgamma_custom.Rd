@@ -2,7 +2,7 @@
 % Please edit documentation in R/srgamma.R
 \name{srgamma_custom}
 \alias{srgamma_custom}
-\title{Sampling from the Gamma Distribution}
+\title{Sampling from Gamma Distribution}
 \usage{
 srgamma_custom(n = 1, x = NULL)
 }
@@ -10,10 +10,6 @@ srgamma_custom(n = 1, x = NULL)
 \item{n}{Integer, length 1. Number of samples to draw.}
 
 \item{x}{(optional) Numeric vector of length \eqn{n}. If provided, this vector is overwritten in place to avoid any memory allocation.}
-
-\item{shape}{Numeric. The shape parameter (\eqn{\alpha}) of the Gamma distribution.}
-
-\item{rate}{Numeric. The rate parameter (\eqn{\beta}) of the Gamma distribution.}
 }
 \value{
 A numeric vector of length \code{n} containing random samples from the Gamma distribution.
@@ -31,7 +27,7 @@ The Gamma Distribution
 The Gamma distribution has the probability density function (PDF):
 \deqn{f(x | \alpha, \beta) = \frac{\beta^\alpha}{\Gamma(\alpha)} x^{\alpha - 1} \exp(-\beta x), \quad x \geq 0,}
 where:
-\itemize{
+\describe{
   \item{\eqn{\alpha}}{is the shape parameter (\eqn{\alpha > 0}), which determines the shape of the distribution.}
   \item{\eqn{\beta}}{is the rate parameter (\eqn{\beta > 0}), which determines the rate of decay.}
 }
@@ -42,6 +38,9 @@ This function samples from a grid constructed using \code{\link{srgamma_optimize
 By default, \code{srgamma_custom()} samples from the standard Gamma distribution with \code{shape = 1} and \code{rate = 1}.
 The proposal distribution is pre-optimized at package load time using \code{srgamma_optimize()} with
 \code{steps = 4091}, creating a scalable grid centered around the mode.
+}
+\note{
+This function is not scalable. Therefore, only the \code{srgamma_custom()} version is available, which requires the grid to be pre-optimized using \code{srgamma_optimize()} before calling this function.
 }
 \examples{
 # Generate 10 samples from Gamma Distribution

@@ -3,7 +3,7 @@
 \name{srnorm}
 \alias{srnorm}
 \alias{srnorm_custom}
-\title{Sampling from the Normal Distribution}
+\title{Sampling from Normal Distribution}
 \usage{
 srnorm(n = 1, mean = 0, sd = 1, x = NULL)
 
@@ -33,7 +33,7 @@ It employs an optimized proposal distribution around the mode and Adaptive Rejec
 The Normal distribution has the probability density function (PDF):
 \eqn{f(x | \mu, \sigma) = \frac{1}{\sigma\sqrt{2\pi}} \exp\left(-\frac{(x - \mu)^2}{2\sigma^2}\right),}
 where:
-\itemize{
+\describe{
   \item{\eqn{\mu}}{ is the mean of the distribution, which determines the center of the bell curve.}
   \item{\eqn{\sigma}}{ is the standard deviation, which controls the spread of the distribution (\eqn{\sigma > 0}).}
 }

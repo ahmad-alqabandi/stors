@@ -42,17 +42,17 @@ check_grid_opt_criteria <- function(symmetric, cnum, dendata) {
       if ((std_symmetric &&
            !scaled_params[1]) ||
           (!std_symmetric && scaled_params[1])) {
-        msg <- cat("you need to delete the ",
+        msg <- message("you need to delete the ",
                    which_grid,
                    " built-in grid, that has ")
         name <- names(dendata$std_params)
         for (i in (1:(length(scaled_params) - 1))) {
-          msg <- cat(msg, name[i], " = ", scaled_params[i + 1])
+          msg <- message(msg, name[i], " = ", scaled_params[i + 1])
 
           if (i != length(scaled_params) - 1)
-            msg <- cat(msg, ", ")
+            msg <- message(msg, ", ")
           else
-            msg <- cat(msg, ".\n")
+            msg <- message(msg, ".\n")
 
         }
         stop(msg)
@@ -322,7 +322,7 @@ cache_user_grid_c <- function(grid) {
     stop("This grid is not valid")
 
   if (grid$lock %in% stors_env$user_session_cached_grid_locks[["lock"]]) {
-    print("cashed grid already exist, no more cashing cashing!. Just returning c_num !")
+    message("cashed grid already exist, no more cashing cashing!. Just returning c_num !")
 
     c_num <- stors_env$user_session_cached_grid_locks[stors_env$user_session_cached_grid_locks$lock == grid$lock, ]$cnum
 
@@ -330,7 +330,7 @@ cache_user_grid_c <- function(grid) {
 
   }
 
-  print("this grid has not been cashed before !")
+  message("this grid has not been cashed before !")
 
   c_num <- stors_env$user_cnum_counter
 
@@ -363,6 +363,32 @@ cached_grid_info <- function(cnum) {
 }
 
 
+#' Delete Built-in Grids
+#'
+#' @description
+#' This function deletes built-in grids from disk by specifying the sampling function and grid type.
+#' It is useful for managing cached grids and freeing up storage space.
+#'
+#' @param sampling_function String. The name of the sampling distribution's function in STORS.
+#' For example, \code{"srgamma"} or \code{"srchisq"}.
+#' @param grid_type String. Either \code{"custom"} to delete the custom grid or \code{"scaled"} to delete the scaled grid.
+#' Defaults to \code{"custom"}.
+#'
+#' @details
+#' The function looks for the specified grid type associated with the sampling function in the built-in grids directory.
+#' If the grid exists, it deletes the corresponding grid file from disk and frees its cached resources.
+#' If the specified sampling function or grid type does not exist, an error is thrown.
+#'
+#' @return
+#' A message indicating the status of the deletion process, or an error if the operation fails.
+#'
+#' @examples
+#' # Delete a custom grid for the srgamma function
+#' delete_build_in_grid(sampling_function = "srgamma", grid_type = "custom")
+#'
+#' # Delete a scaled grid for the srnorm function
+#' delete_build_in_grid(sampling_function = "srnorm", grid_type = "scaled")
+#'
 #' @export
 delete_build_in_grid <- function(sampling_function, grid_type = "custom") {
   grid_type <- match.arg(grid_type, c("scaled", "custom"))
@@ -379,10 +405,10 @@ delete_build_in_grid <- function(sampling_function, grid_type = "custom") {
 
   }
 
-  builtin_grids <- list.files(stors:::stors_env$builtin_grids_dir)
+  builtin_grids <- list.files(stors_env$builtin_grids_dir)
 
   for (grid_name in builtin_grids) {
-    grid_path <- file.path(stors:::stors_env$builtin_grids_dir, grid_name)
+    grid_path <- file.path(stors_env$builtin_grids_dir, grid_name)
     grid <- readRDS(grid_path)
 
     if ("lock" %in% names(grid)) {
@@ -393,7 +419,7 @@ delete_build_in_grid <- function(sampling_function, grid_type = "custom") {
         if (grid$cnum == grid_number) {
           file.remove(grid_path)
           free_cache_cnum_c(grid$cnum)
-          cat(" grid number ", grid$cnum, " DELETED !")
+          message(" grid number ", grid$cnum, " DELETED !")
         }
 
       }

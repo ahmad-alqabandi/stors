@@ -241,7 +241,7 @@ There are many built-in functions in stors, the list below shows all available f
 ```{r, echo = FALSE}
 funcs <- character()
 for (name in names(stors:::pbgrids)) {
-  funcs <- cat(funcs, " ", name)
+  funcs <- message(funcs, " ", name)
 }
 ```
 

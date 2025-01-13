@@ -1,4 +1,4 @@
-#' Sampling from the Gamma Distribution
+#' Sampling from Gamma Distribution
 #' @rdname srgamma_custom
 #'
 #' @description
@@ -12,7 +12,7 @@
 #' The Gamma distribution has the probability density function (PDF):
 #' \deqn{f(x | \alpha, \beta) = \frac{\beta^\alpha}{\Gamma(\alpha)} x^{\alpha - 1} \exp(-\beta x), \quad x \geq 0,}
 #' where:
-#' \itemize{
+#' \describe{
 #'   \item{\eqn{\alpha}}{is the shape parameter (\eqn{\alpha > 0}), which determines the shape of the distribution.}
 #'   \item{\eqn{\beta}}{is the rate parameter (\eqn{\beta > 0}), which determines the rate of decay.}
 #' }
@@ -25,8 +25,6 @@
 #' \code{steps = 4091}, creating a scalable grid centered around the mode.
 #'
 #' @param n Integer, length 1. Number of samples to draw.
-#' @param shape Numeric. The shape parameter (\eqn{\alpha}) of the Gamma distribution.
-#' @param rate Numeric. The rate parameter (\eqn{\beta}) of the Gamma distribution.
 #' @param x (optional) Numeric vector of length \eqn{n}. If provided, this vector is overwritten in place to avoid any memory allocation.
 #'
 #' @return
@@ -34,6 +32,9 @@
 #' The \code{shape} and \code{rate} parameters are specified during the optimization process using \code{srgamma_optimize()}.
 #'
 #' \bold{NOTE:} When the \code{x} parameter is specified, it is updated in-place with the simulation for performance reasons.
+#'
+#' @note
+#' This function is not scalable. Therefore, only the \code{srgamma_custom()} version is available, which requires the grid to be pre-optimized using \code{srgamma_optimize()} before calling this function.
 #'
 #' @seealso
 #' \code{\link{srgamma_optimize}} to optimize the custom grid.
@@ -71,6 +72,7 @@ srgamma_custom <- function(n = 1, x = NULL) {
 #'
 #' @param shape (optional) Numeric. The shape parameter (\eqn{\alpha}) of the Gamma distribution. Defaults to \code{1}.
 #' @param rate (optional) Numeric. The rate parameter (\eqn{\beta}) of the Gamma distribution. Defaults to \code{1}.
+#' @param scale (optional) Numeric. The scale parameter of the Gamma distribution. Defaults to \code{1}.
 #' @param xl Numeric. Left truncation bound for the target distribution. Defaults to \code{0}, representing no left truncation.
 #' @param xr Numeric. Right truncation bound for the target distribution. Defaults to \code{Inf}, representing no right truncation.
 #' @param steps (optional) Integer. Desired number of steps in the proposal grid. Defaults to \code{4091}.

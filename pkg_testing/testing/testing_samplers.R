@@ -193,9 +193,4 @@ microbenchmark::microbenchmark(
   times = 100
 )
 
-l <- list(a1 = 1 )
-
-l$a
-a <- c()
-for( i in seq_along(a)) print("1")
 
