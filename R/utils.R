@@ -322,15 +322,13 @@ cache_user_grid_c <- function(grid) {
     stop("This grid is not valid")
 
   if (grid$lock %in% stors_env$user_session_cached_grid_locks[["lock"]]) {
-    message("cashed grid already exist, no more cashing cashing!. Just returning c_num !")
+     message("Detected cached grid for this distribution already ... replacing with new grid.")
 
     c_num <- stors_env$user_session_cached_grid_locks[stors_env$user_session_cached_grid_locks$lock == grid$lock, ]$cnum
 
     return(c_num)
 
   }
-
-  message("this grid has not been cashed before !")
 
   c_num <- stors_env$user_cnum_counter
 
