@@ -94,13 +94,13 @@ microbenchmark::microbenchmark(
 
 
 library(distributionsrd)
+library(microbenchmark)
 
-# Set parameters
-n <- 1000  # Number of samples
-shape <- 2      # Shape parameter
-scale <- 1   # Scale parameter
+n <- 1000
+shape <- 2
+scale <- 1
 
-# Generate random samples
+# Generate random samples using distributionsrd Package
 samples <- rpareto(n, k = shape, xmin = scale)
 
 plot(density(samples), main = "Density of Pareto Distributed Samples using distributionsrd Package")
@@ -108,11 +108,13 @@ plot(density(samples), main = "Density of Pareto Distributed Samples using distr
 grid <- srpareto_optimize(scale = scale, shape = shape, steps = 8000)
 
 
+# Generate random samples using STORS Package
 samples <- srpareto_custom(n)
 
 plot(density(samples), main = "Density of Pareto Distributed Sample susing STORS Package")
 
 
+# Compare speed
 microbenchmark(
   stors = srpareto_custom(n),
   rpareto = rpareto(n, k = shape, xmin = scale),

@@ -13,25 +13,25 @@ srpareto_custom(n = 1, x = NULL)
 }
 \value{
 A numeric vector of length \code{n} containing random samples from the Pareto distribution.
-The \code{shape} and \code{rate} parameters are specified during the optimization process using \code{srpareto_optimize()}.
+The \code{shape} and \code{scale} parameters are specified during the optimization process using \code{srpareto_optimize()}.
 
 \bold{NOTE:} When the \code{x} parameter is specified, it is updated in-place with the simulation for performance reasons.
 }
 \description{
 The \code{srpareto_custom()} function generates random samples from a Pareto distribution using the STORS algorithm.
-It employs an optimized proposal distribution around the mode and Adaptive Rejection Sampling (ARS) for the tails.
+It employs an optimized proposal distribution around the mode and Inverse Transform (IT) method for the tails.
 }
 \details{
 The Pareto Distribution
 
 The Pareto distribution has the probability density function (PDF):
-\deqn{f(x | \alpha, \beta) = \frac{\beta^\alpha}{\Pareto(\alpha)} x^{\alpha - 1} \exp(-\beta x), \quad x \geq 0,}
+\deqn{f(x | \alpha, \sigma) = \frac{\alpha \sigma^\alpha}{x^{\alpha + 1}}, \quad x \geq \sigma,}
 where:
 \describe{
-  \item{\eqn{\alpha}}{is the shape parameter (\eqn{\alpha > 0}), which determines the shape of the distribution.}
-  \item{\eqn{\beta}}{is the rate parameter (\eqn{\beta > 0}), which determines the rate of decay.}
+  \item{\eqn{\alpha}}{is the shape parameter (\eqn{\alpha > 0}), which determines the tail heaviness of the distribution.}
+  \item{\eqn{\sigma}}{is the scale parameter (\eqn{\sigma > 0}), which determines the minimum possible value of \eqn{x}.}
 }
-The Pareto distribution is widely used in statistics, particularly in Bayesian inference and modeling waiting times.
+The Pareto distribution is widely used in modeling phenomena with heavy tails, such as wealth distribution, insurance losses, and natural events.
 
 This function samples from a grid constructed using \code{\link{srpareto_optimize}}, employing the STORS algorithm.
 
