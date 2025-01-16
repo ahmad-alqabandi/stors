@@ -126,7 +126,7 @@ srgamma_optimize <- function(shape = NULL,
 
   f_params <- list(shape = shape, scale = scale) # F L
 
-  f_params <- ifelse(sapply(f_params, is.null), 1, dendata$std_params)
+  f_params <- ifelse(sapply(f_params, is.null), dendata$std_params, f_params)
 
   modes <- dendata$set_modes(f_params$shape, f_params$scale)
 

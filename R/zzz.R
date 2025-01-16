@@ -143,6 +143,30 @@ pbgrids <- list(
     },
     lb = 0,
     rb = 1
+  ), srpareto = list(
+    c_num = 13,
+    tails_method = "IT",
+    scalable = FALSE,
+    std_params = list(scale = 1, shape = 1),
+    transform_params = function(par) {
+      return(par)
+    },
+    create_f = function(scale, shape) {
+      fun_txt <- paste0("function(x) { fx <- ifelse(x < ", scale, ", 0, ", shape * scale ^ shape, " / x^( ",
+                        shape," + 1 ))", "
+                        return(fx) }")
+      return(eval(parse(text = fun_txt)))
+    },
+    create_cdf = function(scale, shape) {
+      function(x) {
+        return(1 - ( scale / x) ^ scale )
+      }
+    },
+    set_modes = function(scale) {
+      return(scale)
+    },
+    lb = NULL,
+    rb = Inf
   )
 )
 
