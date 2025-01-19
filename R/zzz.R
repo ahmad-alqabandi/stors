@@ -107,7 +107,8 @@ pbgrids <- list(
     transform_params = function(par) {
       return(par)
     },
-    create_f = function(shape = 1, rate = 1, scale = 1 / rate) {
+    create_f = function(shape = 1, scale = 1) {
+      rate = 1 / scale
       fun_txt <- paste0(
         "function(x) {
         fx <- ifelse(x < 0, 0, (1 / (gamma(", shape, ") * ", scale, "^", shape, ") * x ^ (", shape, " - 1) * exp(-x /", scale, ")))
@@ -177,6 +178,9 @@ stors_env <- new.env(parent = emptyenv())
 
   data_dir <- tools::R_user_dir("stors", "data")
 
+  if (!dir.exists(data_dir))
+    dir.create(data_dir, recursive = TRUE)
+
   if (!file.exists(file.path(data_dir, "version"))) {
     # No versioning file so make sure directory is empty and create new version file
     unlink(list.files(tools::R_user_dir("stors", "data"), full.names = TRUE),
@@ -227,7 +231,6 @@ stors_env <- new.env(parent = emptyenv())
 
 
     for (name in names(pbgrids)) {
-
 
       fun_name <- paste0(name, "_optimize")
       do.call(fun_name, list(steps = 4091))

@@ -103,9 +103,9 @@ srgamma_custom <- function(n = 1, x = NULL) {
 #' @export
 srgamma_optimize <- function(shape = NULL,
                             rate = NULL,
+                            scale = NULL,
                             xl = NULL,
                             xr = NULL,
-                            scale = NULL,
                             steps = 4091,
                             grid_range = NULL,
                             theta = NULL,
@@ -122,7 +122,7 @@ srgamma_optimize <- function(shape = NULL,
 
   grid_type <- "custom"
 
-  if (is.null(scale)) scale <- 1 / rate
+  if (!is.null(rate)) scale <- 1 / rate
 
   f_params <- list(shape = shape, scale = scale) # F L
 
