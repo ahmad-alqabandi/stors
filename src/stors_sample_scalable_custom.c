@@ -240,13 +240,9 @@ SEXP DEN_SAMPLE_SYM_SCALED(NAME)(SEXP s_size, SEXP Rpassed_params){
 if(u1 > g->sampling_probabilities[1]){
 
 #if R_TAIL == IT
-  // pareto_IT( pareto_cdf(Inf) - A  + 0.989955  * A )
+
       double U = CDF(g->rb) - g->proposal_area + u1 * g->proposal_area;
       results[i] = R_ITF(U);
-      // Rprintf("u1 = %f \n", u1);
-      // Rprintf("g->proposal_area = %f \n", g->proposal_area);
-      // Rprintf("results[i] = %f \n\n",  results[i]);
-      // Rprintf("U = %f \n\n",  U);
 
       i++;
       u1 = unif_rand();
