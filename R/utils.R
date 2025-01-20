@@ -282,14 +282,13 @@ built_in_pars_trans <- function(f_params, cnum) {
 cache_grid_c <- function(c_num, grid) {
   n_params <- length(grid$f_params)
 
-  if (n_params == 0) {
-    f_params <- 0
-  } else {
+  f_params <- 0
+
+  if (n_params > 0) {
     f_params <- built_in_pars_trans(grid$f_params, c_num)
 
     f_params <- unlist(grid$f_params)
   }
-
 
   .Call(
     C_cache_grid,

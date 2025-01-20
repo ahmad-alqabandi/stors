@@ -196,12 +196,10 @@ SEXP DEN_SAMPLE_SYM_SCALED(NAME)(SEXP s_size, SEXP Rpassed_params){
 #if L_TAIL == IT
 
 #ifdef FLIP_SAMPLE
-        results[i] = FLIP_SAMPLE(L_ITF(u1 + CDF(g->lb)) ,flip);
+        results[i] = FLIP_SAMPLE(L_ITF(u1 * g->proposal_area + CDF(g->lb)) ,flip);
 #else
-      results[i] = L_ITF(u1 + CDF(g->lb));
-      // Rprintf("u1 + CDF(g->lb) = %f \n", u1 + CDF(g->lb));
-      // Rprintf("L_ITF(u1 + CDF(g->lb)) = %f \n\n", L_ITF(u1 + CDF(g->lb)));
-
+      double U = u1 * g->proposal_area + CDF(g->lb);
+      results[i] = L_ITF(U);
 
 #endif
 
@@ -242,10 +240,14 @@ SEXP DEN_SAMPLE_SYM_SCALED(NAME)(SEXP s_size, SEXP Rpassed_params){
 if(u1 > g->sampling_probabilities[1]){
 
 #if R_TAIL == IT
+  // pareto_IT( pareto_cdf(Inf) - A  + 0.989955  * A )
+      double U = CDF(g->rb) - g->proposal_area + u1 * g->proposal_area;
+      results[i] = R_ITF(U);
+      // Rprintf("u1 = %f \n", u1);
+      // Rprintf("g->proposal_area = %f \n", g->proposal_area);
+      // Rprintf("results[i] = %f \n\n",  results[i]);
+      // Rprintf("U = %f \n\n",  U);
 
-      results[i] = R_ITF(u1 - 1 + CDF(g->rb));
-      // Rprintf("u1 - 1 + CDF(g->rb) = %f \n", u1 - 1 + CDF(g->rb));
-      // Rprintf("R_ITF(u1 - 1 + CDF(g->rb)) = %f \n\n", R_ITF(u1 - 1 + CDF(g->rb)));
       i++;
       u1 = unif_rand();
 
@@ -278,7 +280,7 @@ if(u1 > g->sampling_probabilities[1]){
 
       u1 *= g->steps_number;
 
-      j = (int)u1;
+      j = (int) u1;
 
       u1 -= j;
 
@@ -289,7 +291,7 @@ if(u1 > g->sampling_probabilities[1]){
         sample = x[j] + u1 * (x[j + 1] - x[j]);
 
 #ifdef FLIP_SAMPLE
-          results[i] = FLIP_SAMPLE(sample,flip);
+        results[i] = FLIP_SAMPLE(sample,flip);
 #else
         results[i] = sample;
 #endif

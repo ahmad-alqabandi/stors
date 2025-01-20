@@ -153,14 +153,14 @@ pbgrids <- list(
       return(par)
     },
     create_f = function(scale, shape) {
-      fun_txt <- paste0("function(x) { fx <- ifelse(x < ", scale, ", 0, ", shape * scale ^ shape, " / x^( ",
+      fun_txt <- paste0("function(x) { fx <- ifelse(x < ", scale, ", 0, (", shape * scale ^ shape, ") / x^( ",
                         shape," + 1 ))", "
                         return(fx) }")
       return(eval(parse(text = fun_txt)))
     },
     create_cdf = function(scale, shape) {
       function(x) {
-        return(1 - ( scale / x) ^ scale )
+        return(1 - ( scale / x) ^ shape )
       }
     },
     set_modes = function(scale) {
