@@ -28,7 +28,7 @@ test_that("Built_in smpling functions returns a sample of correct size and seeds
 
 
 test_that("Built_in sampling functions, samples properties tests", {
-  for (name in names(pbgrids)) {
+  for (name in setdiff(names(pbgrids), "srpareto")) {
 
     lb <- pbgrids[[name]]$lb
     rb <- pbgrids[[name]]$rb

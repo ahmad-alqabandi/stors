@@ -11,7 +11,7 @@ test_that("MAIN", {
                          f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 1000)
 
   l_trunc <- 0
-  u_trunc <- Inf
+  r_trunc <- Inf
   norm_grid_trunc = build_grid(lb = l_trunc, rb = r_trunc, mode = modes_norm,
                          f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 1000)
 
@@ -41,7 +41,7 @@ test_that("Truncated user grid samples test", {
 
   x <- sampling_function_trunc(1000)
 
-  expect_true((min(x) >= l_trunc) && (max(x) <= u_trunc), info = paste0("generated samples must be within Normal distrebution\'s TRUNCATION BOUNDS"))
+  expect_true((min(x) >= l_trunc) && (max(x) <= r_trunc), info = paste0("generated samples must be within Normal distrebution\'s TRUNCATION BOUNDS"))
 
 })
 
