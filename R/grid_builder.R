@@ -171,15 +171,22 @@ build_grid <- function(lb = -Inf,
     stop("Error: 'f' density function must be provided.")
   }
 
+  f <- fix_function(f)
+
   if (is.null(h)) {
     h <- function(x) {
       log(f(x))
     }
+  }else{
+    h <- fix_function(h)
   }
 
   if (is.null(h_prime)) {
     h_prime <- stors_prime(modes, h)
+  }else{
+    h_prime <- fix_function(h_prime)
   }
+
 
   modes <- adjust_modes(modes, lb, rb, f)
 

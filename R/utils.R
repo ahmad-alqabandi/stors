@@ -1,4 +1,28 @@
 #' @noRd
+fix_function <- function(func) {
+  func_env <- environment(func)
+  func_body <- body(func)
+  func_args <- names(formals(func))
+
+  if(length(func_args) != 1) stop("all provided function must has only one parameter")
+
+  # Remove parameters from the environment to exclude them from substitution
+  captured_env <- as.list(func_env)
+  captured_env <- captured_env[!names(captured_env) %in% func_args]
+
+  # Replace free variables in the body with their values from the environment
+  fixed_body <- eval(substitute(substitute(func_body, captured_env), list(func_body = func_body)))
+
+  # Create a new function with the modified body
+  new_func <- func
+  body(new_func) <- fixed_body
+  environment(new_func) <- baseenv()  # Reset the environment to avoid referencing external variables
+
+  new_func
+}
+
+
+#' @noRd
 adjust_modes <- function(mode, xl, xr, f) {
   delta <- 0.0001
   new_modes <- mode[mode >= xl & mode <= xr]
