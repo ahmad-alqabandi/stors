@@ -102,6 +102,7 @@ stors <- function(grid) {
 
   sampling_function <- parse(text = grid$dens_func)
   dens_func <- eval(sampling_function)
+  dens_func <- create_function(dens_func, grid$density_arguments)
 
   rfunc_env <- new.env()
 

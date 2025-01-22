@@ -7,9 +7,9 @@
 srgamma_optimize(
   shape = NULL,
   rate = NULL,
+  scale = NULL,
   xl = NULL,
   xr = NULL,
-  scale = NULL,
   steps = 4091,
   grid_range = NULL,
   theta = NULL,
@@ -22,11 +22,11 @@ srgamma_optimize(
 
 \item{rate}{(optional) Numeric. The rate parameter (\eqn{\beta}) of the Gamma distribution. Defaults to \code{1}.}
 
+\item{scale}{(optional) Numeric. The scale parameter of the Gamma distribution. Defaults to \code{1}.}
+
 \item{xl}{Numeric. Left truncation bound for the target distribution. Defaults to \code{0}, representing no left truncation.}
 
 \item{xr}{Numeric. Right truncation bound for the target distribution. Defaults to \code{Inf}, representing no right truncation.}
-
-\item{scale}{(optional) Numeric. The scale parameter of the Gamma distribution. Defaults to \code{1}.}
 
 \item{steps}{(optional) Integer. Desired number of steps in the proposal grid. Defaults to \code{4091}.}
 

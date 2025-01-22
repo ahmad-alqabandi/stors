@@ -45,6 +45,7 @@ plot.grid <- function(x,
   grid <- x
   n <- nrow(grid$grid_data)
   f <- eval(parse(text = grid$dens_func))
+  f <- create_function(f, grid$density_arguments)
   lf <- f
   rf <- f
 

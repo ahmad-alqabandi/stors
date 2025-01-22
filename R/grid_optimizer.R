@@ -41,7 +41,8 @@ grid_optimizer <- function(dendata,
       right_bound = xr,
       left_bound = xl,
       estimated_area = NULL,
-      symmetric = symmetric
+      symmetric = symmetric,
+      density_arguments = list()
     ),
 
     proposal = list(

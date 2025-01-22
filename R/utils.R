@@ -1,4 +1,24 @@
 #' @noRd
+create_function <- function(f, arg_list){
+
+  fun_args <- names(formals(f))
+
+  arg_list <- arg_list[names(arg_list) %in% fun_args]
+
+  build_closure <- function(f, ...){
+    return(\(x) {
+      f(x, ...)
+    })
+  }
+
+  f <- do.call("build_closure",c(f,arg_list))
+
+  return(f)
+}
+
+
+
+#' @noRd
 fix_function <- function(func) {
   func_env <- environment(func)
   func_body <- body(func)

@@ -20,6 +20,17 @@
 #'  dictating when the proposal steps constructing break based on the probability of pre-acceptance.
 #' @param target_sample_size Scalar integer indicating the target sample size. The grid optimization process will take this number into account.
 #' @param verbose Boolean if set to True, a table detailing the optimization areas and steps will be displayed during grid optimization.
+#' @param ... Additional parameters required by \code{f}, \code{h}, and \code{h_prime} if they depend on arguments other than \code{x}.
+#'
+#' For instance, if \code{f} is defined as:
+#'
+#' \code{f <- function(x, scale) { x * scale }}
+#'
+#' The parameter \code{scale} must be passed to \code{build_grid} via \code{...}, as shown below:
+#'
+#' \code{grid <- build_grid(lb = 0, rb = 10, modes = 5, f = f, scale = 2)}
+#'
+#' See \strong{Details} for further explanation.
 #'
 #' @details
 #' The grid building process is executed through the construction of constant area rectangles,
@@ -27,6 +38,22 @@
 #' For each mode, rectangles are formed as steps around it,
 #'  with a width defined by \eqn{(x_i - x_{i-1})} and a height determined by \eqn{\max(f(x_{i-1}), f(x_i))}.
 #' This method effectively covers the target distribution in a stepped pattern.
+#'
+#' \strong{Handling Additional Parameters in Functions:}
+#' If the target density function \code{f}, its log-transform \code{h}, or its derivative \code{h_prime}
+#' require additional arguments beyond the primary argument \code{x}, these additional parameters must be
+#' passed through the \code{...} argument of \code{build_grid}.
+#'
+#' For example:
+#'
+#' \code{f <- function(x, scale) { x * scale }}
+#'
+#' To use this function, provide the required parameter \code{scale} via \code{build_grid}:
+#'
+#' \code{grid <- build_grid(lb = 0, rb = 10, modes = 5, f = f, scale = 2)}
+#'
+#' The \code{build_grid} function ensures these parameters are correctly passed to the respective
+#' functions during grid construction.
 #'
 #'
 #' The function \code{build_final_grid()} manages the construction of these steps and calculates values critical for the sampling process.
@@ -166,25 +193,30 @@ build_grid <- function(lb = -Inf,
                        grid_range = NULL,
                        theta = NULL,
                        target_sample_size = 1000,
-                       verbose = FALSE) {
+                       verbose = FALSE, ...) {
+
+  density_arguments <- list(...)
+
+
   if (!is.function(f)) {
     stop("Error: 'f' density function must be provided.")
   }
 
-  f <- fix_function(f)
+  preserved_f <- f
+  f <- create_function(f, density_arguments)
 
   if (is.null(h)) {
     h <- function(x) {
       log(f(x))
     }
   }else{
-    h <- fix_function(h)
+    h <- create_function(h, density_arguments)
   }
 
   if (is.null(h_prime)) {
     h_prime <- stors_prime(modes, h)
   }else{
-    h_prime <- fix_function(h_prime)
+    h_prime <- create_function(h_prime, density_arguments)
   }
 
 
@@ -193,6 +225,7 @@ build_grid <- function(lb = -Inf,
   grid_param <- list(
     target = list(
       density = f,
+      density_arguments = density_arguments,
       log_density = h,
       log_density_prime = h_prime,
       Cumulitive_density = NULL,
@@ -232,7 +265,7 @@ build_grid <- function(lb = -Inf,
   optimal_grid_params <- find_optimal_grid(grid_param)
   opt_grid <- build_final_grid(gp = optimal_grid_params)
 
-  opt_grid$dens_func <- deparse(f)
+  opt_grid$dens_func <- deparse(preserved_f)
 
   lock <- digest(opt_grid)
   opt_grid$lock <- lock
@@ -325,6 +358,7 @@ build_final_grid <- function(gp, opt_area = NULL) {
   grid_type <- gp$grid_type
   cnum <- gp$cnum
   f_area <- gp$target$estimated_area
+  density_arguments <- gp$target$density_arguments
 
 
 
@@ -478,7 +512,8 @@ build_final_grid <- function(gp, opt_area = NULL) {
       f_params = f_params,
       is_symmetric = is_symmetric,
       grid_type = grid_type,
-      target_function_area = f_area
+      target_function_area = f_area,
+      density_arguments = density_arguments
     )
   )
 

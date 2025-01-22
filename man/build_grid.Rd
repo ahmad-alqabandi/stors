@@ -15,7 +15,8 @@ build_grid(
   grid_range = NULL,
   theta = NULL,
   target_sample_size = 1000,
-  verbose = FALSE
+  verbose = FALSE,
+  ...
 )
 }
 \arguments{
@@ -41,6 +42,18 @@ dictating when the proposal steps constructing break based on the probability of
 \item{target_sample_size}{Scalar integer indicating the target sample size. The grid optimization process will take this number into account.}
 
 \item{verbose}{Boolean if set to True, a table detailing the optimization areas and steps will be displayed during grid optimization.}
+
+\item{...}{Additional parameters required by \code{f}, \code{h}, and \code{h_prime} if they depend on arguments other than \code{x}.
+
+For instance, if \code{f} is defined as:
+
+\code{f <- function(x, scale) { x * scale }}
+
+The parameter \code{scale} must be passed to \code{build_grid} via \code{...}, as shown below:
+
+\code{grid <- build_grid(lb = 0, rb = 10, modes = 5, f = f, scale = 2)}
+
+See \strong{Details} for further explanation.}
 }
 \value{
 The returned list must be stored by the user, as it is required to be passed to the \code{\link{stors}} function.
@@ -102,6 +115,22 @@ The grid building process is executed through the construction of constant area 
 For each mode, rectangles are formed as steps around it,
  with a width defined by \eqn{(x_i - x_{i-1})} and a height determined by \eqn{\max(f(x_{i-1}), f(x_i))}.
 This method effectively covers the target distribution in a stepped pattern.
+
+\strong{Handling Additional Parameters in Functions:}
+If the target density function \code{f}, its log-transform \code{h}, or its derivative \code{h_prime}
+require additional arguments beyond the primary argument \code{x}, these additional parameters must be
+passed through the \code{...} argument of \code{build_grid}.
+
+For example:
+
+\code{f <- function(x, scale) { x * scale }}
+
+To use this function, provide the required parameter \code{scale} via \code{build_grid}:
+
+\code{grid <- build_grid(lb = 0, rb = 10, modes = 5, f = f, scale = 2)}
+
+The \code{build_grid} function ensures these parameters are correctly passed to the respective
+functions during grid construction.
 
 
 The function \code{build_final_grid()} manages the construction of these steps and calculates values critical for the sampling process.
