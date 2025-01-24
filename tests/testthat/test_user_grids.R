@@ -2,17 +2,17 @@
 
 test_that("MAIN", {
 
-  modes_norm = 0
-  f_norm <- function(x) { 1 / sqrt(2 * pi) * exp(-0.5 * x^2) }
-  h_norm <- function(x) { log(f_norm(x)) }
-  h_prime_norm <- function(x) { -x }
+  modes_norm <- 0
+  f_norm <- function(x) 1 / sqrt(2 * pi) * exp(-0.5 * x^2)
+  h_norm <- function(x) log(f_norm(x))
+  h_prime_norm <- function(x) -x
 
-  norm_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_norm,
+  norm_grid <- build_grid(lb = -Inf, rb = Inf, mode = modes_norm,
                          f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 1000)
 
   l_trunc <- 0
   r_trunc <- Inf
-  norm_grid_trunc = build_grid(lb = l_trunc, rb = r_trunc, mode = modes_norm,
+  norm_grid_trunc <- build_grid(lb = l_trunc, rb = r_trunc, mode = modes_norm,
                          f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 1000)
 
 

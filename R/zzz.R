@@ -108,7 +108,7 @@ pbgrids <- list(
       return(par)
     },
     create_f = function(shape = 1, scale = 1) {
-      rate = 1 / scale
+      rate <- 1 / scale
       fun_txt <- paste0(
         "function(x) {
         fx <- ifelse(x < 0, 0, (1 / (gamma(", shape, ") * ", scale, "^", shape, ") * x ^ (", shape, " - 1) * exp(-x /", scale, ")))
@@ -154,13 +154,13 @@ pbgrids <- list(
     },
     create_f = function(scale, shape) {
       fun_txt <- paste0("function(x) { fx <- ifelse(x < ", scale, ", 0, (", shape * scale ^ shape, ") / x^( ",
-                        shape," + 1 ))", "
+                        shape, " + 1 ))", "
                         return(fx) }")
       return(eval(parse(text = fun_txt)))
     },
     create_cdf = function(scale, shape) {
       function(x) {
-        return(1 - ( scale / x) ^ shape )
+        return(1 - (scale / x) ^ shape)
       }
     },
     set_modes = function(scale) {

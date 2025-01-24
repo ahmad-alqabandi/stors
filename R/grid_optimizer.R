@@ -20,7 +20,7 @@ grid_optimizer <- function(dendata,
   if ((is.null(xl) || (xl < dendata$lb)))
     xl <- dendata$lb
 
-  if (is.null(xr) ||(xr > dendata$rb))
+  if (is.null(xr) || (xr > dendata$rb))
     xr <- dendata$rb
 
   if (xl > xr)

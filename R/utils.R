@@ -1,17 +1,17 @@
 #' @noRd
-create_function <- function(f, arg_list){
+create_function <- function(f, arg_list) {
 
   fun_args <- names(formals(f))
 
   arg_list <- arg_list[names(arg_list) %in% fun_args]
 
-  build_closure <- function(f, ...){
+  build_closure <- function(f, ...) {
     return(\(x) {
       f(x, ...)
     })
   }
 
-  f <- do.call("build_closure",c(f,arg_list))
+  f <- do.call("build_closure", c(f, arg_list))
 
   return(f)
 }
@@ -24,7 +24,7 @@ fix_function <- function(func) {
   func_body <- body(func)
   func_args <- names(formals(func))
 
-  if(length(func_args) != 1) stop("all provided function must has only one parameter")
+  if (length(func_args) != 1) stop("all provided function must has only one parameter")
 
   # Remove parameters from the environment to exclude them from substitution
   captured_env <- as.list(func_env)

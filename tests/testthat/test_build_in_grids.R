@@ -4,9 +4,9 @@ test_that("Built_in smpling functions returns a sample of correct size and seeds
 
   for (name in names(pbgrids)) {
 
-    if(pbgrids[[name]]$scalable){
+    if (pbgrids[[name]]$scalable) {
       srname_txt <- paste0(name, "(10)")
-    }else{
+    } else {
       srname_txt <- paste0(name, "_custom(10)")
     }
 
@@ -46,9 +46,9 @@ test_that("Built_in sampling functions, samples properties tests", {
     g <- eval(parse(text = paste0(name, "_optimize( xl = ", l_trunc, ",xr = ", u_trunc, ")")))
 
 
-    if(pbgrids[[name]]$scalable){
+    if (pbgrids[[name]]$scalable) {
       srname_txt <- paste0(name, "(1000)")
-    }else{
+    } else {
       srname_txt <- paste0(name, "_custom(1000)")
     }
 

@@ -209,13 +209,13 @@ build_grid <- function(lb = -Inf,
     h <- function(x) {
       log(f(x))
     }
-  }else{
+  } else {
     h <- create_function(h, density_arguments)
   }
 
   if (is.null(h_prime)) {
     h_prime <- stors_prime(modes, h)
-  }else{
+  } else {
     h_prime <- create_function(h_prime, density_arguments)
   }
 
@@ -640,7 +640,7 @@ find_right_steps <- function(gp, area, mode_i, steps_lim = Inf) {
       x_c <- x_next
       r <- r + 1
     }
-  } else{
+  } else {
     x[r] <- mode
     s_upper[r] <- s_lower[r] <- s_upper_lower[r] <-  p_a[r] <- 0
   }
