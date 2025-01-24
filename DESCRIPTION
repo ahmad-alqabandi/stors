@@ -1,7 +1,7 @@
 Package: stors
 Type: Package
 Title: Steps Optimized Rejection Sampling
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: c(
     person("Ahmad", "ALQabandi", email = "ahmad.alqabandi@durham.ac.uk",
            role = c("cre", "aut"),
@@ -10,12 +10,12 @@ Authors@R: c(
            role = c("aut", "ths"),
            comment = c(ORCID = "0000-0003-2211-233X")))
 Maintainer: Ahmad S. ALQabandi <ahmad.alqabandi@durham.ac.uk>
-Description: This package is designed for sampling from uni- and multimodal
-    distributions using very fast and efficient sampling techniques. In the 
-    tails, the Adaptive Rejection Sampling (ARS) algorithm has been implemented
-    to cover heavy and light-tailed distributions. Meanwhile, the core of the
-    distributions is covered by a nonparametric distribution, that is pre-built
-    based on the target density values at certain grid points.
+Description: Fast and efficient sampling from general univariate probability
+    density functions. Implements a rejection sampling approach designed to take
+    advantage of modern CPU caches and minimise evaluation of the the target
+    density for most samples. Many standard densities are internally implemented
+    in 'C' for high performance, with general user defined densities also
+    supported.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
