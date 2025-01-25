@@ -2,7 +2,7 @@
 % Please edit documentation in R/grid_builder.R
 \name{build_grid}
 \alias{build_grid}
-\title{Build User Grid}
+\title{Build Proposal}
 \usage{
 build_grid(
   lb = -Inf,
@@ -20,141 +20,148 @@ build_grid(
 )
 }
 \arguments{
-\item{lb}{Scalar representing the lower bound of the target density.}
+\item{lb}{Numeric scalar representing the lower bound of the target density.
+Default is \code{-Inf} for unbounded lower support.}
 
-\item{rb}{Scalar representing the upper bound of the target density.}
+\item{rb}{Numeric scalar representing the upper bound of the target density.
+Default is \code{Inf} for unbounded upper support.}
 
-\item{modes}{Vector indicating the modes of the density function.}
+\item{modes}{Numeric vector of modes of the density function.}
 
-\item{f}{Function accepting a single argument, returning the probability density of the target.}
+\item{f}{A function which returns the (unnormalised) probability density function of the target distribution.
+The first argument must be the value at which the pdf is to be evaluated.
+Additional arguments may be parameters of the distribution, which should be specified by name in the \code{...} arguments.}
 
-\item{h}{Function accepting a single argument, returning the log-transform of the target density.}
+\item{h}{An optional function which returns the (unnormalised) log-probability density function of the target distribution.
+As for \code{f} the first argument must be the value at which the log-pdf is to be evaluated and additional parameters may be named arguments passed to \code{...}.}
 
-\item{h_prime}{Function accepting a single argument, returning the first derivative of the log-transformed target density.}
+\item{h_prime}{An optional function which returns the first derivative of the (unnormalised) log-probability density function of the target distribution.
+As for \code{f} the first argument must be the value at which the log-pdf is to be evaluated and additional parameters may be named arguments passed to \code{...}.}
 
-\item{steps}{Optional Scalar integer indicating the number of steps in the proposal distribution.}
+\item{steps}{Optional integer scalar specifying the number of steps in the step optimised part of the proposal density and squeezing function.}
 
-\item{grid_range}{Optional Vector of two elements specifying the start and end points for constructing steps along the x-axis.}
+\item{grid_range}{Optional numeric vector of length 2 specifying the lower and upper range of the steps in the step optimised part of the proposal density and squeezing function.
+This range should be contained within the interval defined by \code{lb} and \code{rb}.}
 
-\item{theta}{Optional Scalar defining the pre-acceptance threshold,
-dictating when the proposal steps constructing break based on the probability of pre-acceptance.}
+\item{theta}{Optional numeric scalar (between 0 and 1) defining the pre-acceptance threshold.
+This dictates when no further steps should be added in the step optimised part of the proposal density and squeezing function, based on the probability of pre-acceptance.}
 
-\item{target_sample_size}{Scalar integer indicating the target sample size. The grid optimization process will take this number into account.}
+\item{target_sample_size}{Integer scalar indicating the typical sample size that will be requested when sampling from this density using stors.
+The grid optimization process bases benchmark timings on this target size in order to select a grid best suited to the desired sample size.
+Note this does \emph{not} limit sampling to this number, it is merely a guide should the user be aware that a certain sample size will be most commonly sampled.}
 
-\item{verbose}{Boolean if set to True, a table detailing the optimization areas and steps will be displayed during grid optimization.}
+\item{verbose}{Logical scalar.
+If \code{TRUE}, a table detailing the optimization areas and steps will be displayed during grid optimization.
+Defaults to \code{FALSE}.}
 
-\item{...}{Additional parameters required by \code{f}, \code{h}, and \code{h_prime} if they depend on arguments other than \code{x}.
-
-For instance, if \code{f} is defined as:
-
-\code{f <- function(x, scale) { x * scale }}
-
-The parameter \code{scale} must be passed to \code{build_grid} via \code{...}, as shown below:
-
-\code{grid <- build_grid(lb = 0, rb = 10, modes = 5, f = f, scale = 2)}
-
-See \strong{Details} for further explanation.}
+\item{...}{Further arguments to be passed to \code{f}, \code{h}, and \code{h_prime}, if they depend on additional parameters.}
 }
 \value{
-The returned list must be stored by the user, as it is required to be passed to the \code{\link{stors}} function.
-The \code{stors} function uses the grid's properties to build and return a sampling function.
+This returns a list which is used to construct the sampler by passing to \code{\link{stors}} function.
 
 A list containing the optimized grid and related parameters for the specified built-in distribution:
 \describe{
-  \item{\code{grid_data}}{A data frame with detailed information about the grid steps, including:
-  \describe{
-    \item{\code{x}}{The start point of each step on the x-axis.}
-    \item{\code{s_upper}}{The height of each step on the y-axis.}
-    \item{\code{p_a}}{Pre-acceptance probability for each step.}
-    \item{\code{s_upper_lower}}{A vector used to scale the uniform random number when the sample is accepted.}
-  }}
-  \item{\code{areas}}{A numeric vector containing the areas under:
-  \describe{
-    \item{\code{left_tail}}{The left tail bound.}
-    \item{\code{steps}}{The middle steps.}
-    \item{\code{right_tail}}{The right tail bound.}
-  }}
-  \item{\code{steps_number}}{An integer specifying the number of steps in the proposal.}
-  \item{\code{sampling_probabilities}}{A numeric vector with:
-  \describe{
-    \item{\code{left_tail}}{The probability of sampling from the left tail.}
-    \item{\code{left_and_middle}}{The combined probability of sampling from the left tail and middle steps.}
-  }}
-  \item{\code{unif_scaler}}{A numeric scalar, the inverse probability of sampling from the steps part of the proposal (\eqn{\frac{1}{p(lb < x < rb)}}). Used for scaling uniform random values.}
-  \item{\code{lt_properties}}{A numeric vector of 5 values required for Adaptive Rejection Sampling (ARS) in the left tail.}
-  \item{\code{rt_properties}}{A numeric vector of 6 values required for ARS in the right tail.}
-  \item{\code{alpha}}{A numeric scalar representing the uniform step area.}
-  \item{\code{tails_method}}{A string, either \code{"ARS"} (Adaptive Rejection Sampling) or \code{"IT"} (Inverse Transform), indicating the sampling method for the tails.}
-  \item{\code{grid_bounds}}{A numeric vector specifying the left and right bounds of the target density.}
-  \item{\code{cnum}}{An integer representing the cache number of the created grid in memory.}
-  \item{\code{symmetric}}{A numeric scalar indicating the symmetry point of the grid, or \code{NULL} if not symmetric.}
-  \item{\code{f_params}}{A list of parameters for the target density that the proposal grid is designed for.}
-  \item{\code{is_symmetric}}{A logical value indicating whether the proposal grid is symmetric.}
-  \item{\code{grid_type}}{A string indicating the type of the generated grid:
-  \describe{
-    \item{\code{"scaled"}}{The grid is "scalable" and standardized with \code{rate = 1}. This is used when parameter \code{rate} is either \code{NULL} or not provided. Scalable grids are compatible with \code{\link{srexp}}.}
-    \item{\code{"custom"}}{The grid is "custom" when \code{rate} is provided. Custom grids are compatible with \code{\link{srexp_custom}}.}
-  }}
-  \item{\code{target_function_area}}{A numeric scalar estimating the area of the target distribution.}
-  \item{\code{dens_func}}{A string containing the hardcoded density function.}
-  \item{\code{density_name}}{A string specifying the name of the target density distribution.}
-  \item{\code{lock}}{An identifier used for saving and loading the grid from disk.}
+\item{\code{grid_data}}{A data frame with detailed information about the grid steps, including:
+\describe{
+\item{\code{x}}{The start point of each step on the x-axis.}
+\item{\code{s_upper}}{The height of each step on the y-axis.}
+\item{\code{p_a}}{Pre-acceptance probability for each step.}
+\item{\code{s_upper_lower}}{A vector used to scale the uniform random number when the sample is accepted.}
+}}
+\item{\code{areas}}{A numeric vector containing the areas under:
+\describe{
+\item{\code{left_tail}}{The left tail bound.}
+\item{\code{steps}}{The middle steps.}
+\item{\code{right_tail}}{The right tail bound.}
+}}
+\item{\code{steps_number}}{An integer specifying the number of steps in the proposal.}
+\item{\code{sampling_probabilities}}{A numeric vector with:
+\describe{
+\item{\code{left_tail}}{The probability of sampling from the left tail.}
+\item{\code{left_and_middle}}{The combined probability of sampling from the left tail and middle steps.}
+}}
+\item{\code{unif_scaler}}{A numeric scalar, the inverse probability of sampling from the steps part of the proposal (\eqn{\frac{1}{p(lb < x < rb)}}). Used for scaling uniform random values.}
+\item{\code{lt_properties}}{A numeric vector of 5 values required for Adaptive Rejection Sampling (ARS) in the left tail.}
+\item{\code{rt_properties}}{A numeric vector of 6 values required for ARS in the right tail.}
+\item{\code{alpha}}{A numeric scalar representing the uniform step area.}
+\item{\code{tails_method}}{A string, either \code{"ARS"} (Adaptive Rejection Sampling) or \code{"IT"} (Inverse Transform), indicating the sampling method for the tails.}
+\item{\code{grid_bounds}}{A numeric vector specifying the left and right bounds of the target density.}
+\item{\code{cnum}}{An integer representing the cache number of the created grid in memory.}
+\item{\code{symmetric}}{A numeric scalar indicating the symmetry point of the grid, or \code{NULL} if not symmetric.}
+\item{\code{f_params}}{A list of parameters for the target density that the proposal grid is designed for.}
+\item{\code{is_symmetric}}{A logical value indicating whether the proposal grid is symmetric.}
+\item{\code{grid_type}}{A string indicating the type of the generated grid:
+\describe{
+\item{\code{"scaled"}}{The grid is "scalable" and standardized with \code{rate = 1}. This is used when parameter \code{rate} is either \code{NULL} or not provided. Scalable grids are compatible with \code{\link{srexp}}.}
+\item{\code{"custom"}}{The grid is "custom" when \code{rate} is provided. Custom grids are compatible with \code{\link{srexp_custom}}.}
+}}
+\item{\code{target_function_area}}{A numeric scalar estimating the area of the target distribution.}
+\item{\code{dens_func}}{A string containing the hardcoded density function.}
+\item{\code{density_name}}{A string specifying the name of the target density distribution.}
+\item{\code{lock}}{An identifier used for saving and loading the grid from disk.}
 }
 }
 \description{
-This function is essential for sampling from any uni-modal or multi-modal log-concave density function.
- It generates a proposal grid that can be utilized for this purpose.
- Simply provide the density function \code{f} and its modes. For enhanced accuracy, include
-the log-transform \code{h} of the density and its first derivative \code{h_prime}.
- The grid optimization is pre-configured for efficiency,
-but you can customize the grid-building process through various parameters to suit your specific needs.
+Constructs the step optimized proposal density, squeezing function, and log-linear tail proposal for a user defined probability density function.
 }
 \details{
-The grid building process is executed through the construction of constant area rectangles,
- starting from the modes of the target distribution.
-For each mode, rectangles are formed as steps around it,
- with a width defined by \eqn{(x_i - x_{i-1})} and a height determined by \eqn{\max(f(x_{i-1}), f(x_i))}.
-This method effectively covers the target distribution in a stepped pattern.
+This function is the starting point when a user wishes to build a custom sampler using StORS.
+It is responsible for generating the step optimized proposal density, squeezing function, and log-linear tail proposal that can be utilized for this purpose.
+The minimum information that must be supplied by the user is:
+\itemize{
+\item The (closed) interval of support for the distribution, [\code{lb}, \code{rb}] \eqn{\in \mathbb{R}}, which may also be half-closed on either side, or all of \eqn{\mathbb{R}}.
+\item The probability density function (pdf), which need not be normalised, \code{f}.
+\item Any modes of the pdf, as vector \code{modes}.
+}
 
-\strong{Handling Additional Parameters in Functions:}
-If the target density function \code{f}, its log-transform \code{h}, or its derivative \code{h_prime}
-require additional arguments beyond the primary argument \code{x}, these additional parameters must be
-passed through the \code{...} argument of \code{build_grid}.
+Optionally, the log-pdf and derivative of the log-pdf may be supplied.
 
-For example:
+\strong{Arguments for pdf}
 
-\code{f <- function(x, scale) { x * scale }}
+The pdf (and log-pdf and first derivative of the log-pdf) may depend on certain parameters.
+If so, these can be from the second argument onward in \code{f}.
+For instance, consider the Kumaraswamy distribution, which has pdf:
+\deqn{f(x; a,b) = a b x^{a-1}{ (1-x^a)}^{b-1},  \ \ \mbox{where} \ \ x \in (0,1)}
+This pdf has known modes.
 
-To use this function, provide the required parameter \code{scale} via \code{build_grid}:
+Then, to implement as a custom StORS sampler, we would first define the pdf in R:
 
-\code{grid <- build_grid(lb = 0, rb = 10, modes = 5, f = f, scale = 2)}
+\code{dkumaraswamy <- function(x, a, b) a*b*(x^(a-1))*(1-x^a)^(b-1)}
 
-The \code{build_grid} function ensures these parameters are correctly passed to the respective
-functions during grid construction.
+Then, to construct a StORS proposal for \eqn{a=2} and \eqn{b=2}, we would call
 
+\code{grid <- build_grid(lb = 0, rb = 1, modes = sqrt(1/3), f = dkumaraswamy, a = 2, b = 2)}
+
+\strong{StORS proposal construction}
+
+StORS defines an unnormalised piecewise constant proposal density and squeezing function, with a grid defining the change points.
+To optimise the execution speed on modern CPUs, the unnormalised piecewise constant proposal has fixed area for each segment with one end of the segment coinciding with the user's pdf.
+That is, each step of the function has width defined by \eqn{w_i = (x_i - x_{i-1})} and a height determined by \eqn{h_i = \max(f(x_{i-1}), f(x_i))}, such that \eqn{w_i h_i = \alpha \ \forall\,i} where \eqn{\alpha} is constant.
+
+Once the user has constructed the proposal, the sampling function can be built using \code{\link[=stors]{stors()}}.
+
+\strong{Internal details}
 
 The function \code{build_final_grid()} manages the construction of these steps and calculates values critical for the sampling process.
 When the resultant grid is used with the \code{stors()} function, these values are cached,
 significantly enhancing the computational efficiency and hence improving sampling speed.
- During the optimization process, we aim for a certain grid
+During the optimization process, we aim for a certain grid
 size based on L1-3 memory cache size. Therefore, we test the speed of grids of sizes \eqn{2^m} Kb.
- To achieve this, we estimate the uniform step area
+To achieve this, we estimate the uniform step area
 based on a certain steps number that leads to the target cache size,
- \eqn{ \alpha = \frac{1}{\text{number of steps}} }.
-
+\eqn{ \alpha = \frac{1}{\text{number of steps}} }.
 
 The speed testing for each possible grid is initially based on a sample size of 1000.
- However, if the user wishes to optimize the grid for a different sample size, they can do so
+However, if the user wishes to optimize the grid for a different sample size, they can do so
 by specifying the desired sample size using the \code{target_sample_size} argument.
-
 
 In case the user wants to select a specific number of steps for the proposal grid
 and bypass the optimization process, this can be done by specifying a steps number greater than the number of modes by 2 using the \code{steps} argument.
- If the target density is heavy-tailed,
-  and the user wishes to stop the grid building process at a certain pre-acceptance threshold, this can be achieved by setting
+If the target density is heavy-tailed,
+and the user wishes to stop the grid building process at a certain pre-acceptance threshold, this can be achieved by setting
 the acceptance probability threshold \code{theta} \eqn{\theta}.
- Once the steps reach this level of pre-acceptance probability,
-  the step construction will end \eqn{ \frac{\min(f(x_i), f(x_{i+1}))}{\max(f(x_i), f(x_{i+1}))} < \theta }.
+Once the steps reach this level of pre-acceptance probability,
+the step construction will end \eqn{ \frac{\min(f(x_i), f(x_{i+1}))}{\max(f(x_i), f(x_{i+1}))} < \theta }.
 Alternatively, if the user wishes to create the steps within certain limits on the
 x-axis, they can do so by specifying the proposal grid limits using the \code{grid_range} argument.
 }
