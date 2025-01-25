@@ -34,8 +34,8 @@ The Laplace distribution has the probability density function (PDF):
 \eqn{f(x | \mu, b) = \frac{1}{2b} \exp\left(-\frac{|x - \mu|}{b}\right),}
 where:
 \describe{
-  \item{\eqn{\mu}}{is the location parameter (mean of the distribution).}
-  \item{\code{b}}{is the scale parameter, which controls the spread of the distribution (\code{b > 0}).}
+\item{\eqn{\mu}}{is the location parameter (mean of the distribution).}
+\item{\code{b}}{is the scale parameter, which controls the spread of the distribution (\code{b > 0}).}
 }
 
 These two functions are for sampling using the STORS algorithm based on the grid that has been constructed using \code{\link{srlaplace_optimize}}.

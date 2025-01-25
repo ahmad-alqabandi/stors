@@ -38,10 +38,10 @@ srbeta_optimize(
 \value{
 A list containing the optimized grid and related parameters for the specified Beta distribution. The grid is also cached for internal use.
 \describe{
-  \item{\code{grid_data}}{Detailed information about the grid steps, including \code{x}, \code{s_upper}, \code{p_a}, and \code{s_upper_lower}.}
-  \item{\code{areas}}{The areas under the left tail, steps, and right tail of the proposal distribution.}
-  \item{\code{steps_number}}{The number of steps in the proposal grid.}
-  \item{\code{f_params}}{The parameters (\code{shape1} and \code{shape2}) of the Beta distribution.}
+\item{\code{grid_data}}{Detailed information about the grid steps, including \code{x}, \code{s_upper}, \code{p_a}, and \code{s_upper_lower}.}
+\item{\code{areas}}{The areas under the left tail, steps, and right tail of the proposal distribution.}
+\item{\code{steps_number}}{The number of steps in the proposal grid.}
+\item{\code{f_params}}{The parameters (\code{shape1} and \code{shape2}) of the Beta distribution.}
 }
 }
 \description{
@@ -51,11 +51,11 @@ The grid can be customized and adjusted based on various options provided by the
 \details{
 When \code{srbeta_optimize()} is explicitly called:
 \itemize{
-  \item A grid is created and cached. If no parameters are provided, a standard grid is created with \code{shape1 = 1} and \code{shape2 = 1}.
-  \item Providing \code{shape1} and \code{shape2} creates a custom grid, which is cached for use with \code{srbeta_custom()}.
-  \item The optimization process can be controlled via parameters such as \code{steps}, \code{grid_range}, or
-  \code{theta}. If no parameters are provided, the grid is optimized via brute force based on the
-  \code{target_sample_size}.
+\item A grid is created and cached. If no parameters are provided, a standard grid is created with \code{shape1 = 1} and \code{shape2 = 1}.
+\item Providing \code{shape1} and \code{shape2} creates a custom grid, which is cached for use with \code{srbeta_custom()}.
+\item The optimization process can be controlled via parameters such as \code{steps}, \code{grid_range}, or
+\code{theta}. If no parameters are provided, the grid is optimized via brute force based on the
+\code{target_sample_size}.
 }
 }
 \examples{

@@ -16,8 +16,8 @@ Prints a summary of the grid's properties, but does not return any value.
 }
 \description{
 The function displays detailed information about the grid object created by STORS' \code{build_grid()} or \code{grid_optimizer()} functions.
- This includes the number of steps within the grid, the range of values covered by the grid, and the grid's sampling efficiency.
-  This information is crucial for understanding the structure and performance of the grid in sampling processes.
+This includes the number of steps within the grid, the range of values covered by the grid, and the grid's sampling efficiency.
+This information is crucial for understanding the structure and performance of the grid in sampling processes.
 }
 \details{
 This method extends the generic \code{print} function for objects of class \code{grid}.

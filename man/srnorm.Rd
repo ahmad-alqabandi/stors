@@ -34,8 +34,8 @@ The Normal distribution has the probability density function (PDF):
 \eqn{f(x | \mu, \sigma) = \frac{1}{\sigma\sqrt{2\pi}} \exp\left(-\frac{(x - \mu)^2}{2\sigma^2}\right),}
 where:
 \describe{
-  \item{\eqn{\mu}}{ is the mean of the distribution, which determines the center of the bell curve.}
-  \item{\eqn{\sigma}}{ is the standard deviation, which controls the spread of the distribution (\eqn{\sigma > 0}).}
+\item{\eqn{\mu}}{ is the mean of the distribution, which determines the center of the bell curve.}
+\item{\eqn{\sigma}}{ is the standard deviation, which controls the spread of the distribution (\eqn{\sigma > 0}).}
 }
 
 These two functions are for sampling using the STORS algorithm based on the grid that has been constructed using \code{\link{srnorm_optimize}}.

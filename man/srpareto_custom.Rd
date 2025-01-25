@@ -28,8 +28,8 @@ The Pareto distribution has the probability density function (PDF):
 \deqn{f(x | \alpha, \sigma) = \frac{\alpha \sigma^\alpha}{x^{\alpha + 1}}, \quad x \geq \sigma,}
 where:
 \describe{
-  \item{\eqn{\alpha}}{is the shape parameter (\eqn{\alpha > 0}), which determines the tail heaviness of the distribution.}
-  \item{\eqn{\sigma}}{is the scale parameter (\eqn{\sigma > 0}), which determines the minimum possible value of \eqn{x}.}
+\item{\eqn{\alpha}}{is the shape parameter (\eqn{\alpha > 0}), which determines the tail heaviness of the distribution.}
+\item{\eqn{\sigma}}{is the scale parameter (\eqn{\sigma > 0}), which determines the minimum possible value of \eqn{x}.}
 }
 The Pareto distribution is widely used in modeling phenomena with heavy tails, such as wealth distribution, insurance losses, and natural events.
 

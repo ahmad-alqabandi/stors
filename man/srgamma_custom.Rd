@@ -28,8 +28,8 @@ The Gamma distribution has the probability density function (PDF):
 \deqn{f(x | \alpha, \beta) = \frac{\beta^\alpha}{\Gamma(\alpha)} x^{\alpha - 1} \exp(-\beta x), \quad x \geq 0,}
 where:
 \describe{
-  \item{\eqn{\alpha}}{is the shape parameter (\eqn{\alpha > 0}), which determines the shape of the distribution.}
-  \item{\eqn{\beta}}{is the rate parameter (\eqn{\beta > 0}), which determines the rate of decay.}
+\item{\eqn{\alpha}}{is the shape parameter (\eqn{\alpha > 0}), which determines the shape of the distribution.}
+\item{\eqn{\beta}}{is the rate parameter (\eqn{\beta > 0}), which determines the rate of decay.}
 }
 The Gamma distribution is widely used in statistics, particularly in Bayesian inference and modeling waiting times.
 

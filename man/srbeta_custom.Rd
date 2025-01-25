@@ -28,8 +28,8 @@ The Beta distribution has the probability density function (PDF):
 \deqn{f(x | \alpha, \beta) = \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha)\Gamma(\beta)} x^{\alpha - 1} (1 - x)^{\beta - 1}, \quad 0 \leq x \leq 1,}
 where:
 \describe{
-  \item{\eqn{\alpha}}{is the first shape parameter (\eqn{\alpha > 0}).}
-  \item{\eqn{\beta}}{is the second shape parameter (\eqn{\beta > 0}).}
+\item{\eqn{\alpha}}{is the first shape parameter (\eqn{\alpha > 0}).}
+\item{\eqn{\beta}}{is the second shape parameter (\eqn{\beta > 0}).}
 }
 The Beta distribution is widely used in Bayesian statistics and in modeling probabilities and proportions.
 

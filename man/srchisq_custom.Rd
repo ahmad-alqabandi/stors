@@ -28,7 +28,7 @@ The Chi-squared distribution has the probability density function (PDF):
 \deqn{f(x | k) = \frac{1}{2^{k/2} \Gamma(k/2)} x^{(k/2) - 1} \exp(-x/2), \quad x \geq 0,}
 where:
 \describe{
-  \item{\eqn{k}}{ is the degrees of freedom (\eqn{k > 0}), which determines the shape of the distribution.}
+\item{\eqn{k}}{ is the degrees of freedom (\eqn{k > 0}), which determines the shape of the distribution.}
 }
 The Chi-squared distribution is widely used in hypothesis testing and constructing confidence intervals, particularly in the context of variance estimation.
 
