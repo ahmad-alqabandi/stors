@@ -5,10 +5,10 @@
 \title{Build Proposal}
 \usage{
 build_proposal(
+  f = NULL,
+  modes = NA,
   lb = -Inf,
   rb = Inf,
-  modes = NULL,
-  f = NA,
   h = NULL,
   h_prime = NULL,
   steps = NULL,
@@ -20,17 +20,17 @@ build_proposal(
 )
 }
 \arguments{
+\item{f}{A function which returns the (unnormalised) probability density function of the target distribution.
+The first argument must be the value at which the pdf is to be evaluated.
+Additional arguments may be parameters of the distribution, which should be specified by name in the \code{...} arguments.}
+
+\item{modes}{Numeric vector of modes of the density function.}
+
 \item{lb}{Numeric scalar representing the lower bound of the target density.
 Default is \code{-Inf} for unbounded lower support.}
 
 \item{rb}{Numeric scalar representing the upper bound of the target density.
 Default is \code{Inf} for unbounded upper support.}
-
-\item{modes}{Numeric vector of modes of the density function.}
-
-\item{f}{A function which returns the (unnormalised) probability density function of the target distribution.
-The first argument must be the value at which the pdf is to be evaluated.
-Additional arguments may be parameters of the distribution, which should be specified by name in the \code{...} arguments.}
 
 \item{h}{An optional function which returns the (unnormalised) log-probability density function of the target distribution.
 As for \code{f} the first argument must be the value at which the log-pdf is to be evaluated and additional parameters may be named arguments passed to \code{...}.}

@@ -62,18 +62,18 @@
 #' Alternatively, if the user wishes to create the steps within certain limits on the
 #' x-axis, they can do so by specifying the proposal limits using the \code{proposal_range} argument.
 #'
-#' @param lb
-#'        Numeric scalar representing the lower bound of the target density.
-#'        Default is `-Inf` for unbounded lower support.
-#' @param rb
-#'        Numeric scalar representing the upper bound of the target density.
-#'        Default is `Inf` for unbounded upper support.
 #' @param modes
 #'        Numeric vector of modes of the density function.
 #' @param f
 #'        A function which returns the (unnormalised) probability density function of the target distribution.
 #'        The first argument must be the value at which the pdf is to be evaluated.
 #'        Additional arguments may be parameters of the distribution, which should be specified by name in the `...` arguments.
+#' @param lb
+#'        Numeric scalar representing the lower bound of the target density.
+#'        Default is `-Inf` for unbounded lower support.
+#' @param rb
+#'        Numeric scalar representing the upper bound of the target density.
+#'        Default is `Inf` for unbounded upper support.
 #' @param h
 #'        An optional function which returns the (unnormalised) log-probability density function of the target distribution.
 #'        As for `f` the first argument must be the value at which the log-pdf is to be evaluated and additional parameters may be named arguments passed to `...`.
@@ -200,18 +200,18 @@
 #'
 #' @import digest
 #' @export
-build_proposal <- function(lb = -Inf,
-                       rb = Inf,
-                       modes = NULL,
-                       f = NA,
-                       h = NULL,
-                       h_prime = NULL,
-                       steps = NULL,
-                       proposal_range = NULL,
-                       theta = NULL,
-                       target_sample_size = 1000,
-                       verbose = FALSE, ...) {
-
+build_proposal <- function(f = NULL,
+                           modes = NA,
+                           lb = -Inf,
+                           rb = Inf,
+                           h = NULL,
+                           h_prime = NULL,
+                           steps = NULL,
+                           proposal_range = NULL,
+                           theta = NULL,
+                           target_sample_size = 1000,
+                           verbose = FALSE,
+                           ...) {
   density_arguments <- list(...)
 
 
