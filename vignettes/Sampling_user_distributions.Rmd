@@ -20,12 +20,12 @@ The `stors` package is designed to generate samples from uni- and multimodal dis
 
 In this vignette, we focus on how to use the `stors` package to sample from user-defined distributions. We will demonstrate how to build custom grids for distributions not covered by the built-in functions and how to utilize the package's functions to sample efficiently from these distributions.
 
-To sample from user-defined distributions, you can create custom grids using the `build_grid()` function and then use the `stors()` function to create a sampler based on the custom grid.
+To sample from user-defined distributions, you can create custom grids using the `build_proposal()` function and then use the `stors()` function to create a sampler based on the custom grid.
 
 
 ## Sampling from User-Defined Distributions
 
-For distributions not covered by the built-in functions and that satisfy the log-concavity condition, users have the flexibility to create their own grids using the `build_grid()` function. This function is designed to handle a variety of distributions by accepting a range of parameters tailored to the specific needs of the distribution being sampled from.
+For distributions not covered by the built-in functions and that satisfy the log-concavity condition, users have the flexibility to create their own grids using the `build_proposal()` function. This function is designed to handle a variety of distributions by accepting a range of parameters tailored to the specific needs of the distribution being sampled from.
 
 The following example demonstrates the process of sampling from a bimodal normal distribution. Let's assume that you want to sample from a bimodal distribution, which is a combination of two normal distributions \( f(x) = 0.5 w_1(x) + 0.5 w_2(x) \), where \( w_1(x) \sim N(0, 1) \) and \( w_2(x) \sim N(4, 1) \):
 
@@ -52,10 +52,10 @@ h_prime_bi <- function(x) {
   num / den
 }
 
-bi_grid <- build_grid(lb = -Inf, rb = Inf, modes = modes_bi, f = f_bi, h = h_bi, h_prime = h_prime_bi)
+bi_grid <- build_proposal(lb = -Inf, rb = Inf, modes = modes_bi, f = f_bi, h = h_bi, h_prime = h_prime_bi)
 ```
 
-After building the desired grid with `build_grid()`, you can explore its properties using the `print()` function and visualize its structure using the `plot()` function. This step is similar to what was done previously with the built-in grid and helps in understanding the grid's configuration and ensuring that it aligns with the requirements of the target distribution.
+After building the desired grid with `build_proposal()`, you can explore its properties using the `print()` function and visualize its structure using the `plot()` function. This step is similar to what was done previously with the built-in grid and helps in understanding the grid's configuration and ensuring that it aligns with the requirements of the target distribution.
 
 ```{r , echo = TRUE}
 # Printing the properties of the custom grid
@@ -87,7 +87,7 @@ Example: Sampling from a Truncated Multi-Modal Distribution
 modes_bi <- c(0.00134865, 3.99865)
 
 # Build a truncated grid for the multi-modal distribution
-bi_grid_trunc_grid <- build_grid(
+bi_grid_trunc_grid <- build_proposal(
   lb = -1,
   rb = 6,
   modes = modes_bi,
@@ -129,22 +129,22 @@ hist(
 
 ## Saving, Loading, and Deleting User Grids
 
-The grid stored in `bi_grid` will not be preserved across sessions. Therefore, if you are satisfied with the sampling results and wish to store the grid for future use, you should save the grid using the `save_grid()` function. This function takes the optimized grid and a filename you choose to save the grid in the internal R data directory on your machine. This is recommended if you plan to use the grid frequently across sessions, to avoid re-optimizing the grid in future sessions.
+The grid stored in `bi_grid` will not be preserved across sessions. Therefore, if you are satisfied with the sampling results and wish to store the grid for future use, you should save the grid using the `save_proposal()` function. This function takes the optimized grid and a filename you choose to save the grid in the internal R data directory on your machine. This is recommended if you plan to use the grid frequently across sessions, to avoid re-optimizing the grid in future sessions.
 
 ```{r , echo = TRUE}
-save_grid(bi_grid, "bimodal_grid")
+save_proposal(bi_grid, "bimodal_grid")
 ```
 
-To load and use the grid in future sessions, you only need to use the `load_grid()` function.
+To load and use the grid in future sessions, you only need to use the `load_proposal()` function.
 
 ```{r , echo = TRUE}
-bi_grid <- load_grid("bimodal_grid")
+bi_grid <- load_proposal("bimodal_grid")
 ```
 
-In case you want to view a list of all previously stored grids, the `print_grids()` function will provide you with all stored grids.
+In case you want to view a list of all previously stored grids, the `print_proposals()` function will provide you with all stored grids.
 
 ```{r , echo = TRUE}
-print_grids()
+print_proposals()
 ```
 
 Be aware that the saved grid can be quite large in size, depending on your system. Therefore, if you want to delete a grid, the `delete_grid()` function can be used by providing the grid's name.
@@ -152,5 +152,5 @@ Be aware that the saved grid can be quite large in size, depending on your syste
 ```{r , echo = TRUE}
 delete_grid("bimodal_grid")
 
-print_grids()
+print_proposals()
 ```

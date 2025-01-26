@@ -32,14 +32,14 @@ where:
 }
 The Chi-squared distribution is widely used in hypothesis testing and constructing confidence intervals, particularly in the context of variance estimation.
 
-this function is sampling from grid that has been constructed using \code{\link{srchisq_optimize}}, using the STORS algorithm.
+this function is sampling from proposal that has been constructed using \code{\link{srchisq_optimize}}, using the STORS algorithm.
 
 By default, \code{srchisq_custom()} samples from Chi-squared Distribution \code{df = 2}.
 The proposal distribution is pre-optimized at package load time using \code{srchisq_optimize()} with
-\code{steps = 4091}, creating a scalable grid centered around the mode.
+\code{steps = 4091}, creating a scalable proposal centered around the mode.
 }
 \note{
-This function is not scalable. Therefore, only the \code{srchisq_custom()} version is available, which requires the grid to be pre-optimized using \code{srchisq_optimize()} before calling this function.
+This function is not scalable. Therefore, only the \code{srchisq_custom()} version is available, which requires the proposal to be pre-optimized using \code{srchisq_optimize()} before calling this function.
 }
 \examples{
 
@@ -55,5 +55,5 @@ print(x)
 
 }
 \seealso{
-\code{\link{srchisq_optimize}} to optimize the custom grid.
+\code{\link{srchisq_optimize}} to optimize the custom proposal.
 }

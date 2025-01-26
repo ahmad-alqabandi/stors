@@ -33,14 +33,14 @@ where:
 }
 The Pareto distribution is widely used in modeling phenomena with heavy tails, such as wealth distribution, insurance losses, and natural events.
 
-This function samples from a grid constructed using \code{\link{srpareto_optimize}}, employing the STORS algorithm.
+This function samples from a proposal constructed using \code{\link{srpareto_optimize}}, employing the STORS algorithm.
 
 By default, \code{srpareto_custom()} samples from the standard Pareto distribution with \code{shape = 1} and \code{rate = 1}.
 The proposal distribution is pre-optimized at package load time using \code{srpareto_optimize()} with
-\code{steps = 4091}, creating a scalable grid centered around the mode.
+\code{steps = 4091}, creating a scalable proposal centered around the mode.
 }
 \note{
-This function is not scalable. Therefore, only the \code{srpareto_custom()} version is available, which requires the grid to be pre-optimized using \code{srpareto_optimize()} before calling this function.
+This function is not scalable. Therefore, only the \code{srpareto_custom()} version is available, which requires the proposal to be pre-optimized using \code{srpareto_optimize()} before calling this function.
 }
 \examples{
 # Generate 10 samples from Pareto Distribution
@@ -54,5 +54,5 @@ print(x)
 
 }
 \seealso{
-\code{\link{srpareto_optimize}} to optimize the custom grid.
+\code{\link{srpareto_optimize}} to optimize the custom proposal.
 }

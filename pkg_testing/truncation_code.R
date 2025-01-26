@@ -4,7 +4,7 @@
 #
 #   dist_name <- 'srnorm'
 #
-#   dendata <- pbgrids[[dist_name]]
+#   dendata <- built_in_proposals[[dist_name]]
 #
 #   cnum_scalable <- dendata$c_num
 #   cnum_custom <- dendata$c_num + 1

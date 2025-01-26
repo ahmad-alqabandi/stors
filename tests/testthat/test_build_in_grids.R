@@ -2,9 +2,9 @@
 
 test_that("Built_in smpling functions returns a sample of correct size and seeds", {
 
-  for (name in names(pbgrids)) {
+  for (name in names(built_in_proposals)) {
 
-    if (pbgrids[[name]]$scalable) {
+    if (built_in_proposals[[name]]$scalable) {
       srname_txt <- paste0(name, "(10)")
     } else {
       srname_txt <- paste0(name, "_custom(10)")
@@ -28,10 +28,10 @@ test_that("Built_in smpling functions returns a sample of correct size and seeds
 
 
 test_that("Built_in sampling functions, samples properties tests", {
-  for (name in setdiff(names(pbgrids), "srpareto")) {
+  for (name in setdiff(names(built_in_proposals), "srpareto")) {
 
-    lb <- pbgrids[[name]]$lb
-    rb <- pbgrids[[name]]$rb
+    lb <- built_in_proposals[[name]]$lb
+    rb <- built_in_proposals[[name]]$rb
 
     rnds <- runif(2)
     rnds <- rnds[order(rnds)]
@@ -46,7 +46,7 @@ test_that("Built_in sampling functions, samples properties tests", {
     g <- eval(parse(text = paste0(name, "_optimize( xl = ", l_trunc, ",xr = ", u_trunc, ")")))
 
 
-    if (pbgrids[[name]]$scalable) {
+    if (built_in_proposals[[name]]$scalable) {
       srname_txt <- paste0(name, "(1000)")
     } else {
       srname_txt <- paste0(name, "_custom(1000)")
@@ -57,6 +57,13 @@ test_that("Built_in sampling functions, samples properties tests", {
 
     expect_true((min(x) >= l_trunc) && (max(x) <= u_trunc), info = paste0("generated samples must be within ",
                                                                            name, " distrebution\'s TRUNCATION BOUNDS"))
+  }
+
+  for (name in names(built_in_proposals)) {
+
+    fun_name <- paste0(name, "_optimize")
+    do.call(fun_name, list(steps = 4091))
+
   }
 
 })

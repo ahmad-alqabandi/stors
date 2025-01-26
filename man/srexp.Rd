@@ -36,11 +36,11 @@ where:
 }
 The Exponential distribution is commonly used to model the time between independent events that occur at a constant average rate.
 
-These two functions are for sampling using the STORS algorithm based on the grid that has been constructed using \code{\link{srexp_optimize}}.
+These two functions are for sampling using the STORS algorithm based on the proposal that has been constructed using \code{\link{srexp_optimize}}.
 
 By default, \code{srexp()} samples from a standard Exponential Distribution \code{rate = 1}.
 The proposal distribution is pre-optimized at package load time using \code{srexp_optimize()} with
-\code{steps = 4091}, creating a scalable grid centered around the mode.
+\code{steps = 4091}, creating a scalable proposal centered around the mode.
 
 If \code{srexp()} is called with custom \code{rate} parameter, the samples are generated
 from the standard Exponential Distribution, then scaled accordingly.
@@ -61,5 +61,5 @@ print(samples)
 
 }
 \seealso{
-\code{\link{srexp_optimize}} to optimize the custom or the scaled proposal grid.
+\code{\link{srexp_optimize}} to optimize the custom or the scaled proposal.
 }

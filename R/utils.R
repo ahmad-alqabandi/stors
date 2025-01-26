@@ -71,7 +71,7 @@ adjust_modes <- function(mode, xl, xr, f) {
 }
 
 #' @noRd
-check_grid_opt_criteria <- function(symmetric, cnum, dendata) {
+check_proposal_opt_criteria <- function(symmetric, cnum, dendata) {
   if (dendata$scalable) {
     std_symmetric <- !is.null(symmetric)
 
@@ -120,13 +120,13 @@ truncate_error_checking <- function(xl, xr, density) {
 }
 
 #' @noRd
-grid_error_checking_and_preparation <- function(gp) {
+proposal_error_checking_and_preparation <- function(gp) {
   modes <- gp$target$modes
   f <- gp$target$density
   between_minima <- gp$target$between_minima
   steps <- gp$proposal$steps
   theta <- gp$proposal$pre_acceptance_threshold
-  grid_range <- gp$proposal$grid_range
+  proposal_range <- gp$proposal$proposal_range
   lb <- gp$target$left_bound
   rb <- gp$target$right_bound
 
@@ -145,15 +145,15 @@ grid_error_checking_and_preparation <- function(gp) {
   if (is.null(theta))
     theta <- 0
 
-  if (theta != 0 && !is.null(grid_range)) {
+  if (theta != 0 && !is.null(proposal_range)) {
     stop(
-      "Error: You must provide either a pre-acceptance threshold 'theta' value or a proposal x-axis limit 'grid_range'."
+      "Error: You must provide either a pre-acceptance threshold 'theta' value or a proposal x-axis limit 'proposal_range'."
     )
   }
 
-  if ((theta != 0 || !is.null(grid_range)) && !is.null(steps)) {
+  if ((theta != 0 || !is.null(proposal_range)) && !is.null(steps)) {
     warning(
-      "Warning: The pre-acceptance threshold 'theta' value and proposal x-axis limit 'grid_range' will not take effect because you are specifying a target 'steps' number."
+      "Warning: The pre-acceptance threshold 'theta' value and proposal x-axis limit 'proposal_range' will not take effect because you are specifying a target 'steps' number."
     )
   }
 
@@ -162,18 +162,18 @@ grid_error_checking_and_preparation <- function(gp) {
               "Error: 'theta' must be in the range [0,1]")
   }
 
-  if (!is.null(grid_range)) {
-    if (length(grid_range) != 2)
-      stop("Error: 'grid_range' must be a vector of two elements.")
+  if (!is.null(proposal_range)) {
+    if (length(proposal_range) != 2)
+      stop("Error: 'proposal_range' must be a vector of two elements.")
 
-    if (grid_range[1] < lb && grid_range[2] > rb)
-      stop("Error: 'grid_range' must be within the range of distribution bounds.")
+    if (proposal_range[1] < lb && proposal_range[2] > rb)
+      stop("Error: 'proposal_range' must be within the range of distribution bounds.")
 
-    if (grid_range[1] > modes[1] ||
-        grid_range[2] < modes[length(modes)])
-      stop("Error: 'grid_range' range must include distribution's modes.")
+    if (proposal_range[1] > modes[1] ||
+        proposal_range[2] < modes[length(modes)])
+      stop("Error: 'proposal_range' range must include distribution's modes.")
   } else {
-    grid_range <- gp$grid_range <- c(lb, rb)
+    proposal_range <- gp$proposal_range <- c(lb, rb)
   }
 
   if (!is.null(between_minima)) {
@@ -192,7 +192,7 @@ grid_error_checking_and_preparation <- function(gp) {
     }
   }
 
-  gp$proposal$grid_range <- grid_range
+  gp$proposal$proposal_range <- proposal_range
   gp$proposal$pre_acceptance_threshold <- theta
 
   return(gp)
@@ -201,7 +201,7 @@ grid_error_checking_and_preparation <- function(gp) {
 
 #' @import digest digest
 #' @noRd
-is_valid_grid <- function(grid) {
+is_valid_proposal <- function(grid) {
   if ("lock" %in% names(grid)) {
     temp <- grid[setdiff(names(grid), "lock")]
     key <- digest(temp)
@@ -218,14 +218,14 @@ is_valid_grid <- function(grid) {
 
 
 #' @noRd
-grid_check_symmetric <- function(gp) {
+proposal_check_symmetric <- function(gp) {
 
 
   if (!is.null(gp$target$symmetric)) {
     # modes <- gp$target$modes
     # rb <- gp$target$right_bound
     # lb <- gp$target$left_bound
-    # grid_range <- gp$proposal$grid_range
+    # proposal_range <- gp$proposal$proposal_range
     # f <- gp$target$density
     # center <- gp$target$symmetric
     # n <- 21
@@ -248,7 +248,7 @@ grid_check_symmetric <- function(gp) {
     # gp$target$modes <- modes[modes > center]
     # if (length(modes) == 1) {
     #   modes <- center
-    #   grid_range <- c(center, grid_range[2])
+    #   proposal_range <- c(center, proposal_range[2])
     # } else {
     #   if (center %in% modes) {
     #     modes <- modes[modes >= center]
@@ -259,13 +259,13 @@ grid_check_symmetric <- function(gp) {
     #
     # gp$target$modes <- modes
     # gp$target$left_bound <- center
-    # gp$proposal$grid_range <- grid_range
+    # gp$proposal$proposal_range <- proposal_range
     # gp$target$modes_count <- length(gp$target$modes)
-    grid_range <- gp$proposal$grid_range
+    proposal_range <- gp$proposal$proposal_range
     center <- gp$target$modes
 
     gp$target$left_bound <- center
-    gp$proposal$grid_range <- c(center, grid_range[2])
+    gp$proposal$proposal_range <- c(center, proposal_range[2])
 
   }
 
@@ -287,7 +287,7 @@ get_buildin_sampling_function <- function(cnum, name) {
 
 
 
-  if (pbgrids[[name]]$c_num == cnum_search) {
+  if (built_in_proposals[[name]]$c_num == cnum_search) {
     if (even) {
       fun <- function(n) {
         args <- list(n = n)
@@ -296,7 +296,7 @@ get_buildin_sampling_function <- function(cnum, name) {
 
     } else {
       fun <- function(n) {
-        args <- as.list(c(n = n, pbgrids[[name]]$std_params))
+        args <- as.list(c(n = n, built_in_proposals[[name]]$std_params))
         do.call(paste0(name), args)
       }
     }
@@ -312,10 +312,10 @@ get_buildin_sampling_function <- function(cnum, name) {
 
 #' @noRd
 built_in_pars_trans <- function(f_params, cnum) {
-  for (name in names(pbgrids)) {
-    if (pbgrids[[name]]$c_num == cnum ||
-        pbgrids[[name]]$c_num + 1 == cnum) {
-      return(pbgrids[[name]]$transform_params(f_params))
+  for (name in names(built_in_proposals)) {
+    if (built_in_proposals[[name]]$c_num == cnum ||
+        built_in_proposals[[name]]$c_num + 1 == cnum) {
+      return(built_in_proposals[[name]]$transform_params(f_params))
 
     }
   }
@@ -323,7 +323,7 @@ built_in_pars_trans <- function(f_params, cnum) {
 }
 
 #' @noRd
-cache_grid_c <- function(c_num, grid) {
+cache_proposal_c <- function(c_num, grid) {
   n_params <- length(grid$f_params)
 
   f_params <- 0
@@ -337,10 +337,10 @@ cache_grid_c <- function(c_num, grid) {
   .Call(
     C_cache_grid,
     c_num,
-    grid$grid_data$x,
-    grid$grid_data$s_upper,
-    grid$grid_data$p_a,
-    grid$grid_data$s_upper_lower,
+    grid$data$x,
+    grid$data$s_upper,
+    grid$data$p_a,
+    grid$data$s_upper_lower,
     grid$areas,
     grid$steps_number,
     grid$sampling_probabilities,
@@ -351,8 +351,8 @@ cache_grid_c <- function(c_num, grid) {
     grid$symmetric,
     f_params,
     n_params,
-    grid$grid_bounds[1],
-    grid$grid_bounds[2]
+    grid$proposal_bounds[1],
+    grid$proposal_bounds[2]
   )
 
 }
@@ -361,7 +361,7 @@ cache_grid_c <- function(c_num, grid) {
 
 #' @noRd
 cache_user_grid_c <- function(grid) {
-  if (!is_valid_grid(grid))
+  if (!is_valid_proposal(grid))
     stop("This grid is not valid")
 
   if (grid$lock %in% stors_env$user_session_cached_grid_locks[["lock"]]) {
@@ -375,7 +375,7 @@ cache_user_grid_c <- function(grid) {
 
   c_num <- stors_env$user_cnum_counter
 
-  cache_grid_c(c_num, grid)
+  cache_proposal_c(c_num, grid)
 
   user_session_cached_grid_locks <- data.frame(lock = grid$lock, cnum = c_num)
 
@@ -394,8 +394,8 @@ free_cache_cnum_c <- function(c_num) {
 
 #' @noRd
 save_builtin_grid <- function(c_num, grid) {
-  grids_file_path <- file.path(stors_env$builtin_grids_dir, paste0(c_num, ".rds"))
-  saveRDS(grid, grids_file_path)
+  proposals_file_path <- file.path(stors_env$builtin_grids_dir, paste0(c_num, ".rds"))
+  saveRDS(grid, proposals_file_path)
 }
 
 #' @noRd
@@ -412,7 +412,7 @@ cached_grid_info <- function(cnum) {
 #'
 #' @param sampling_function String. The name of the sampling distribution's function in STORS.
 #' For example, \code{"srgamma"} or \code{"srchisq"}.
-#' @param grid_type String. Either \code{"custom"} to delete the custom grid or \code{"scaled"} to delete the scaled grid.
+#' @param proposal_type String. Either \code{"custom"} to delete the custom grid or \code{"scaled"} to delete the scaled grid.
 #' Defaults to \code{"custom"}.
 #'
 #' @details
@@ -425,20 +425,20 @@ cached_grid_info <- function(cnum) {
 #'
 #' @examples
 #' # Delete a custom grid for the srgamma function
-#' delete_build_in_grid(sampling_function = "srgamma", grid_type = "custom")
+#' delete_build_in_grid(sampling_function = "srgamma", proposal_type = "custom")
 #'
 #' # Delete a scaled grid for the srnorm function
-#' delete_build_in_grid(sampling_function = "srnorm", grid_type = "scaled")
+#' delete_build_in_grid(sampling_function = "srnorm", proposal_type = "scaled")
 #'
 #' @export
-delete_build_in_grid <- function(sampling_function, grid_type = "custom") {
-  grid_type <- match.arg(grid_type, c("scaled", "custom"))
+delete_build_in_grid <- function(sampling_function, proposal_type = "custom") {
+  proposal_type <- match.arg(proposal_type, c("scaled", "custom"))
 
-  if (sampling_function %in% names(pbgrids)) {
-    if (grid_type == "scaled") {
-      grid_number <- pbgrids[[sampling_function]]$c_num
+  if (sampling_function %in% names(built_in_proposals)) {
+    if (proposal_type == "scaled") {
+      grid_number <- built_in_proposals[[sampling_function]]$c_num
     } else {
-      grid_number <- pbgrids[[sampling_function]]$c_num + 1
+      grid_number <- built_in_proposals[[sampling_function]]$c_num + 1
     }
 
   } else {
@@ -448,9 +448,9 @@ delete_build_in_grid <- function(sampling_function, grid_type = "custom") {
 
   builtin_grids <- list.files(stors_env$builtin_grids_dir)
 
-  for (grid_name in builtin_grids) {
-    grid_path <- file.path(stors_env$builtin_grids_dir, grid_name)
-    grid <- readRDS(grid_path)
+  for (proposal_name in builtin_grids) {
+    proposal_path <- file.path(stors_env$builtin_grids_dir, proposal_name)
+    grid <- readRDS(proposal_path)
 
     if ("lock" %in% names(grid)) {
       temp <- grid[setdiff(names(grid), "lock")]
@@ -458,7 +458,7 @@ delete_build_in_grid <- function(sampling_function, grid_type = "custom") {
 
       if (key == grid$lock) {
         if (grid$cnum == grid_number) {
-          file.remove(grid_path)
+          file.remove(proposal_path)
           free_cache_cnum_c(grid$cnum)
           message(" grid number ", grid$cnum, " DELETED !")
         }

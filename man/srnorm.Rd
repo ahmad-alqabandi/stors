@@ -38,11 +38,11 @@ where:
 \item{\eqn{\sigma}}{ is the standard deviation, which controls the spread of the distribution (\eqn{\sigma > 0}).}
 }
 
-These two functions are for sampling using the STORS algorithm based on the grid that has been constructed using \code{\link{srnorm_optimize}}.
+These two functions are for sampling using the STORS algorithm based on the proposal that has been constructed using \code{\link{srnorm_optimize}}.
 
 By default, \code{srnorm()} samples from a standard Normal distribution (\code{mean = 0}, \code{sd = 1}).
 The proposal distribution is pre-optimized at package load time using \code{srnorm_optimize()} with
-\code{steps = 4091}, creating a scalable grid centered around the mode.
+\code{steps = 4091}, creating a scalable proposal centered around the mode.
 
 If \code{srnorm()} is called with custom \code{mean} or \code{sd} parameters, the samples are generated
 from the standard Normal distribution, then scaled and location shifted accordingly.
@@ -63,5 +63,5 @@ print(samples)
 
 }
 \seealso{
-\code{\link{srnorm_optimize}} to optimize the custom or the scaled proposal grid.
+\code{\link{srnorm_optimize}} to optimize the custom or the scaled proposal.
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/srlaplace.R
 \name{srlaplace_optimize}
 \alias{srlaplace_optimize}
-\title{Optimizing Laplace Distribution Grid}
+\title{Optimizing Laplace Distribution proposal}
 \usage{
 srlaplace_optimize(
   mu = NULL,
@@ -10,7 +10,7 @@ srlaplace_optimize(
   xl = NULL,
   xr = NULL,
   steps = 4091,
-  grid_range = NULL,
+  proposal_range = NULL,
   theta = NULL,
   target_sample_size = 1000,
   verbose = FALSE,
@@ -26,26 +26,26 @@ srlaplace_optimize(
 
 \item{xr}{Numeric. Right truncation bound for the target distribution. Defaults to \code{Inf}, representing no right truncation.}
 
-\item{steps}{(optional) Integer. Desired number of steps in the proposal grid. Defaults to \code{NULL}, which means the number of steps is determined automatically during optimization.}
+\item{steps}{(optional) Integer. Desired number of steps in the proposal. Defaults to \code{NULL}, which means the number of steps is determined automatically during optimization.}
 
-\item{grid_range}{(optional) Numeric vector. Specifies the range for optimizing the steps part of the proposal grid. Defaults to \code{NULL}, indicating automatic range selection.}
+\item{proposal_range}{(optional) Numeric vector. Specifies the range for optimizing the steps part of the proposal. Defaults to \code{NULL}, indicating automatic range selection.}
 
-\item{theta}{(optional) Numeric. A parameter for grid optimization. Defaults to \code{NULL}.}
+\item{theta}{(optional) Numeric. A parameter for proposal optimization. Defaults to \code{NULL}.}
 
-\item{target_sample_size}{(optional) Integer. Target sample size for grid optimization. Defaults to \code{1000}.}
+\item{target_sample_size}{(optional) Integer. Target sample size for proposal optimization. Defaults to \code{1000}.}
 
 \item{verbose}{Boolean. If \code{TRUE}, detailed optimization information, including areas and steps, will be displayed. Defaults to \code{FALSE}.}
 
-\item{symmetric}{Boolean. If \code{TRUE}, the proposal will target only the right tail of the distribution, reducing the size of the cached grid and making sampling more memory-efficient.
+\item{symmetric}{Boolean. If \code{TRUE}, the proposal will target only the right tail of the distribution, reducing the size of the cached proposal and making sampling more memory-efficient.
 An additional uniform random number will be sampled to determine the sample's position relative to the mode of the distribution.
-While this improves memory efficiency, the extra sampling may slightly impact performance, especially when the grid efficiency is close to 1. Defaults to \code{FALSE}.}
+While this improves memory efficiency, the extra sampling may slightly impact performance, especially when the proposal efficiency is close to 1. Defaults to \code{FALSE}.}
 }
 \value{
-The user does not need to store the returned value, because the package internally cashes the grid. However, we explain here the full returned grid for advanced users.
+The user does not need to store the returned value, because the package internally cashes the proposal. However, we explain here the full returned proposal for advanced users.
 
-A list containing the optimized grid and related parameters for the specified built-in distribution:
+A list containing the optimized proposal and related parameters for the specified built-in distribution:
 \describe{
-\item{\code{grid_data}}{A data frame with detailed information about the grid steps, including:
+\item{\code{data}}{A data frame with detailed information about the proposal steps, including:
 \describe{
 \item{\code{x}}{The start point of each step on the x-axis.}
 \item{\code{s_upper}}{The height of each step on the y-axis.}
@@ -69,49 +69,49 @@ A list containing the optimized grid and related parameters for the specified bu
 \item{\code{rt_properties}}{A numeric vector of 6 values required for ARS in the right tail.}
 \item{\code{alpha}}{A numeric scalar representing the uniform step area.}
 \item{\code{tails_method}}{A string, either \code{"ARS"} (Adaptive Rejection Sampling) or \code{"IT"} (Inverse Transform), indicating the sampling method for the tails.}
-\item{\code{grid_bounds}}{A numeric vector specifying the left and right bounds of the target density.}
-\item{\code{cnum}}{An integer representing the cache number of the created grid in memory.}
-\item{\code{symmetric}}{A numeric scalar indicating the symmetry point of the grid, or \code{NULL} if not symmetric.}
-\item{\code{f_params}}{A list of parameters for the target density that the proposal grid is designed for.}
+\item{\code{proposal_bounds}}{A numeric vector specifying the left and right bounds of the target density.}
+\item{\code{cnum}}{An integer representing the cache number of the created proposal in memory.}
+\item{\code{symmetric}}{A numeric scalar indicating the symmetry point of the proposal, or \code{NULL} if not symmetric.}
+\item{\code{f_params}}{A list of parameters for the target density that the proposal is designed for.}
 \describe{
 \item{\code{mu}}{is the location parameter (location of the distribution).}
 \item{\code{b}}{is the scale parameter, which controls the spread of the distribution (\code{b > 0}).}
 }
-\item{\code{is_symmetric}}{A logical value indicating whether the proposal grid is symmetric.}
-\item{\code{grid_type}}{A string indicating the type of the generated grid:
+\item{\code{is_symmetric}}{A logical value indicating whether the proposal is symmetric.}
+\item{\code{proposal_type}}{A string indicating the type of the generated proposal:
 \describe{
-\item{\code{"scaled"}}{The grid is "scalable" and standardized with \code{mu = 0} and \code{b = 1}. This is used when parameters \code{mu} and \code{b} are either \code{NULL} or not provided. Scalable grids are compatible with \code{\link{srlaplace}}.}
-\item{\code{"custom"}}{The grid is "custom" when either \code{mu} or \code{b} is provided. Custom grids are compatible with \code{\link{srlaplace_custom}}.}
+\item{\code{"scaled"}}{The proposal is "scalable" and standardized with \code{mu = 0} and \code{b = 1}. This is used when parameters \code{mu} and \code{b} are either \code{NULL} or not provided. Scalable proposals are compatible with \code{\link{srlaplace}}.}
+\item{\code{"custom"}}{The proposal is "custom" when either \code{mu} or \code{b} is provided. Custom proposals are compatible with \code{\link{srlaplace_custom}}.}
 }}
 \item{\code{target_function_area}}{A numeric scalar estimating the area of the target distribution.}
 \item{\code{dens_func}}{A string containing the hardcoded density function.}
 \item{\code{density_name}}{A string specifying the name of the target density distribution.}
-\item{\code{lock}}{An identifier used for saving and loading the grid from disk.}
+\item{\code{lock}}{An identifier used for saving and loading the proposal from disk.}
 }
 }
 \description{
-The \code{srlaplace_optimize()} function generates an optimized proposal grid for a targeted Laplace Distribution.
-The grid can be customized and adjusted based on various options provided by the user.
+The \code{srlaplace_optimize()} function generates an optimized proposal for a targeted Laplace Distribution.
+The proposal can be customized and adjusted based on various options provided by the user.
 }
 \details{
 When \code{srlaplace_optimize()} is explicitly called:
 \itemize{
-\item A grid is created and cached. If no parameters are provided, a standard grid is created (\code{mu = 0}, \code{b = 1}).
-\item Providing \code{mu} or \code{b} creates a custom grid, which is cached for use with \code{srlaplace_custom()}.
-\item The optimization process can be controlled via parameters such as \code{steps}, \code{grid_range}, or
-\code{theta}. If no parameters are provided, the grid is optimized via brute force based on the.
+\item A proposal is created and cached. If no parameters are provided, a standard proposal is created (\code{mu = 0}, \code{b = 1}).
+\item Providing \code{mu} or \code{b} creates a custom proposal, which is cached for use with \code{srlaplace_custom()}.
+\item The optimization process can be controlled via parameters such as \code{steps}, \code{proposal_range}, or
+\code{theta}. If no parameters are provided, the proposal is optimized via brute force based on the.
 \code{target_sample_size}.
 }
 }
 \examples{
-# Generate scalable grid that with mu = 0 and b = 1, that has 4096 steps
-scalable_grid <- srlaplace_optimize(steps = 4096)
+# Generate scalable proposal that with mu = 0 and b = 1, that has 4096 steps
+scalable_proposal <- srlaplace_optimize(steps = 4096)
 
-# Generate custom grid that with mu = 2 and b = 1
-scalable_grid <- srlaplace_optimize(mu = 2, b = 1)
+# Generate custom proposal that with mu = 2 and b = 1
+scalable_proposal <- srlaplace_optimize(mu = 2, b = 1)
 
 }
 \seealso{
-\code{\link{srlaplace}}: Function to sample from a scalable grid generated by \code{srlaplace_optimize()}.
-\code{\link{srlaplace_custom}}: Function to sample from a custom grid tailored to user specifications.
+\code{\link{srlaplace}}: Function to sample from a scalable proposal generated by \code{srlaplace_optimize()}.
+\code{\link{srlaplace_custom}}: Function to sample from a custom proposal tailored to user specifications.
 }

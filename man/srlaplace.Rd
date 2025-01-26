@@ -38,11 +38,11 @@ where:
 \item{\code{b}}{is the scale parameter, which controls the spread of the distribution (\code{b > 0}).}
 }
 
-These two functions are for sampling using the STORS algorithm based on the grid that has been constructed using \code{\link{srlaplace_optimize}}.
+These two functions are for sampling using the STORS algorithm based on the proposal that has been constructed using \code{\link{srlaplace_optimize}}.
 
 By default, \code{srlaplace()} samples from a standard Laplace Distribution (\code{mu = 0}, \code{b = 1}).
 The proposal distribution is pre-optimized at package load time using \code{srlaplace_optimize()} with
-\code{steps = 4091}, creating a scalable grid centered around the mode.
+\code{steps = 4091}, creating a scalable proposal centered around the mode.
 
 If \code{srlaplace()} is called with custom \code{mu} or \code{b} parameters, the samples are generated
 from the standard Laplace Distribution, then scaled and location shifted accordingly.
@@ -63,5 +63,5 @@ print(samples)
 
 }
 \seealso{
-\code{\link{srlaplace_optimize}} to optimize the custom or the scaled proposal grid.
+\code{\link{srlaplace_optimize}} to optimize the custom or the scaled proposal.
 }

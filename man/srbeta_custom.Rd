@@ -33,14 +33,14 @@ where:
 }
 The Beta distribution is widely used in Bayesian statistics and in modeling probabilities and proportions.
 
-This function samples from a grid constructed using \code{\link{srbeta_optimize}}, employing the STORS algorithm.
+This function samples from a proposal constructed using \code{\link{srbeta_optimize}}, employing the STORS algorithm.
 
 By default, \code{srbeta_custom()} samples from the standard Beta distribution with \code{shape1 = 1} and \code{shape2 = 1}.
 The proposal distribution is pre-optimized at package load time using \code{srbeta_optimize()} with
-\code{steps = 4091}, creating a scalable grid centered around the mode.
+\code{steps = 4091}, creating a scalable proposal centered around the mode.
 }
 \note{
-This function is not scalable. Therefore, only the \code{srbeta_custom()} version is available, which requires the grid to be pre-optimized using \code{srbeta_optimize()} before calling this function.
+This function is not scalable. Therefore, only the \code{srbeta_custom()} version is available, which requires the proposal to be pre-optimized using \code{srbeta_optimize()} before calling this function.
 }
 \examples{
 # Generate 10 samples from Beta Distribution
@@ -54,5 +54,5 @@ print(x)
 
 }
 \seealso{
-\code{\link{srbeta_optimize}} to optimize the custom grid.
+\code{\link{srbeta_optimize}} to optimize the custom proposal.
 }

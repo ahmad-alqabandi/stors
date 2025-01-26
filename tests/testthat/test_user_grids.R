@@ -7,19 +7,19 @@ test_that("MAIN", {
   h_norm <- function(x) log(f_norm(x))
   h_prime_norm <- function(x) -x
 
-  norm_grid <- build_grid(lb = -Inf, rb = Inf, mode = modes_norm,
+  norm_grid <- build_proposal(lb = -Inf, rb = Inf, mode = modes_norm,
                          f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 1000)
 
   l_trunc <- 0
   r_trunc <- Inf
-  norm_grid_trunc <- build_grid(lb = l_trunc, rb = r_trunc, mode = modes_norm,
+  norm_grid_trunc <- build_proposal(lb = l_trunc, rb = r_trunc, mode = modes_norm,
                          f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 1000)
 
 
 test_that("user smpling functions returns a sample of correct size and seeds", {
 
 
-  sampling_function <- stors(norm_grid)
+  sampling_function <- build_sampler(norm_grid)
 
   set.seed(123)
   x1 <- sampling_function(10)
@@ -37,7 +37,7 @@ test_that("user smpling functions returns a sample of correct size and seeds", {
 test_that("Truncated user grid samples test", {
 
 
-  sampling_function_trunc <- stors(norm_grid_trunc)
+  sampling_function_trunc <- build_sampler(norm_grid_trunc)
 
   x <- sampling_function_trunc(1000)
 

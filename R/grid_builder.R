@@ -26,41 +26,41 @@
 #'
 #' Then, to construct a StORS proposal for \eqn{a=2} and \eqn{b=2}, we would call
 #'
-#' \code{grid <- build_grid(lb = 0, rb = 1, modes = sqrt(1/3), f = dkumaraswamy, a = 2, b = 2)}
+#' \code{Proposal <- build_Proposal(lb = 0, rb = 1, modes = sqrt(1/3), f = dkumaraswamy, a = 2, b = 2)}
 #'
 #' **StORS proposal construction**
 #'
-#' StORS defines an unnormalised piecewise constant proposal density and squeezing function, with a grid defining the change points.
+#' StORS defines an unnormalised piecewise constant proposal density and squeezing function, with a Proposal defining the change points.
 #' To optimise the execution speed on modern CPUs, the unnormalised piecewise constant proposal has fixed area for each segment with one end of the segment coinciding with the user's pdf.
 #' That is, each step of the function has width defined by \eqn{w_i = (x_i - x_{i-1})} and a height determined by \eqn{h_i = \max(f(x_{i-1}), f(x_i))}, such that \eqn{w_i h_i = \alpha \ \forall\,i} where \eqn{\alpha} is constant.
 #'
-#' Once the user has constructed the proposal, the sampling function can be built using [stors()].
+#' Once the user has constructed the proposal, the sampling function can be built using [build_sampler()].
 #'
 #' **Internal details**
 #'
-#' The function \code{build_final_grid()} manages the construction of these steps and calculates values critical for the sampling process.
-#' When the resultant grid is used with the \code{stors()} function, these values are cached,
+#' The function \code{build_final_Proposal()} manages the construction of these steps and calculates values critical for the sampling process.
+#' When the resultant Proposal is used with the \code{build_sampler()} function, these values are cached,
 #' significantly enhancing the computational efficiency and hence improving sampling speed.
-#'  During the optimization process, we aim for a certain grid
-#' size based on L1-3 memory cache size. Therefore, we test the speed of grids of sizes \eqn{2^m} Kb.
+#'  During the optimization process, we aim for a certain Proposal
+#' size based on L1-3 memory cache size. Therefore, we test the speed of Proposals of sizes \eqn{2^m} Kb.
 #'  To achieve this, we estimate the uniform step area
 #' based on a certain steps number that leads to the target cache size,
 #'  \eqn{ \alpha = \frac{1}{\text{number of steps}} }.
 #'
 #'
-#' The speed testing for each possible grid is initially based on a sample size of 1000.
-#'  However, if the user wishes to optimize the grid for a different sample size, they can do so
+#' The speed testing for each possible Proposal is initially based on a sample size of 1000.
+#'  However, if the user wishes to optimize the Proposal for a different sample size, they can do so
 #' by specifying the desired sample size using the \code{target_sample_size} argument.
 #'
-#' In case the user wants to select a specific number of steps for the proposal grid
+#' In case the user wants to select a specific number of steps for the proposal
 #' and bypass the optimization process, this can be done by specifying a steps number greater than the number of modes by 2 using the \code{steps} argument.
 #'  If the target density is heavy-tailed,
-#'   and the user wishes to stop the grid building process at a certain pre-acceptance threshold, this can be achieved by setting
+#'   and the user wishes to stop the Proposal building process at a certain pre-acceptance threshold, this can be achieved by setting
 #' the acceptance probability threshold \code{theta} \eqn{\theta}.
 #'  Once the steps reach this level of pre-acceptance probability,
 #'   the step construction will end \eqn{ \frac{\min(f(x_i), f(x_{i+1}))}{\max(f(x_i), f(x_{i+1}))} < \theta }.
 #' Alternatively, if the user wishes to create the steps within certain limits on the
-#' x-axis, they can do so by specifying the proposal grid limits using the \code{grid_range} argument.
+#' x-axis, they can do so by specifying the proposal limits using the \code{proposal_range} argument.
 #'
 #' @param lb
 #'        Numeric scalar representing the lower bound of the target density.
@@ -82,29 +82,29 @@
 #'        As for `f` the first argument must be the value at which the log-pdf is to be evaluated and additional parameters may be named arguments passed to `...`.
 #' @param steps
 #'        Optional integer scalar specifying the number of steps in the step optimised part of the proposal density and squeezing function.
-#' @param grid_range
+#' @param proposal_range
 #'        Optional numeric vector of length 2 specifying the lower and upper range of the steps in the step optimised part of the proposal density and squeezing function.
 #'        This range should be contained within the interval defined by `lb` and `rb`.
 #' @param theta
 #'        Optional numeric scalar (between 0 and 1) defining the pre-acceptance threshold.
 #'        This dictates when no further steps should be added in the step optimised part of the proposal density and squeezing function, based on the probability of pre-acceptance.
 #' @param target_sample_size
-#'        Integer scalar indicating the typical sample size that will be requested when sampling from this density using stors.
-#'        The grid optimization process bases benchmark timings on this target size in order to select a grid best suited to the desired sample size.
+#'        Integer scalar indicating the typical sample size that will be requested when sampling from this density using build_sampler.
+#'        The proposal optimization process bases benchmark timings on this target size in order to select a proposal best suited to the desired sample size.
 #'        Note this does *not* limit sampling to this number, it is merely a guide should the user be aware that a certain sample size will be most commonly sampled.
 #' @param verbose
 #'        Logical scalar.
-#'        If `TRUE`, a table detailing the optimization areas and steps will be displayed during grid optimization.
+#'        If `TRUE`, a table detailing the optimization areas and steps will be displayed during proposal optimization.
 #'        Defaults to `FALSE`.
 #' @param ...
 #'        Further arguments to be passed to `f`, `h`, and `h_prime`, if they depend on additional parameters.
 #'
 #' @return
-#' This returns a list which is used to construct the sampler by passing to \code{\link{stors}} function.
+#' This returns a list which is used to construct the sampler by passing to \code{\link{build_sampler}} function.
 #'
-#' A list containing the optimized grid and related parameters for the specified built-in distribution:
+#' A list containing the optimized proposal and related parameters for the specified built-in distribution:
 #' \describe{
-#'   \item{\code{grid_data}}{A data frame with detailed information about the grid steps, including:
+#'   \item{\code{data}}{A data frame with detailed information about the proposal steps, including:
 #'   \describe{
 #'     \item{\code{x}}{The start point of each step on the x-axis.}
 #'     \item{\code{s_upper}}{The height of each step on the y-axis.}
@@ -128,31 +128,31 @@
 #'   \item{\code{rt_properties}}{A numeric vector of 6 values required for ARS in the right tail.}
 #'   \item{\code{alpha}}{A numeric scalar representing the uniform step area.}
 #'   \item{\code{tails_method}}{A string, either \code{"ARS"} (Adaptive Rejection Sampling) or \code{"IT"} (Inverse Transform), indicating the sampling method for the tails.}
-#'   \item{\code{grid_bounds}}{A numeric vector specifying the left and right bounds of the target density.}
-#'   \item{\code{cnum}}{An integer representing the cache number of the created grid in memory.}
-#'   \item{\code{symmetric}}{A numeric scalar indicating the symmetry point of the grid, or \code{NULL} if not symmetric.}
-#'   \item{\code{f_params}}{A list of parameters for the target density that the proposal grid is designed for.}
-#'   \item{\code{is_symmetric}}{A logical value indicating whether the proposal grid is symmetric.}
-#'   \item{\code{grid_type}}{A string indicating the type of the generated grid:
+#'   \item{\code{proposal_bounds}}{A numeric vector specifying the left and right bounds of the target density.}
+#'   \item{\code{cnum}}{An integer representing the cache number of the created proposal in memory.}
+#'   \item{\code{symmetric}}{A numeric scalar indicating the symmetry point of the proposal, or \code{NULL} if not symmetric.}
+#'   \item{\code{f_params}}{A list of parameters for the target density that the proposal is designed for.}
+#'   \item{\code{is_symmetric}}{A logical value indicating whether the proposal is symmetric.}
+#'   \item{\code{proposal_type}}{A string indicating the type of the generated proposal:
 #'   \describe{
-#'     \item{\code{"scaled"}}{The grid is "scalable" and standardized with \code{rate = 1}. This is used when parameter \code{rate} is either \code{NULL} or not provided. Scalable grids are compatible with \code{\link{srexp}}.}
-#'     \item{\code{"custom"}}{The grid is "custom" when \code{rate} is provided. Custom grids are compatible with \code{\link{srexp_custom}}.}
+#'     \item{\code{"scaled"}}{The proposal is "scalable" and standardized with \code{rate = 1}. This is used when parameter \code{rate} is either \code{NULL} or not provided. Scalable proposals are compatible with \code{\link{srexp}}.}
+#'     \item{\code{"custom"}}{The proposal is "custom" when \code{rate} is provided. Custom proposals are compatible with \code{\link{srexp_custom}}.}
 #'   }}
 #'   \item{\code{target_function_area}}{A numeric scalar estimating the area of the target distribution.}
 #'   \item{\code{dens_func}}{A string containing the hardcoded density function.}
 #'   \item{\code{density_name}}{A string specifying the name of the target density distribution.}
-#'   \item{\code{lock}}{An identifier used for saving and loading the grid from disk.}
+#'   \item{\code{lock}}{An identifier used for saving and loading the proposal from disk.}
 #' }
 #'
 #'
 #' @seealso
-#' \code{\link{stors}}: Function to build and return a sampling function based on the provided grid properties.
+#' \code{\link{build_sampler}}: Function to build and return a sampling function based on the provided proposal properties.
 #'
 #'
 #' @examples
 #'
-#' # Example 1: Building a Grid for Standard Normal Distribution
-#' # This example demonstrates constructing a grid for a standard normal distribution
+#' # Example 1: Building a proposal for Standard Normal Distribution
+#' # This example demonstrates constructing a proposal for a standard normal distribution
 #' # \( f(x) \sim \mathcal{N}(0,1) \),
 #' # and shows the optimization table by setting \code{verbose} to \code{TRUE}.
 #'
@@ -163,15 +163,15 @@
 #' h_norm <- function(x) { log(f_norm(x)) }
 #' h_prime_norm <- function(x) { -x }
 #'
-#' # Build the proposal grid for the standard normal distribution
-#' norm_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_norm,
+#' # Build the proposal for the standard normal distribution
+#' norm_proposal = build_proposal(lb = -Inf, rb = Inf, mode = modes_norm,
 #'  f = f_norm, h = h_norm, h_prime = h_prime_norm, verbose = TRUE)
 #'
-#' # Plot the generated grid
-#' plot(norm_grid)
+#' # Plot the generated proposal
+#' plot(norm_proposal)
 #'
-#' # Example 2: Grid for a Bimodal Distribution
-#' # This example shows how to build a grid for sampling from a bimodal distribution,
+#' # Example 2: proposal for a Bimodal Distribution
+#' # This example shows how to build a proposal for sampling from a bimodal distribution,
 #' #combining two normal distributions
 #' # \( f(x) = 0.5 \cdot w_1(x) + 0.5 \cdot w_2(x) \),
 #' # where \( w_1(x) \sim \mathcal{N}(0, 1) \) and \( w_2(x) \sim \mathcal{N}(4, 1) \).
@@ -182,32 +182,32 @@
 #' }
 #' modes_bimodal = c(0.00134865, 3.99865)
 #'
-#' # Build the proposal grid for the bimodal distribution
-#' bimodal_grid = build_grid(lb = -Inf, rb = Inf, mode = modes_bimodal, f = f_bimodal)
+#' # Build the proposal for the bimodal distribution
+#' bimodal_proposal = build_proposal(lb = -Inf, rb = Inf, mode = modes_bimodal, f = f_bimodal)
 #'
-#' # Print and plot the bimodal grid
-#' print(bimodal_grid)
-#' plot(bimodal_grid)
+#' # Print and plot the bimodal proposal
+#' print(bimodal_proposal)
+#' plot(bimodal_proposal)
 #'
-#' # Example 3: Grid with 500 Steps for Bimodal Distribution
-#' # This example demonstrates constructing a grid with 500 steps,
+#' # Example 3: Proposal with 500 Steps for Bimodal Distribution
+#' # This example demonstrates constructing a proposal with 500 steps,
 #' # for the bimodal distribution used in Example 2.
 #'
-#' bimodal_grid_500 = build_grid(lb = -Inf, rb = Inf, mode = modes_bimodal, f = f_bimodal, steps = 500)
+#' bimodal_proposal_500 = build_proposal(lb = -Inf, rb = Inf, mode = modes_bimodal, f = f_bimodal, steps = 500)
 #'
-#' # Print and plot the grid with 500 steps
-#' print(bimodal_grid_500)
+#' # Print and plot the proposal with 500 steps
+#' print(bimodal_proposal_500)
 #'
 #' @import digest
 #' @export
-build_grid <- function(lb = -Inf,
+build_proposal <- function(lb = -Inf,
                        rb = Inf,
                        modes = NULL,
                        f = NA,
                        h = NULL,
                        h_prime = NULL,
                        steps = NULL,
-                       grid_range = NULL,
+                       proposal_range = NULL,
                        theta = NULL,
                        target_sample_size = 1000,
                        verbose = FALSE, ...) {
@@ -231,7 +231,7 @@ build_grid <- function(lb = -Inf,
   }
 
   if (is.null(h_prime)) {
-    h_prime <- stors_prime(modes, h)
+    h_prime <- estimate_slope(modes, h)
   } else {
     h_prime <- create_function(h_prime, density_arguments)
   }
@@ -239,7 +239,7 @@ build_grid <- function(lb = -Inf,
 
   modes <- adjust_modes(modes, lb, rb, f)
 
-  grid_param <- list(
+  proposal_param <- list(
     target = list(
       density = f,
       density_arguments = density_arguments,
@@ -255,7 +255,7 @@ build_grid <- function(lb = -Inf,
       symmetric = NULL
     ),
     proposal = list(
-      grid_range = grid_range,
+      proposal_range = proposal_range,
       tails_method = "ARS",
       steps = steps,
       optimal_step_area = NULL,
@@ -266,7 +266,7 @@ build_grid <- function(lb = -Inf,
     ),
     built_in = FALSE,
     cnum = NULL,
-    grid_type = NULL,
+    proposal_type = NULL,
     c_function_name = NULL,
     verbose = verbose,
     f_params = NULL
@@ -274,22 +274,22 @@ build_grid <- function(lb = -Inf,
 
 
 
-  grid_param <- grid_error_checking_and_preparation(grid_param)
+  proposal_param <- proposal_error_checking_and_preparation(proposal_param)
 
   if (!is.null(steps))
-    grid_param$proposal$pre_acceptance_thres_hold <- 0.1
+    proposal_param$proposal$pre_acceptance_thres_hold <- 0.1
 
-  optimal_grid_params <- find_optimal_grid(grid_param)
-  opt_grid <- build_final_grid(gp = optimal_grid_params)
+  optimal_proposal_params <- find_optimal_proposal(proposal_param)
+  opt_proposal <- build_final_proposal(gp = optimal_proposal_params)
 
-  opt_grid$dens_func <- deparse(preserved_f)
+  opt_proposal$dens_func <- deparse(preserved_f)
 
-  lock <- digest(opt_grid)
-  opt_grid$lock <- lock
+  lock <- digest(opt_proposal)
+  opt_proposal$lock <- lock
 
-  class(opt_grid) <- "grid"
+  class(opt_proposal) <- "proposal"
 
-  return(opt_grid)
+  return(opt_proposal)
 
 }
 
@@ -357,7 +357,7 @@ construct_left_and_right_steps <- function(gp, opt_area, mode_n) {
 
 
 #' @importFrom utils head
-build_final_grid <- function(gp, opt_area = NULL) {
+build_final_proposal <- function(gp, opt_area = NULL) {
   if (is.null(opt_area))
     opt_area <- gp$proposal$optimal_step_area
 
@@ -372,16 +372,16 @@ build_final_grid <- function(gp, opt_area = NULL) {
   tails_method <- gp$proposal$tails_method
   symmetric <- gp$target$symmetric
   f_params <- gp$f_params
-  grid_type <- gp$grid_type
+  proposal_type <- gp$proposal_type
   cnum <- gp$cnum
   f_area <- gp$target$estimated_area
   density_arguments <- gp$target$density_arguments
 
 
 
-  grid_bounds <- rep(NA, 2)
+  proposal_bounds <- rep(NA, 2)
 
-  final_grid <- data.frame(
+  final_proposal <- data.frame(
     x = c(),
     s_upper = c(),
     s_lower = c(),
@@ -422,30 +422,30 @@ build_final_grid <- function(gp, opt_area = NULL) {
       g_len[length(g_len) + 1] <- m1
 
       if (i == (mode_n - 1)) {
-        final_grid <- rbind(final_grid, grids[[i]]$data, grids[[i + 1]]$data)
+        final_proposal <- rbind(final_proposal, grids[[i]]$data, grids[[i + 1]]$data)
         proposal_areas[2] <- proposal_areas[2] + m2 * opt_area
         g_len[length(g_len) + 1] <- m2
       } else {
-        final_grid <- rbind(final_grid, grids[[i]]$data)
+        final_proposal <- rbind(final_proposal, grids[[i]]$data)
       }
     }
 
   } else {
-    final_grid <- grids[[1]]$data
+    final_proposal <- grids[[1]]$data
     proposal_areas[2] <- grids[[1]]$steps * opt_area
     g_len[length(g_len) + 1] <- grids[[1]]$steps
   }
 
   steps_number <- sum(g_len)
-  x1 <- final_grid$x[1]
-  xm <- final_grid$x[steps_number + 1]
+  x1 <- final_proposal$x[1]
+  xm <- final_proposal$x[steps_number + 1]
 
 
   if (!is.null(symmetric))
     steps_number <- steps_number * 2
 
   if (identical(tails_method, "ARS")) {
-    tails_area <- tails_ars(final_grid, f, h, h_prime, modes, lb, rb)
+    tails_area <- tails_ars(final_proposal, f, h, h_prime, modes, lb, rb)
 
     if (modes[1] == lb)
       proposal_areas[1] <- 0
@@ -502,19 +502,19 @@ build_final_grid <- function(gp, opt_area = NULL) {
     }
   }
 
-  grid_bounds[1] <- lb
-  grid_bounds[2] <- rb
+  proposal_bounds[1] <- lb
+  proposal_bounds[2] <- rb
 
   if (is.null(symmetric))
     is_symmetric <- FALSE
   else
     is_symmetric <- TRUE
 
-  # if(steps_number != length(final_grid$x) - 1 ) stop("ERROR: STEPS NUMBER")
+  # if(steps_number != length(final_proposal$x) - 1 ) stop("ERROR: STEPS NUMBER")
 
   invisible(
     list(
-      grid_data = final_grid,
+      data = final_proposal,
       areas = proposal_areas,
       steps_number = steps_number,
       sampling_probabilities = sampling_probabilities,
@@ -523,12 +523,12 @@ build_final_grid <- function(gp, opt_area = NULL) {
       rt_properties = rt_properties,
       alpha = opt_area,
       tails_method = tails_method,
-      grid_bounds = grid_bounds,
+      proposal_bounds = proposal_bounds,
       cnum = cnum,
       symmetric = symmetric,
       f_params = f_params,
       is_symmetric = is_symmetric,
-      grid_type = grid_type,
+      proposal_type = proposal_type,
       target_function_area = f_area,
       density_arguments = density_arguments
     )
@@ -544,7 +544,7 @@ find_left_steps <- function(gp, area, mode_i, steps_lim = Inf) {
   mode <- gp$target$modes[mode_i]
   f <- gp$target$density
   theta <- gp$proposal$pre_acceptance_threshold
-  grid_range <- gp$proposal$grid_range
+  proposal_range <- gp$proposal$proposal_range
   # to check if new constructed steps get less than mode_previous due to low density value compared to area
   mode_previous <- ifelse(mode_i == 1, NA, gp$target$modes[mode_i - 1])
 
@@ -568,7 +568,7 @@ find_left_steps <- function(gp, area, mode_i, steps_lim = Inf) {
           x_c < lb ||
           (mode_i == 1 &&
            ((f(x_c) / f_x_previous  <= theta) ||
-            x_previous < grid_range[1])))
+            x_previous < proposal_range[1])))
         break
 
       f_x <- f(x_c)
@@ -611,7 +611,7 @@ find_right_steps <- function(gp, area, mode_i, steps_lim = Inf) {
   mode_n <- gp$target$modes_count
   f <- gp$target$density
   theta <- gp$proposal$pre_acceptance_threshold
-  grid_range <- gp$proposal$grid_range
+  proposal_range <- gp$proposal$proposal_range
 
   # to check if x_next exceeds mode_next due to low density value compared to area
   mode_next <- ifelse(mode_i == mode_n, NA, gp$target$modes[mode_i + 1])
@@ -635,7 +635,7 @@ find_right_steps <- function(gp, area, mode_i, steps_lim = Inf) {
           x_next > rb ||
           (mode_i == mode_n &&
            ((f(x_next) / f_x <= theta) ||
-            x_c > grid_range[2]))) {
+            x_c > proposal_range[2]))) {
         x[r] <- x_c
         s_upper[r] <- s_lower[r] <- s_upper_lower[r] <- p_a[r] <- NA
         break
@@ -676,8 +676,8 @@ find_right_steps <- function(gp, area, mode_i, steps_lim = Inf) {
 
 
 #' @noRd
-h_upper <- function(grid_point, val, h_prime, h) {
-  h_prime(grid_point) * (val - grid_point) + h(grid_point)
+h_upper <- function(proposals_point, val, h_prime, h) {
+  h_prime(proposals_point) * (val - proposals_point) + h(proposals_point)
 }
 
 
@@ -711,7 +711,7 @@ tails_ars <- function(grid, f, h, h_prime, modes, lb, rb) {
 
 
 #' @noRd
-stors_prime <- function(mode, h) {
+estimate_slope <- function(mode, h) {
   function(x) {
     if (x < mode[1]) {
       x0 <- x + 0.0000001

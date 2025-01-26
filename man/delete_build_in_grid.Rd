@@ -4,13 +4,13 @@
 \alias{delete_build_in_grid}
 \title{Delete Built-in Grids}
 \usage{
-delete_build_in_grid(sampling_function, grid_type = "custom")
+delete_build_in_grid(sampling_function, proposal_type = "custom")
 }
 \arguments{
 \item{sampling_function}{String. The name of the sampling distribution's function in STORS.
 For example, \code{"srgamma"} or \code{"srchisq"}.}
 
-\item{grid_type}{String. Either \code{"custom"} to delete the custom grid or \code{"scaled"} to delete the scaled grid.
+\item{proposal_type}{String. Either \code{"custom"} to delete the custom grid or \code{"scaled"} to delete the scaled grid.
 Defaults to \code{"custom"}.}
 }
 \value{
@@ -27,9 +27,9 @@ If the specified sampling function or grid type does not exist, an error is thro
 }
 \examples{
 # Delete a custom grid for the srgamma function
-delete_build_in_grid(sampling_function = "srgamma", grid_type = "custom")
+delete_build_in_grid(sampling_function = "srgamma", proposal_type = "custom")
 
 # Delete a scaled grid for the srnorm function
-delete_build_in_grid(sampling_function = "srnorm", grid_type = "scaled")
+delete_build_in_grid(sampling_function = "srnorm", proposal_type = "scaled")
 
 }

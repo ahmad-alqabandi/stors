@@ -16,7 +16,7 @@ h_prime_norm = function(x) {
   -x
 }
 
-norm_grid <- build_grid(lb = -Inf, rb = Inf, modes , f = f_norm,
+norm_grid <- build_proposal(lb = -Inf, rb = Inf, modes , f = f_norm,
                        steps = 1000, verbose = TRUE,  target_sample_size = 10000)
 
 plot(norm_grid)
@@ -25,23 +25,23 @@ s <- stors(norm_grid)
 
 hist(s(10000))
 
-? save_grid
+? save_proposal
 
-? print_grids
+? print_proposals
 
 ? delete_grid
 
-? load_grid
+? load_proposal
 
 norm_grid
 
-save_grid(norm_grid, "normal")
+save_proposal(norm_grid, "normal")
 
-print_grids()
+print_proposals()
 
 steps = 2000
 
-norm_grid = build_grid(lb = -1, rb = Inf, modes , f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = steps)
+norm_grid = build_proposal(lb = -1, rb = Inf, modes , f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = steps)
 
 norm_grid
 
@@ -78,7 +78,7 @@ h_prime_multi <- function(x) {
   (-(exp(-1/2 * (-4 + x)^2) * q * (-4 + x))/sqrt(2 * pi) - (exp(-x^2/2) * p * x)/sqrt(2 * pi))/((exp(-x^2/2) * p)/sqrt(2 * pi) + (exp(-1/2 * (-4 + x)^2) * q)/sqrt(2 * pi))
 }
 
-multi_grid = build_grid(lb = -Inf, rb = Inf,verbose = T, mode = modes_multi, f = f_multi, h = h_multi, h_prime = h_prime_multi)
+multi_grid = build_proposal(lb = -Inf, rb = Inf,verbose = T, mode = modes_multi, f = f_multi, h = h_multi, h_prime = h_prime_multi)
 
 plot(multi_grid)
 
@@ -88,9 +88,9 @@ multi_sampler = stors(multi_grid)
 
 hist(multi_sampler(1000000))
 
-save_grid(grid = multi_grid, grid_name = "multi_grid")
+save_proposal(grid = multi_grid, proposal_name = "multi_grid")
 
-multi_grid = load_grid("multi_grid")
+multi_grid = load_proposal("multi_grid")
 
 multi_sampler = stors(multi_grid)
 
@@ -105,7 +105,7 @@ delete_grid("multi_grid")
 
 ##    srnorm
 
-srnorm_grid = grid_optimizer("srnorm" , verbose = TRUE)
+srnorm_grid = proposal_optimizer("srnorm" , verbose = TRUE)
 
 print(srnorm_grid)
 
@@ -138,7 +138,7 @@ microbenchmark::microbenchmark(
 
 ##    laplace
 
-laplace_grid = grid_optimizer("srlaplace")
+laplace_grid = proposal_optimizer("srlaplace")
 
 plot(laplace_grid)
 
@@ -169,7 +169,7 @@ microbenchmark::microbenchmark(
 
 ##    srexp
 
-srexp_grid = grid_optimizer("srexp")
+srexp_grid = proposal_optimizer("srexp")
 
 plot(srexp_grid)
 

@@ -2,7 +2,7 @@
 # Globals:
 
 
-pbgrids <- list(
+built_in_proposals <- list(
   srnorm = list(
     c_num = 1,
     tails_method = "ARS",
@@ -193,12 +193,12 @@ stors_env <- new.env(parent = emptyenv())
                    vers)) {
       warning("Package version updated, old grids being archived.")
       if (file.exists(file.path(data_dir, paste0("builtin_grids_", vers)))) {
-        unlink(file.path(data_dir, c(paste0("builtin_grids_", vers), paste0("user_grids_", vers))), recursive = TRUE, force = TRUE)
+        unlink(file.path(data_dir, c(paste0("builtin_grids_", vers), paste0("user_proposals_", vers))), recursive = TRUE, force = TRUE)
       }
       file.rename(file.path(data_dir, "builtin_grids"),
                   file.path(data_dir, paste0("builtin_grids_", vers)))
-      file.rename(file.path(data_dir, "user_grids"),
-                  file.path(data_dir, paste0("user_grids_", vers)))
+      file.rename(file.path(data_dir, "user_proposals"),
+                  file.path(data_dir, paste0("user_proposals_", vers)))
       cat(paste(utils::packageVersion("stors"), sep = "."),
           file = file.path(data_dir, "version"))
     }
@@ -206,21 +206,21 @@ stors_env <- new.env(parent = emptyenv())
 
   builtin_grids_dir <- file.path(data_dir, "builtin_grids")
 
-  user_grids_dir <- file.path(data_dir, "user_grids")
+  user_proposals_dir <- file.path(data_dir, "user_proposals")
 
 
   if (!dir.exists(builtin_grids_dir))
     dir.create(builtin_grids_dir, recursive = TRUE)
 
 
-  if (!dir.exists(user_grids_dir))
-    dir.create(user_grids_dir, recursive = TRUE)
+  if (!dir.exists(user_proposals_dir))
+    dir.create(user_proposals_dir, recursive = TRUE)
 
   user_cnum_counter <- 101
   user_session_cached_grid_locks <- data.frame(lock = character(), cnum = numeric())
 
   assign("builtin_grids_dir", builtin_grids_dir, envir = stors_env)
-  assign("user_grids_dir", user_grids_dir, envir = stors_env)
+  assign("user_proposals_dir", user_proposals_dir, envir = stors_env)
   assign("user_cnum_counter", user_cnum_counter, envir = stors_env)
   assign("user_session_cached_grid_locks", user_session_cached_grid_locks, envir = stors_env)
 
@@ -230,7 +230,7 @@ stors_env <- new.env(parent = emptyenv())
   if (length(builtin_grids) == 0) {
 
 
-    for (name in names(pbgrids)) {
+    for (name in names(built_in_proposals)) {
 
       fun_name <- paste0(name, "_optimize")
       do.call(fun_name, list(steps = 4091))
@@ -239,13 +239,13 @@ stors_env <- new.env(parent = emptyenv())
 
   } else {
 
-    for (grid_name in builtin_grids) {
+    for (proposal_name in builtin_grids) {
 
-      grid_path <- file.path(builtin_grids_dir, grid_name)
-      grid <- readRDS(grid_path)
+      proposal_path <- file.path(builtin_grids_dir, proposal_name)
+      grid <- readRDS(proposal_path)
 
-      if (is_valid_grid(grid))
-        cache_grid_c(grid$cnum, grid)
+      if (is_valid_proposal(grid))
+        cache_proposal_c(grid$cnum, grid)
 
 
 

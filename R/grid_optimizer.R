@@ -1,5 +1,5 @@
 #' @noRd
-grid_optimizer <- function(dendata,
+proposal_optimizer <- function(dendata,
                            density_name,
                            xl = NULL,
                            xr = NULL,
@@ -7,10 +7,10 @@ grid_optimizer <- function(dendata,
                            modes,
                            f_params = NULL,
                            steps = NULL,
-                           grid_range = NULL,
+                           proposal_range = NULL,
                            theta = NULL,
                            target_sample_size = NULL,
-                           grid_type,
+                           proposal_type,
                            symmetric = NULL,
                            cnum = NULL,
                            verbose = FALSE) {
@@ -29,7 +29,7 @@ grid_optimizer <- function(dendata,
   modes <- adjust_modes(modes, xl, xr, f)
 
 
-  grid_param <- list(
+  proposal_param <- list(
     target = list(
       density = f,
       log_density = NULL,
@@ -46,7 +46,7 @@ grid_optimizer <- function(dendata,
     ),
 
     proposal = list(
-      grid_range = grid_range,
+      proposal_range = proposal_range,
       tails_method = dendata$tails_method,
       steps = steps,
       optimal_step_area = NULL,
@@ -58,7 +58,7 @@ grid_optimizer <- function(dendata,
 
     built_in = TRUE,
     cnum = cnum,
-    grid_type = grid_type,
+    proposal_type = proposal_type,
     c_function_name = density_name,
     verbose = verbose,
     f_params = f_params
@@ -70,41 +70,41 @@ grid_optimizer <- function(dendata,
       log(f(x))
       }
 
-    h_prime <- stors_prime(modes, h)
+    h_prime <- estimate_slope(modes, h)
 
   } else {
     cdf <- do.call(dendata$create_cdf, f_params)
 
   }
 
-  if (grid_param$proposal$tails_method == "IT") {
-    grid_param$target$Cumulitive_density <- cdf
+  if (proposal_param$proposal$tails_method == "IT") {
+    proposal_param$target$Cumulitive_density <- cdf
 
   } else {
-    grid_param$target$log_density <- h
-    grid_param$target$log_density_prime <- h_prime
+    proposal_param$target$log_density <- h
+    proposal_param$target$log_density_prime <- h_prime
 
   }
 
-  grid_param <- grid_error_checking_and_preparation(grid_param)
-  grid_param <- grid_check_symmetric(grid_param)
+  proposal_param <- proposal_error_checking_and_preparation(proposal_param)
+  proposal_param <- proposal_check_symmetric(proposal_param)
 
-  optimal_grid_params <- find_optimal_grid(grid_param)
-  opt_grid <- build_final_grid(gp = optimal_grid_params)
+  optimal_proposal_params <- find_optimal_proposal(proposal_param)
+  opt_proposal <- build_final_proposal(gp = optimal_proposal_params)
 
-  cache_grid_c(cnum, opt_grid)
-  opt_grid$dens_func <- deparse(f)
-  opt_grid$density_name <- density_name
+  cache_proposal_c(cnum, opt_proposal)
+  opt_proposal$dens_func <- deparse(f)
+  opt_proposal$density_name <- density_name
 
 
-  lock <- digest(opt_grid)
-  opt_grid$lock <- lock
+  lock <- digest(opt_proposal)
+  opt_proposal$lock <- lock
 
-  class(opt_grid) <- "grid"
+  class(opt_proposal) <- "proposal"
 
-  save_builtin_grid(cnum, opt_grid)
+  save_builtin_grid(cnum, opt_proposal)
 
-  return(opt_grid)
+  return(opt_proposal)
 
 }
 
@@ -113,10 +113,10 @@ grid_optimizer <- function(dendata,
 
 #' @importFrom microbenchmark microbenchmark
 #' @importFrom stats integrate
-find_optimal_grid <- function(gp) {
+find_optimal_proposal <- function(gp) {
   target_sample_size <- gp$proposal$target_sample_size
   theta <- gp$proposal$pre_acceptance_threshold
-  grid_range <- gp$proposal$grid_range
+  proposal_range <- gp$proposal$proposal_range
   lb <- gp$target$left_bound
   rb <- gp$target$right_bound
   f <- gp$target$density
@@ -154,7 +154,7 @@ find_optimal_grid <- function(gp) {
   gp$target$estimated_area <- f_area
 
   if ((theta == 0 &&
-       identical(grid_range, c(lb, rb))) ||
+       identical(proposal_range, c(lb, rb))) ||
       !is.null(steps)) {
 
     if (!is.null(steps)) {
@@ -237,8 +237,8 @@ find_optimal_grid <- function(gp) {
     steps_time <- double()
 
     for (j in seq_along(area_seq)) {
-      grid <- build_final_grid(gp = gp, opt_area = area_seq[j])
-      cache_grid_c(cnum, grid)
+      grid <- build_final_proposal(gp = gp, opt_area = area_seq[j])
+      cache_proposal_c(cnum, grid)
       gc <- gc()
 
       if (gp$built_in) {

@@ -33,14 +33,14 @@ where:
 }
 The Gamma distribution is widely used in statistics, particularly in Bayesian inference and modeling waiting times.
 
-This function samples from a grid constructed using \code{\link{srgamma_optimize}}, employing the STORS algorithm.
+This function samples from a proposal constructed using \code{\link{srgamma_optimize}}, employing the STORS algorithm.
 
 By default, \code{srgamma_custom()} samples from the standard Gamma distribution with \code{shape = 1} and \code{rate = 1}.
 The proposal distribution is pre-optimized at package load time using \code{srgamma_optimize()} with
-\code{steps = 4091}, creating a scalable grid centered around the mode.
+\code{steps = 4091}, creating a scalable proposal centered around the mode.
 }
 \note{
-This function is not scalable. Therefore, only the \code{srgamma_custom()} version is available, which requires the grid to be pre-optimized using \code{srgamma_optimize()} before calling this function.
+This function is not scalable. Therefore, only the \code{srgamma_custom()} version is available, which requires the proposal to be pre-optimized using \code{srgamma_optimize()} before calling this function.
 }
 \examples{
 # Generate 10 samples from Gamma Distribution
@@ -54,5 +54,5 @@ print(x)
 
 }
 \seealso{
-\code{\link{srgamma_optimize}} to optimize the custom grid.
+\code{\link{srgamma_optimize}} to optimize the custom proposal.
 }
