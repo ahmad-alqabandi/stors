@@ -16,7 +16,7 @@ h_prime_norm = function(x) {
   -x
 }
 
-norm_proposal <- build_proposal(lb = -Inf, rb = Inf, modes , f = f_norm,
+norm_proposal <- build_proposal(lower = -Inf, upper = Inf, modes , f = f_norm,
                        steps = 1000, verbose = TRUE,  target_sample_size = 10000)
 
 plot(norm_proposal)
@@ -41,7 +41,7 @@ print_proposals()
 
 steps = 2000
 
-norm_proposal = build_proposal(lb = -1, rb = Inf, modes , f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = steps)
+norm_proposal = build_proposal(lower = -1, upper = Inf, modes , f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = steps)
 
 norm_proposal
 
@@ -78,7 +78,7 @@ h_prime_multi <- function(x) {
   (-(exp(-1/2 * (-4 + x)^2) * q * (-4 + x))/sqrt(2 * pi) - (exp(-x^2/2) * p * x)/sqrt(2 * pi))/((exp(-x^2/2) * p)/sqrt(2 * pi) + (exp(-1/2 * (-4 + x)^2) * q)/sqrt(2 * pi))
 }
 
-multi_proposal = build_proposal(lb = -Inf, rb = Inf,verbose = T, mode = modes_multi, f = f_multi, h = h_multi, h_prime = h_prime_multi)
+multi_proposal = build_proposal(lower = -Inf, upper = Inf,verbose = T, mode = modes_multi, f = f_multi, h = h_multi, h_prime = h_prime_multi)
 
 plot(multi_proposal)
 

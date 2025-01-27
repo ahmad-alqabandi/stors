@@ -17,11 +17,11 @@ proposal_optimizer <- function(dendata,
 
   free_cache_cnum_c(cnum)
 
-  if ((is.null(xl) || (xl < dendata$lb)))
-    xl <- dendata$lb
+  if ((is.null(xl) || (xl < dendata$lower)))
+    xl <- dendata$lower
 
-  if (is.null(xr) || (xr > dendata$rb))
-    xr <- dendata$rb
+  if (is.null(xr) || (xr > dendata$upper))
+    xr <- dendata$upper
 
   if (xl > xr)
     stop("xl must be smaller than xr.")
@@ -117,8 +117,8 @@ find_optimal_proposal <- function(gp) {
   target_sample_size <- gp$proposal$target_sample_size
   theta <- gp$proposal$pre_acceptance_threshold
   proposal_range <- gp$proposal$proposal_range
-  lb <- gp$target$left_bound
-  rb <- gp$target$right_bound
+  lower <- gp$target$left_bound
+  upper <- gp$target$right_bound
   f <- gp$target$density
   lstpsp <- gp$proposal$left_steps_proportion
   rstpsp <- gp$proposal$right_steps_proportion
@@ -139,7 +139,7 @@ find_optimal_proposal <- function(gp) {
 
   times <- ceiling(opt_times / target_sample_size)
 
-  f_integrate <- integrate(f, lower = lb, upper = rb)
+  f_integrate <- integrate(f, lower = lower, upper = upper)
   relative_error <- f_integrate$abs.error / f_integrate$value * 100
 
   if (relative_error > 0.1) {
@@ -154,7 +154,7 @@ find_optimal_proposal <- function(gp) {
   gp$target$estimated_area <- f_area
 
   if ((theta == 0 &&
-       identical(proposal_range, c(lb, rb))) ||
+       identical(proposal_range, c(lower, upper))) ||
       !is.null(steps)) {
 
     if (!is.null(steps)) {

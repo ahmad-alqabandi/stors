@@ -26,7 +26,7 @@
 #' h_prime_norm <- function(x) { -x }
 #'
 #' # Build a dense proposal for the standard normal distribution
-#' norm_proposal = build_proposal(lb = -Inf, rb = Inf, mode = modes_norm,
+#' norm_proposal = build_proposal(lower = -Inf, upper = Inf, mode = modes_norm,
 #'  f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 4000)
 #'
 #' # Plot the generated proposal
@@ -170,7 +170,7 @@ plot.proposal <- function(x,
 #' h_prime_norm <- function(x) { -x }
 #'
 #' # Build a dense proposal for the standard normal distribution
-#' norm_proposal = build_proposal(lb = -Inf, rb = Inf, mode = modes_norm,
+#' norm_proposal = build_proposal(lower = -Inf, upper = Inf, mode = modes_norm,
 #'  f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 1000)
 #'
 #' # Print the properties of the generated proposal
@@ -215,7 +215,7 @@ print.proposal <- function(x, ...) {
 #' @examples
 #' # First, let's create a proposal to sample from a standard normal distribution
 #' f_normal <- function(x) { 0.3989423 * exp(-0.5 * x^2) }
-#' normal_proposal = build_proposal(f = f_normal, modes = 0, lb = -Inf, rb = Inf, steps = 1000)
+#' normal_proposal = build_proposal(f = f_normal, modes = 0, lower = -Inf, upper = Inf, steps = 1000)
 #' print(normal_proposal)
 #'
 #' # `print_proposals()` prints all proposals stored in R's internal data directory.
@@ -232,7 +232,7 @@ print.proposal <- function(x, ...) {
 #'   0.5 * (1 / sqrt(2 * pi)) * exp(-((x - 4)^2) / 2)
 #' }
 #' modes_bimodal = c(0, 4)
-#' bimodal_proposal = build_proposal(f = f_bimodal, modes = modes_bimodal, lb = -Inf, rb = Inf, steps = 1000)
+#' bimodal_proposal = build_proposal(f = f_bimodal, modes = modes_bimodal, lower = -Inf, upper = Inf, steps = 1000)
 #' save_proposal(bimodal_proposal, "bimodal")
 #' print(bimodal_proposal)
 #'
@@ -279,7 +279,7 @@ print_proposals <- function() {
 #' @examples
 #' # First, let's create a proposal to sample from a standard normal distribution
 #' f_normal <- function(x) { 0.3989423 * exp( -0.5 * x^2) }
-#' normal_proposal = build_proposal(f = f_normal, modes = 0, lb = -Inf, rb = Inf, steps = 1000)
+#' normal_proposal = build_proposal(f = f_normal, modes = 0, lower = -Inf, upper = Inf, steps = 1000)
 #' print(normal_proposal)
 #'
 #' # Then, we can save this proposal in R's internal data directory using `save_proposal()`
@@ -317,7 +317,7 @@ save_proposal <- function(proposal, proposal_name) {
 #' @examples
 #' # First, let's create a proposal to sample from a standard normal distribution
 #' f_normal <- function(x) { 0.3989423 * exp(-0.5 * x^2) }
-#' normal_proposal = build_proposal(f = f_normal, modes = 0, lb = -Inf, rb = Inf, steps = 1000)
+#' normal_proposal = build_proposal(f = f_normal, modes = 0, lower = -Inf, upper = Inf, steps = 1000)
 #' print(normal_proposal)
 #'
 #' # Then, save this proposal in R's internal data directory using `save_proposal()` with the name "normal"
@@ -361,7 +361,7 @@ delete_proposal <- function(proposal_name) {
 #' @examples
 #' # First, let's create a proposal to sample from a standard normal distribution
 #' f_normal <- function(x) { 0.3989423 * exp(-0.5 * x^2) }
-#' normal_proposal = build_proposal(f = f_normal, modes = 0, lb = -Inf, rb = Inf, steps = 1000)
+#' normal_proposal = build_proposal(f = f_normal, modes = 0, lower = -Inf, upper = Inf, steps = 1000)
 #' print(normal_proposal)
 #'
 #' # Then, save this proposal in R's internal data directory using `save_proposal()` with the name "normal"

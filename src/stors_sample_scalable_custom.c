@@ -196,9 +196,9 @@ SEXP DEN_SAMPLE_SYM_SCALED(NAME)(SEXP s_size, SEXP Rpassed_params){
 #if L_TAIL == IT
 
 #ifdef FLIP_SAMPLE
-        results[i] = FLIP_SAMPLE(L_ITF(u1 * g->proposal_area + CDF(g->lb)) ,flip);
+        results[i] = FLIP_SAMPLE(L_ITF(u1 * g->proposal_area + CDF(g->lower)) ,flip);
 #else
-      double U = u1 * g->proposal_area + CDF(g->lb);
+      double U = u1 * g->proposal_area + CDF(g->lower);
       results[i] = L_ITF(U);
 
 #endif
@@ -241,7 +241,7 @@ if(u1 > g->sampling_probabilities[1]){
 
 #if R_TAIL == IT
 
-      double U = CDF(g->rb) - g->proposal_area + u1 * g->proposal_area;
+      double U = CDF(g->upper) - g->proposal_area + u1 * g->proposal_area;
       results[i] = R_ITF(U);
 
       i++;

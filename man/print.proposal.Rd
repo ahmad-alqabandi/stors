@@ -32,7 +32,7 @@ h_norm <- function(x) { log(f_norm(x)) }
 h_prime_norm <- function(x) { -x }
 
 # Build a dense proposal for the standard normal distribution
-norm_proposal = build_proposal(lb = -Inf, rb = Inf, mode = modes_norm,
+norm_proposal = build_proposal(lower = -Inf, upper = Inf, mode = modes_norm,
  f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 1000)
 
 # Print the properties of the generated proposal

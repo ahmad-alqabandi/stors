@@ -24,8 +24,8 @@ built_in_proposals <- list(
     set_modes = function(mu = 0) {
       return(mu)
     },
-    lb = -Inf,
-    rb = Inf
+    lower = -Inf,
+    upper = Inf
   ), srlaplace = list(
     c_num = 3,
     tails_method = "IT",
@@ -52,8 +52,8 @@ built_in_proposals <- list(
     set_modes = function(mu = 0) {
       mu
     },
-    lb = -Inf,
-    rb = Inf
+    lower = -Inf,
+    upper = Inf
   ), srexp = list(
     c_num = 5,
     tails_method = "IT",
@@ -73,8 +73,8 @@ built_in_proposals <- list(
         return(1 - exp(- rate * x))
       }
     },
-    lb = 0,
-    rb = Inf
+    lower = 0,
+    upper = Inf
   ), srchisq = list(
     c_num = 7,
     tails_method = "ARS",
@@ -97,8 +97,8 @@ built_in_proposals <- list(
     set_modes = function(df = 1) {
       max(df - 2, 0)
     },
-    lb = 0,
-    rb = Inf
+    lower = 0,
+    upper = Inf
   ), srgamma = list(
     c_num = 9,
     std_params = list(shape = 1, scale = 1),
@@ -121,8 +121,8 @@ built_in_proposals <- list(
     set_modes = function(shape, scale) {
       if (shape < 1) 0 else (shape - 1) * scale
     },
-    lb = 0,
-    rb = Inf
+    lower = 0,
+    upper = Inf
   ),  srbeta = list(
     c_num = 11,
     tails_method = "ARS",
@@ -142,8 +142,8 @@ built_in_proposals <- list(
     set_modes = function(shape1, shape2) {
       return((shape1 - 1) / (shape1 + shape2 - 2))
     },
-    lb = 0,
-    rb = 1
+    lower = 0,
+    upper = 1
   ), srpareto = list(
     c_num = 13,
     tails_method = "IT",
@@ -166,8 +166,8 @@ built_in_proposals <- list(
     set_modes = function(scale) {
       return(scale)
     },
-    lb = NULL,
-    rb = Inf
+    lower = NULL,
+    upper = Inf
   )
 )
 

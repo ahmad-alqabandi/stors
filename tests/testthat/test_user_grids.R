@@ -7,12 +7,12 @@ test_that("MAIN", {
   h_norm <- function(x) log(f_norm(x))
   h_prime_norm <- function(x) -x
 
-  norm_grid <- build_proposal(lb = -Inf, rb = Inf, mode = modes_norm,
+  norm_grid <- build_proposal(lower = -Inf, upper = Inf, mode = modes_norm,
                          f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 1000)
 
   l_trunc <- 0
   r_trunc <- Inf
-  norm_grid_trunc <- build_proposal(lb = l_trunc, rb = r_trunc, mode = modes_norm,
+  norm_grid_trunc <- build_proposal(lower = l_trunc, upper = r_trunc, mode = modes_norm,
                          f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 1000)
 
 

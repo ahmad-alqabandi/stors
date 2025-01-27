@@ -126,7 +126,7 @@ srlaplace_custom <- function(n = 1, x = NULL) {
 #'     \item{\code{left_tail}}{The probability of sampling from the left tail.}
 #'     \item{\code{left_and_middle}}{The combined probability of sampling from the left tail and middle steps.}
 #'   }}
-#'   \item{\code{unif_scaler}}{A numeric scalar, the inverse probability of sampling from the steps part of the proposal (\eqn{\frac{1}{p(lb < x < rb)}}). Used for scaling uniform random values.}
+#'   \item{\code{unif_scaler}}{A numeric scalar, the inverse probability of sampling from the steps part of the proposal (\eqn{\frac{1}{p(lower < x < upper)}}). Used for scaling uniform random values.}
 #'   \item{\code{lt_properties}}{A numeric vector of 5 values required for Adaptive Rejection Sampling (ARS) in the left tail.}
 #'   \item{\code{rt_properties}}{A numeric vector of 6 values required for ARS in the right tail.}
 #'   \item{\code{alpha}}{A numeric scalar representing the uniform step area.}

@@ -18,7 +18,7 @@ This function deletes a proposal that was previously stored by the user using th
 \examples{
 # First, let's create a proposal to sample from a standard normal distribution
 f_normal <- function(x) { 0.3989423 * exp(-0.5 * x^2) }
-normal_proposal = build_proposal(f = f_normal, modes = 0, lb = -Inf, rb = Inf, steps = 1000)
+normal_proposal = build_proposal(f = f_normal, modes = 0, lower = -Inf, upper = Inf, steps = 1000)
 print(normal_proposal)
 
 # Then, save this proposal in R's internal data directory using `save_proposal()` with the name "normal"

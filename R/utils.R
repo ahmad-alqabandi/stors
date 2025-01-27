@@ -111,8 +111,8 @@ truncate_error_checking <- function(xl, xr, density) {
     "xl must be a scaler" = (is.numeric(xl) && length(xl) == 1),
     "xr must be a scaler" = (is.numeric(xr) && length(xr) == 1),
     "xl must be smaller that xr" = (xl < xr),
-    "xl must be greater than the density lower bound" = (xl >=  density$lb),
-    "xr must be smaller than the density upper bound" = (xr <= density$rb)
+    "xl must be greater than the density lower bound" = (xl >=  density$lower),
+    "xr must be smaller than the density upper bound" = (xr <= density$upper)
   )
 
   return(list(xl = xl, xr = xr))
@@ -127,8 +127,8 @@ proposal_error_checking_and_preparation <- function(gp) {
   steps <- gp$proposal$steps
   theta <- gp$proposal$pre_acceptance_threshold
   proposal_range <- gp$proposal$proposal_range
-  lb <- gp$target$left_bound
-  rb <- gp$target$right_bound
+  lower <- gp$target$left_bound
+  upper <- gp$target$right_bound
 
   if (is.null(modes)) {
     stop("Error: 'modes' density modes must be provided.")
@@ -166,18 +166,18 @@ proposal_error_checking_and_preparation <- function(gp) {
     if (length(proposal_range) != 2)
       stop("Error: 'proposal_range' must be a vector of two elements.")
 
-    if (proposal_range[1] < lb && proposal_range[2] > rb)
+    if (proposal_range[1] < lower && proposal_range[2] > upper)
       stop("Error: 'proposal_range' must be within the range of distribution bounds.")
 
     if (proposal_range[1] > modes[1] ||
         proposal_range[2] < modes[length(modes)])
       stop("Error: 'proposal_range' range must include distribution's modes.")
   } else {
-    proposal_range <- gp$proposal_range <- c(lb, rb)
+    proposal_range <- gp$proposal_range <- c(lower, upper)
   }
 
   if (!is.null(between_minima)) {
-    if (between_minima < lb || between_minima > rb)
+    if (between_minima < lower || between_minima > upper)
       stop("Error: 'between_minima' must be within the range of distribution bounds.")
 
     if (length(between_minima) != (length(modes) - 1))
@@ -223,15 +223,15 @@ proposal_check_symmetric <- function(gp) {
 
   if (!is.null(gp$target$symmetric)) {
     # modes <- gp$target$modes
-    # rb <- gp$target$right_bound
-    # lb <- gp$target$left_bound
+    # upper <- gp$target$right_bound
+    # lower <- gp$target$left_bound
     # proposal_range <- gp$proposal$proposal_range
     # f <- gp$target$density
     # center <- gp$target$symmetric
     # n <- 21
     #
-    # if (is.finite(lb) || is.finite(rb)) {
-    #   sub <- min(lb, rb)
+    # if (is.finite(lower) || is.finite(upper)) {
+    #   sub <- min(lower, upper)
     # } else {
     #   sub <- 5
     # }

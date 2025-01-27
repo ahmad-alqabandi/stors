@@ -23,7 +23,7 @@ SEXP cache_grid(SEXP R_Cnum, SEXP R_x, SEXP R_s_upper,
     *lt_properties = REAL(R_lt_properties), *rt_properties = REAL(R_rt_properties),
     *params = REAL(Rparams), symmetric = 0;
 
-    double lb = asReal(Rlb), rb = asReal(Rrb) ;
+    double lower = asReal(Rlb), upper = asReal(Rrb) ;
 
     if(!isNull(Rsymmetric)){
       symmetric = asReal(Rsymmetric);
@@ -42,8 +42,8 @@ SEXP cache_grid(SEXP R_Cnum, SEXP R_x, SEXP R_s_upper,
   grids.grid[j].alpha = alpha;
   grids.grid[j].symmetric = symmetric;
   grids.grid[j].n_params = n_params;
-  grids.grid[j].lb = lb;
-  grids.grid[j].rb = rb;
+  grids.grid[j].lower = lower;
+  grids.grid[j].upper = upper;
   grids.grid[j].proposal_area = 0;
 
   for( size_t i = 0; i < (m + 1); i++){

@@ -35,7 +35,7 @@ modes_norm = 0
 f_norm <- function(x) { 1 / sqrt(2 * pi) * exp(-0.5 * x^2) }
 h_norm <- function(x) { log(f_norm(x)) }
 h_prime_norm <- function(x) { -x }
-normal_proposal = build_proposal(lb = -Inf, rb = Inf, mode = modes_norm,
+normal_proposal = build_proposal(lower = -Inf, upper = Inf, mode = modes_norm,
  f = f_norm, h = h_norm, h_prime = h_prime_norm, steps = 1000)
 
 # Generate samples from the standard normal distribution
@@ -57,7 +57,7 @@ f_bimodal <- function(x) {
    modes_bimodal <- c(0.00316841, 3.99942)
 
 # Build the proposal for the bimodal distribution
-bimodal_proposal = build_proposal(f = f_bimodal, modes = modes_bimodal, lb = -Inf, rb = Inf, steps = 1000)
+bimodal_proposal = build_proposal(f = f_bimodal, modes = modes_bimodal, lower = -Inf, upper = Inf, steps = 1000)
 
 # Create the sampling function using \code{build_sampler()}
 sample_bimodal <- build_sampler(bimodal_proposal)
@@ -68,7 +68,7 @@ hist(bimodal_samples, breaks = 30, main = "Bimodal Distribution Samples")
 
 # Create the truncated sampling function using \code{build_sampler()} with truncation bounds [-0.5, 6]
 truncated_bimodal_proposal <- build_proposal(f = f_bimodal,
- modes = modes_bimodal, lb = -0.5, rb = 6, steps = 1000)
+ modes = modes_bimodal, lower = -0.5, upper = 6, steps = 1000)
 
 # Create the sampling function using \code{build_sampler()}
 sample_truncated_bimodal <- build_sampler(truncated_bimodal_proposal)

@@ -7,8 +7,8 @@
 build_proposal(
   f = NULL,
   modes = NA,
-  lb = -Inf,
-  rb = Inf,
+  lower = -Inf,
+  upper = Inf,
   h = NULL,
   h_prime = NULL,
   steps = NULL,
@@ -22,8 +22,8 @@ build_proposal(
 build_proposal(
   f = NULL,
   modes = NA,
-  lb = -Inf,
-  rb = Inf,
+  lower = -Inf,
+  upper = Inf,
   h = NULL,
   h_prime = NULL,
   steps = NULL,
@@ -41,10 +41,10 @@ Additional arguments may be parameters of the distribution, which should be spec
 
 \item{modes}{Numeric vector of modes of the density function.}
 
-\item{lb}{Numeric scalar representing the lower bound of the target density.
+\item{lower}{Numeric scalar representing the lower bound of the target density.
 Default is \code{-Inf} for unbounded lower support.}
 
-\item{rb}{Numeric scalar representing the upper bound of the target density.
+\item{upper}{Numeric scalar representing the upper bound of the target density.
 Default is \code{Inf} for unbounded upper support.}
 
 \item{h}{An optional function which returns the (unnormalised) log-probability density function of the target distribution.
@@ -56,7 +56,7 @@ As for \code{f} the first argument must be the value at which the log-pdf is to 
 \item{steps}{Optional integer scalar specifying the number of steps in the step optimised part of the proposal density and squeezing function.}
 
 \item{proposal_range}{Optional numeric vector of length 2 specifying the lower and upper range of the steps in the step optimised part of the proposal density and squeezing function.
-This range should be contained within the interval defined by \code{lb} and \code{rb}.}
+This range should be contained within the interval defined by \code{lower} and \code{upper}.}
 
 \item{theta}{Optional numeric scalar (between 0 and 1) defining the pre-acceptance threshold.
 This dictates when no further steps should be added in the step optimised part of the proposal density and squeezing function, based on the probability of pre-acceptance.}
@@ -95,7 +95,7 @@ A list containing the optimized proposal and related parameters for the specifie
 \item{\code{left_tail}}{The probability of sampling from the left tail.}
 \item{\code{left_and_middle}}{The combined probability of sampling from the left tail and middle steps.}
 }}
-\item{\code{unif_scaler}}{A numeric scalar, the inverse probability of sampling from the steps part of the proposal (\eqn{\frac{1}{p(lb < x < rb)}}). Used for scaling uniform random values.}
+\item{\code{unif_scaler}}{A numeric scalar, the inverse probability of sampling from the steps part of the proposal (\eqn{\frac{1}{p(lower < x < upper)}}). Used for scaling uniform random values.}
 \item{\code{lt_properties}}{A numeric vector of 5 values required for Adaptive Rejection Sampling (ARS) in the left tail.}
 \item{\code{rt_properties}}{A numeric vector of 6 values required for ARS in the right tail.}
 \item{\code{alpha}}{A numeric scalar representing the uniform step area.}
@@ -139,7 +139,7 @@ A list containing the optimized proposal and related parameters for the specifie
 \item{\code{left_tail}}{The probability of sampling from the left tail.}
 \item{\code{left_and_middle}}{The combined probability of sampling from the left tail and middle steps.}
 }}
-\item{\code{unif_scaler}}{A numeric scalar, the inverse probability of sampling from the steps part of the proposal (\eqn{\frac{1}{p(lb < x < rb)}}). Used for scaling uniform random values.}
+\item{\code{unif_scaler}}{A numeric scalar, the inverse probability of sampling from the steps part of the proposal (\eqn{\frac{1}{p(lower < x < upper)}}). Used for scaling uniform random values.}
 \item{\code{lt_properties}}{A numeric vector of 5 values required for Adaptive Rejection Sampling (ARS) in the left tail.}
 \item{\code{rt_properties}}{A numeric vector of 6 values required for ARS in the right tail.}
 \item{\code{alpha}}{A numeric scalar representing the uniform step area.}
@@ -170,7 +170,7 @@ This function is the starting point when a user wishes to build a custom sampler
 It is responsible for generating the step optimized proposal density, squeezing function, and log-linear tail proposal that can be utilized for this purpose.
 The minimum information that must be supplied by the user is:
 \itemize{
-\item The (closed) interval of support for the distribution, [\code{lb}, \code{rb}] \eqn{\in \mathbb{R}}, which may also be half-closed on either side, or all of \eqn{\mathbb{R}}.
+\item The (closed) interval of support for the distribution, [\code{lower}, \code{upper}] \eqn{\in \mathbb{R}}, which may also be half-closed on either side, or all of \eqn{\mathbb{R}}.
 \item The probability density function (pdf), which need not be normalised, \code{f}.
 \item Any modes of the pdf, as vector \code{modes}.
 }
@@ -191,7 +191,7 @@ Then, to implement as a custom StORS sampler, we would first define the pdf in R
 
 Then, to construct a StORS proposal for \eqn{a=2} and \eqn{b=2}, we would call
 
-\code{Proposal <- build_Proposal(lb = 0, rb = 1, modes = sqrt(1/3), f = dkumaraswamy, a = 2, b = 2)}
+\code{Proposal <- build_Proposal(lower = 0, upper = 1, modes = sqrt(1/3), f = dkumaraswamy, a = 2, b = 2)}
 
 \strong{StORS proposal construction}
 
@@ -233,7 +233,7 @@ This function is the starting point when a user wishes to build a custom sampler
 It is responsible for generating the step optimized proposal density, squeezing function, and log-linear tail proposal that can be utilized for this purpose.
 The minimum information that must be supplied by the user is:
 \itemize{
-\item The (closed) interval of support for the distribution, [\code{lb}, \code{rb}] \eqn{\in \mathbb{R}}, which may also be half-closed on either side, or all of \eqn{\mathbb{R}}.
+\item The (closed) interval of support for the distribution, [\code{lower}, \code{upper}] \eqn{\in \mathbb{R}}, which may also be half-closed on either side, or all of \eqn{\mathbb{R}}.
 \item The probability density function (pdf), which need not be normalised, \code{f}.
 \item Any modes of the pdf, as vector \code{modes}.
 }
@@ -254,7 +254,7 @@ Then, to implement as a custom StORS sampler, we would first define the pdf in R
 
 Then, to construct a StORS proposal for \eqn{a=2} and \eqn{b=2}, we would call
 
-\code{Proposal <- build_Proposal(lb = 0, rb = 1, modes = sqrt(1/3), f = dkumaraswamy, a = 2, b = 2)}
+\code{Proposal <- build_Proposal(lower = 0, upper = 1, modes = sqrt(1/3), f = dkumaraswamy, a = 2, b = 2)}
 
 \strong{StORS proposal construction}
 
@@ -304,7 +304,7 @@ h_norm <- function(x) { log(f_norm(x)) }
 h_prime_norm <- function(x) { -x }
 
 # Build the proposal for the standard normal distribution
-norm_proposal = build_proposal(lb = -Inf, rb = Inf, mode = modes_norm,
+norm_proposal = build_proposal(lower = -Inf, upper = Inf, mode = modes_norm,
  f = f_norm, h = h_norm, h_prime = h_prime_norm, verbose = TRUE)
 
 # Plot the generated proposal
@@ -323,7 +323,7 @@ f_bimodal <- function(x) {
 modes_bimodal = c(0.00134865, 3.99865)
 
 # Build the proposal for the bimodal distribution
-bimodal_proposal = build_proposal(lb = -Inf, rb = Inf, mode = modes_bimodal, f = f_bimodal)
+bimodal_proposal = build_proposal(lower = -Inf, upper = Inf, mode = modes_bimodal, f = f_bimodal)
 
 # Print and plot the bimodal proposal
 print(bimodal_proposal)
@@ -333,7 +333,7 @@ plot(bimodal_proposal)
 # This example demonstrates constructing a proposal with 500 steps,
 # for the bimodal distribution used in Example 2.
 
-bimodal_proposal_500 = build_proposal(lb = -Inf, rb = Inf, mode = modes_bimodal, f = f_bimodal, steps = 500)
+bimodal_proposal_500 = build_proposal(lower = -Inf, upper = Inf, mode = modes_bimodal, f = f_bimodal, steps = 500)
 
 # Print and plot the proposal with 500 steps
 print(bimodal_proposal_500)
@@ -352,7 +352,7 @@ h_norm <- function(x) { log(f_norm(x)) }
 h_prime_norm <- function(x) { -x }
 
 # Build the proposal for the standard normal distribution
-norm_proposal = build_proposal(lb = -Inf, rb = Inf, mode = modes_norm,
+norm_proposal = build_proposal(lower = -Inf, upper = Inf, mode = modes_norm,
  f = f_norm, h = h_norm, h_prime = h_prime_norm, verbose = TRUE)
 
 # Plot the generated proposal
@@ -371,7 +371,7 @@ f_bimodal <- function(x) {
 modes_bimodal = c(0.00134865, 3.99865)
 
 # Build the proposal for the bimodal distribution
-bimodal_proposal = build_proposal(lb = -Inf, rb = Inf, mode = modes_bimodal, f = f_bimodal)
+bimodal_proposal = build_proposal(lower = -Inf, upper = Inf, mode = modes_bimodal, f = f_bimodal)
 
 # Print and plot the bimodal proposal
 print(bimodal_proposal)
@@ -381,7 +381,7 @@ plot(bimodal_proposal)
 # This example demonstrates constructing a proposal with 500 steps,
 # for the bimodal distribution used in Example 2.
 
-bimodal_proposal_500 = build_proposal(lb = -Inf, rb = Inf, mode = modes_bimodal, f = f_bimodal, steps = 500)
+bimodal_proposal_500 = build_proposal(lower = -Inf, upper = Inf, mode = modes_bimodal, f = f_bimodal, steps = 500)
 
 # Print and plot the proposal with 500 steps
 print(bimodal_proposal_500)

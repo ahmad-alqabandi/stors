@@ -30,14 +30,14 @@ test_that("Built_in smpling functions returns a sample of correct size and seeds
 test_that("Built_in sampling functions, samples properties tests", {
   for (name in setdiff(names(built_in_proposals), "srpareto")) {
 
-    lb <- built_in_proposals[[name]]$lb
-    rb <- built_in_proposals[[name]]$rb
+    lower <- built_in_proposals[[name]]$lower
+    upper <- built_in_proposals[[name]]$upper
 
     rnds <- runif(2)
     rnds <- rnds[order(rnds)]
 
-    poss_min <- if (is.infinite(lb)) -10 else lb
-    poss_max <- if (is.infinite(rb)) 10 else rb
+    poss_min <- if (is.infinite(lower)) -10 else lower
+    poss_max <- if (is.infinite(upper)) 10 else upper
 
     l_trunc <- poss_min + (poss_max - poss_min) * rnds[1]
     u_trunc <- poss_min + (poss_max - poss_min) * rnds[2]

@@ -274,7 +274,7 @@ h_prime_bi <- function(x) {
   (-(exp(-1 / 2 * (-4 + x)^2) * 0.5 * (-4 + x)) / sqrt(2 * pi) - (exp(-x^2 / 2) * 0.5 * x) / sqrt(2 *  pi)) / ((exp(-x^2 / 2) * 0.5) / sqrt(2 * pi) + (exp(-1 / 2 * (-4 + x)^2) * 0.5) / sqrt(2 * pi))
 }
 
-bi_proposal <- build_proposal(lb = -Inf, rb = Inf, modes = modes_bi, f = f_bi, h = h_bi, h_prime = h_prime_bi)
+bi_proposal <- build_proposal(lower = -Inf, upper = Inf, modes = modes_bi, f = f_bi, h = h_bi, h_prime = h_prime_bi)
 
 plot(bi_proposal)
 
@@ -310,7 +310,7 @@ hist(sample, main = "Sample Generated From Multi-modal Distribution ", xlab = "V
 ```
 
 Sampling from a Truncated User-Defined Distribution
-To sample from a truncated user-defined distribution, simply provide the lower and upper truncation bounds using the \code{lb} (lower bound) and \code{rb} (upper bound) arguments. Below, we demonstrate this process using a previously created multi-modal distribution.
+To sample from a truncated user-defined distribution, simply provide the lower and upper truncation bounds using the \code{lower} (lower bound) and \code{upper} (upper bound) arguments. Below, we demonstrate this process using a previously created multi-modal distribution.
 
 Example: Sampling from a Truncated Multi-Modal Distribution
 ```{r , echo = TRUE}
@@ -320,8 +320,8 @@ modes_bi <- c(0.00134865, 3.99865)
 
 # Build a truncated proposal for the multi-modal distribution
 bi_trunc_proposal <- build_proposal(
-  lb = -1,
-  rb = 6,
+  lower = -1,
+  upper = 6,
   modes = modes_bi,
   f = f_bi,
   h = h_bi,

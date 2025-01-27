@@ -12,7 +12,7 @@ This function prints details of all proposals stored by the user. It provides in
 \examples{
 # First, let's create a proposal to sample from a standard normal distribution
 f_normal <- function(x) { 0.3989423 * exp(-0.5 * x^2) }
-normal_proposal = build_proposal(f = f_normal, modes = 0, lb = -Inf, rb = Inf, steps = 1000)
+normal_proposal = build_proposal(f = f_normal, modes = 0, lower = -Inf, upper = Inf, steps = 1000)
 print(normal_proposal)
 
 # `print_proposals()` prints all proposals stored in R's internal data directory.
@@ -29,7 +29,7 @@ f_bimodal <- function(x) {
   0.5 * (1 / sqrt(2 * pi)) * exp(-((x - 4)^2) / 2)
 }
 modes_bimodal = c(0, 4)
-bimodal_proposal = build_proposal(f = f_bimodal, modes = modes_bimodal, lb = -Inf, rb = Inf, steps = 1000)
+bimodal_proposal = build_proposal(f = f_bimodal, modes = modes_bimodal, lower = -Inf, upper = Inf, steps = 1000)
 save_proposal(bimodal_proposal, "bimodal")
 print(bimodal_proposal)
 

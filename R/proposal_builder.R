@@ -6,7 +6,7 @@
 #' It is responsible for generating the step optimized proposal density, squeezing function, and log-linear tail proposal that can be utilized for this purpose.
 #' The minimum information that must be supplied by the user is:
 #'
-#' - The (closed) interval of support for the distribution, \[`lb`, `rb`\] \eqn{\in \mathbb{R}}, which may also be half-closed on either side, or all of \eqn{\mathbb{R}}.
+#' - The (closed) interval of support for the distribution, \[`lower`, `upper`\] \eqn{\in \mathbb{R}}, which may also be half-closed on either side, or all of \eqn{\mathbb{R}}.
 #' - The probability density function (pdf), which need not be normalised, `f`.
 #' - Any modes of the pdf, as vector `modes`.
 #'
@@ -26,7 +26,7 @@
 #'
 #' Then, to construct a StORS proposal for \eqn{a=2} and \eqn{b=2}, we would call
 #'
-#' \code{Proposal <- build_Proposal(lb = 0, rb = 1, modes = sqrt(1/3), f = dkumaraswamy, a = 2, b = 2)}
+#' \code{Proposal <- build_Proposal(lower = 0, upper = 1, modes = sqrt(1/3), f = dkumaraswamy, a = 2, b = 2)}
 #'
 #' **StORS proposal construction**
 #'
@@ -68,10 +68,10 @@
 #'        A function which returns the (unnormalised) probability density function of the target distribution.
 #'        The first argument must be the value at which the pdf is to be evaluated.
 #'        Additional arguments may be parameters of the distribution, which should be specified by name in the `...` arguments.
-#' @param lb
+#' @param lower
 #'        Numeric scalar representing the lower bound of the target density.
 #'        Default is `-Inf` for unbounded lower support.
-#' @param rb
+#' @param upper
 #'        Numeric scalar representing the upper bound of the target density.
 #'        Default is `Inf` for unbounded upper support.
 #' @param h
@@ -84,7 +84,7 @@
 #'        Optional integer scalar specifying the number of steps in the step optimised part of the proposal density and squeezing function.
 #' @param proposal_range
 #'        Optional numeric vector of length 2 specifying the lower and upper range of the steps in the step optimised part of the proposal density and squeezing function.
-#'        This range should be contained within the interval defined by `lb` and `rb`.
+#'        This range should be contained within the interval defined by `lower` and `upper`.
 #' @param theta
 #'        Optional numeric scalar (between 0 and 1) defining the pre-acceptance threshold.
 #'        This dictates when no further steps should be added in the step optimised part of the proposal density and squeezing function, based on the probability of pre-acceptance.
@@ -123,7 +123,7 @@
 #'     \item{\code{left_tail}}{The probability of sampling from the left tail.}
 #'     \item{\code{left_and_middle}}{The combined probability of sampling from the left tail and middle steps.}
 #'   }}
-#'   \item{\code{unif_scaler}}{A numeric scalar, the inverse probability of sampling from the steps part of the proposal (\eqn{\frac{1}{p(lb < x < rb)}}). Used for scaling uniform random values.}
+#'   \item{\code{unif_scaler}}{A numeric scalar, the inverse probability of sampling from the steps part of the proposal (\eqn{\frac{1}{p(lower < x < upper)}}). Used for scaling uniform random values.}
 #'   \item{\code{lt_properties}}{A numeric vector of 5 values required for Adaptive Rejection Sampling (ARS) in the left tail.}
 #'   \item{\code{rt_properties}}{A numeric vector of 6 values required for ARS in the right tail.}
 #'   \item{\code{alpha}}{A numeric scalar representing the uniform step area.}
@@ -164,7 +164,7 @@
 #' h_prime_norm <- function(x) { -x }
 #'
 #' # Build the proposal for the standard normal distribution
-#' norm_proposal = build_proposal(lb = -Inf, rb = Inf, mode = modes_norm,
+#' norm_proposal = build_proposal(lower = -Inf, upper = Inf, mode = modes_norm,
 #'  f = f_norm, h = h_norm, h_prime = h_prime_norm, verbose = TRUE)
 #'
 #' # Plot the generated proposal
@@ -183,7 +183,7 @@
 #' modes_bimodal = c(0.00134865, 3.99865)
 #'
 #' # Build the proposal for the bimodal distribution
-#' bimodal_proposal = build_proposal(lb = -Inf, rb = Inf, mode = modes_bimodal, f = f_bimodal)
+#' bimodal_proposal = build_proposal(lower = -Inf, upper = Inf, mode = modes_bimodal, f = f_bimodal)
 #'
 #' # Print and plot the bimodal proposal
 #' print(bimodal_proposal)
@@ -193,7 +193,7 @@
 #' # This example demonstrates constructing a proposal with 500 steps,
 #' # for the bimodal distribution used in Example 2.
 #'
-#' bimodal_proposal_500 = build_proposal(lb = -Inf, rb = Inf, mode = modes_bimodal, f = f_bimodal, steps = 500)
+#' bimodal_proposal_500 = build_proposal(lower = -Inf, upper = Inf, mode = modes_bimodal, f = f_bimodal, steps = 500)
 #'
 #' # Print and plot the proposal with 500 steps
 #' print(bimodal_proposal_500)
@@ -202,8 +202,8 @@
 #' @export
 build_proposal <- function(f = NULL,
                            modes = NA,
-                           lb = -Inf,
-                           rb = Inf,
+                           lower = -Inf,
+                           upper = Inf,
                            h = NULL,
                            h_prime = NULL,
                            steps = NULL,
@@ -237,7 +237,7 @@ build_proposal <- function(f = NULL,
   }
 
 
-  modes <- adjust_modes(modes, lb, rb, f)
+  modes <- adjust_modes(modes, lower, upper, f)
 
   proposal_param <- list(
     target = list(
@@ -249,8 +249,8 @@ build_proposal <- function(f = NULL,
       modes = modes,
       modes_count = length(modes),
       between_minima = NULL,
-      right_bound = rb,
-      left_bound = lb,
+      right_bound = upper,
+      left_bound = lower,
       estimated_area = NULL,
       symmetric = NULL
     ),
@@ -361,8 +361,8 @@ build_final_proposal <- function(gp, opt_area = NULL) {
   if (is.null(opt_area))
     opt_area <- gp$proposal$optimal_step_area
 
-  lb <- gp$target$left_bound
-  rb <- gp$target$right_bound
+  lower <- gp$target$left_bound
+  upper <- gp$target$right_bound
   mode_n <- gp$target$modes_count
   modes <- gp$target$modes
   f <- gp$target$density
@@ -445,29 +445,29 @@ build_final_proposal <- function(gp, opt_area = NULL) {
     steps_number <- steps_number * 2
 
   if (identical(tails_method, "ARS")) {
-    tails_area <- tails_ars(final_proposal, f, h, h_prime, modes, lb, rb)
+    tails_area <- tails_ars(final_proposal, f, h, h_prime, modes, lower, upper)
 
-    if (modes[1] == lb)
+    if (modes[1] == lower)
       proposal_areas[1] <- 0
     else
       proposal_areas[1] <- tails_area$lta
 
-    if (modes[mode_n] == rb)
+    if (modes[mode_n] == upper)
       proposal_areas[3] <- 0
     else
       proposal_areas[3] <- tails_area$rta
 
   } else {
-    if (modes[1] == lb) {
+    if (modes[1] == lower) {
       proposal_areas[1] <- 0
     } else {
-      proposal_areas[1] <- cdf(x1) - cdf(lb)
+      proposal_areas[1] <- cdf(x1) - cdf(lower)
     }
 
-    if (modes[mode_n] == rb) {
+    if (modes[mode_n] == upper) {
       proposal_areas[3] <- 0
     } else {
-      proposal_areas[3] <- cdf(rb) - cdf(xm)
+      proposal_areas[3] <- cdf(upper) - cdf(xm)
     }
   }
 
@@ -482,7 +482,7 @@ build_final_proposal <- function(gp, opt_area = NULL) {
   if (identical(tails_method, "ARS")) {
     if (proposal_areas[1] != 0) {
       lt_properties <- c(
-        exp(h_upper(x1, lb, h_prime, h)),
+        exp(h_upper(x1, lower, h_prime, h)),
         normalizing_con * h_prime(x1),
         h(x1),
         1 / h_prime(x1),
@@ -502,8 +502,8 @@ build_final_proposal <- function(gp, opt_area = NULL) {
     }
   }
 
-  proposal_bounds[1] <- lb
-  proposal_bounds[2] <- rb
+  proposal_bounds[1] <- lower
+  proposal_bounds[2] <- upper
 
   if (is.null(symmetric))
     is_symmetric <- FALSE
@@ -540,7 +540,7 @@ build_final_proposal <- function(gp, opt_area = NULL) {
 #' @noRd
 find_left_steps <- function(gp, area, mode_i, steps_lim = Inf) {
   estimated_area <- gp$target$estimated_area
-  lb <- gp$target$left_bound
+  lower <- gp$target$left_bound
   mode <- gp$target$modes[mode_i]
   f <- gp$target$density
   theta <- gp$proposal$pre_acceptance_threshold
@@ -558,14 +558,14 @@ find_left_steps <- function(gp, area, mode_i, steps_lim = Inf) {
 
   i <- 0
 
-  if (mode != lb) {
+  if (mode != lower) {
     x_previous <- mode
     f_x_previous <- f(x_previous)
     while (TRUE) {
       x_c <- x_previous - area / f_x_previous
 
       if (i >= steps_lim ||
-          x_c < lb ||
+          x_c < lower ||
           (mode_i == 1 &&
            ((f(x_c) / f_x_previous  <= theta) ||
             x_previous < proposal_range[1])))
@@ -606,7 +606,7 @@ find_left_steps <- function(gp, area, mode_i, steps_lim = Inf) {
 #' @noRd
 find_right_steps <- function(gp, area, mode_i, steps_lim = Inf) {
   estimated_area <- gp$target$estimated_area
-  rb <- gp$target$right_bound
+  upper <- gp$target$right_bound
   mode <- gp$target$modes[mode_i]
   mode_n <- gp$target$modes_count
   f <- gp$target$density
@@ -626,13 +626,13 @@ find_right_steps <- function(gp, area, mode_i, steps_lim = Inf) {
 
   r <- 1
 
-  if (mode != rb) {
+  if (mode != upper) {
     x_c <- mode
     f_x <- f(x_c)
     while (TRUE) {
       x_next <- x_c + area / f_x
       if (r > steps_lim ||
-          x_next > rb ||
+          x_next > upper ||
           (mode_i == mode_n &&
            ((f(x_next) / f_x <= theta) ||
             x_c > proposal_range[2]))) {
@@ -682,27 +682,27 @@ h_upper <- function(proposals_point, val, h_prime, h) {
 
 
 #' @noRd
-tails_ars <- function(grid, f, h, h_prime, modes, lb, rb) {
+tails_ars <- function(grid, f, h, h_prime, modes, lower, upper) {
   steps <- length(grid$x)
   modes_n <- length(modes)
   # left tail
-  if (lb == Inf) {
+  if (lower == Inf) {
     l_tail_area <- (1 / h_prime(grid$x[1])) * f(grid$x[1])
   } else {
     if (modes[1] == grid$x[1]) {
       l_tail_area <- 0
     } else {
-      l_tail_area <- (1 / h_prime(grid$x[1])) * (f(grid$x[1]) - exp(h_upper(grid$x[1], lb, h_prime, h)))
+      l_tail_area <- (1 / h_prime(grid$x[1])) * (f(grid$x[1]) - exp(h_upper(grid$x[1], lower, h_prime, h)))
     }
   }
   #right tails
-  if (rb == Inf) {
+  if (upper == Inf) {
     r_tail_area <- (1 / h_prime(grid$x[steps])) * -f(grid$x[steps])
   } else {
     if (modes[modes_n] == grid$x[steps]) {
       r_tail_area <- 0
     } else {
-      r_tail_area <- (1 / h_prime(grid$x[steps])) * (exp(h_upper(grid$x[steps], rb, h_prime, h)) - f(grid$x[steps]))
+      r_tail_area <- (1 / h_prime(grid$x[steps])) * (exp(h_upper(grid$x[steps], upper, h_prime, h)) - f(grid$x[steps]))
     }
   }
 
