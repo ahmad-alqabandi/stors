@@ -76,19 +76,19 @@ check_proposal_opt_criteria <- function(symmetric, cnum, dendata) {
     std_symmetric <- !is.null(symmetric)
 
     if (cnum %% 2 == 1) {
-      scaled_params <- cached_grid_info(cnum + 1)
-      which_grid <- "secondary"
+      scaled_params <- cached_proposal_info(cnum + 1)
+      which_proposal <- "secondary"
     } else {
-      scaled_params <- cached_grid_info(cnum)
-      which_grid <- "standerd"
+      scaled_params <- cached_proposal_info(cnum)
+      which_proposal <- "standerd"
     }
     if (!is.null(scaled_params)) {
       if ((std_symmetric &&
            !scaled_params[1]) ||
           (!std_symmetric && scaled_params[1])) {
         msg <- message("you need to delete the ",
-                   which_grid,
-                   " built-in grid, that has ")
+                   which_proposal,
+                   " built-in proposal, that has ")
         name <- names(dendata$std_params)
         for (i in (1:(length(scaled_params) - 1))) {
           msg <- message(msg, name[i], " = ", scaled_params[i + 1])
@@ -201,12 +201,12 @@ proposal_error_checking_and_preparation <- function(gp) {
 
 #' @import digest digest
 #' @noRd
-is_valid_proposal <- function(grid) {
-  if ("lock" %in% names(grid)) {
-    temp <- grid[setdiff(names(grid), "lock")]
+is_valid_proposal <- function(proposal) {
+  if ("lock" %in% names(proposal)) {
+    temp <- proposal[setdiff(names(proposal), "lock")]
     key <- digest(temp)
 
-    if (key == grid$lock) {
+    if (key == proposal$lock) {
       return(TRUE)
 
     }
@@ -301,7 +301,7 @@ get_buildin_sampling_function <- function(cnum, name) {
       }
     }
   } else {
-    stop("Check the grid caching number c_num !")
+    stop("Check the proposal caching number c_num !")
   }
 
   return(fun)
@@ -323,36 +323,36 @@ built_in_pars_trans <- function(f_params, cnum) {
 }
 
 #' @noRd
-cache_proposal_c <- function(c_num, grid) {
-  n_params <- length(grid$f_params)
+cache_proposal_c <- function(c_num, proposal) {
+  n_params <- length(proposal$f_params)
 
   f_params <- 0
 
   if (n_params > 0) {
-    f_params <- built_in_pars_trans(grid$f_params, c_num)
+    f_params <- built_in_pars_trans(proposal$f_params, c_num)
 
-    f_params <- unlist(grid$f_params)
+    f_params <- unlist(proposal$f_params)
   }
 
   .Call(
     C_cache_grid,
     c_num,
-    grid$data$x,
-    grid$data$s_upper,
-    grid$data$p_a,
-    grid$data$s_upper_lower,
-    grid$areas,
-    grid$steps_number,
-    grid$sampling_probabilities,
-    grid$unif_scaler,
-    grid$lt_properties,
-    grid$rt_properties,
-    grid$alpha,
-    grid$symmetric,
+    proposal$data$x,
+    proposal$data$s_upper,
+    proposal$data$p_a,
+    proposal$data$s_upper_lower,
+    proposal$areas,
+    proposal$steps_number,
+    proposal$sampling_probabilities,
+    proposal$unif_scaler,
+    proposal$lt_properties,
+    proposal$rt_properties,
+    proposal$alpha,
+    proposal$symmetric,
     f_params,
     n_params,
-    grid$proposal_bounds[1],
-    grid$proposal_bounds[2]
+    proposal$proposal_bounds[1],
+    proposal$proposal_bounds[2]
   )
 
 }
@@ -360,14 +360,14 @@ cache_proposal_c <- function(c_num, grid) {
 
 
 #' @noRd
-cache_user_grid_c <- function(grid) {
-  if (!is_valid_proposal(grid))
-    stop("This grid is not valid")
+cache_user_proposal_c <- function(proposal) {
+  if (!is_valid_proposal(proposal))
+    stop("This proposal is not valid")
 
-  if (grid$lock %in% stors_env$user_session_cached_grid_locks[["lock"]]) {
-     message("Detected cached grid for this distribution already ... replacing with new grid.")
+  if (proposal$lock %in% stors_env$user_session_cached_proposals_locks[["lock"]]) {
+     message("Detected cached proposal for this distribution already ... replacing with new proposal.")
 
-    c_num <- stors_env$user_session_cached_grid_locks[stors_env$user_session_cached_grid_locks$lock == grid$lock, ]$cnum
+    c_num <- stors_env$user_session_cached_proposals_locks[stors_env$user_session_cached_proposals_locks$lock == proposal$lock, ]$cnum
 
     return(c_num)
 
@@ -375,12 +375,12 @@ cache_user_grid_c <- function(grid) {
 
   c_num <- stors_env$user_cnum_counter
 
-  cache_proposal_c(c_num, grid)
+  cache_proposal_c(c_num, proposal)
 
-  user_session_cached_grid_locks <- data.frame(lock = grid$lock, cnum = c_num)
+  user_session_cached_proposals_locks <- data.frame(lock = proposal$lock, cnum = c_num)
 
-  stors_env$user_session_cached_grid_locks <- rbind(stors_env$user_session_cached_grid_locks,
-                                                    user_session_cached_grid_locks)
+  stors_env$user_session_cached_proposals_locks <- rbind(stors_env$user_session_cached_proposals_locks,
+                                                    user_session_cached_proposals_locks)
 
   stors_env$user_cnum_counter <- stors_env$user_cnum_counter + 1
 
@@ -393,52 +393,52 @@ free_cache_cnum_c <- function(c_num) {
 }
 
 #' @noRd
-save_builtin_grid <- function(c_num, grid) {
-  proposals_file_path <- file.path(stors_env$builtin_grids_dir, paste0(c_num, ".rds"))
-  saveRDS(grid, proposals_file_path)
+save_builtin_proposal <- function(c_num, proposal) {
+  proposals_file_path <- file.path(stors_env$builtin_proposals_dir, paste0(c_num, ".rds"))
+  saveRDS(proposal, proposals_file_path)
 }
 
 #' @noRd
-cached_grid_info <- function(cnum) {
+cached_proposal_info <- function(cnum) {
   .Call(C_grid_info, cnum)
 }
 
 
-#' Delete Built-in Grids
+#' Delete Built-in Proposal
 #'
 #' @description
-#' This function deletes built-in grids from disk by specifying the sampling function and grid type.
-#' It is useful for managing cached grids and freeing up storage space.
+#' This function deletes built-in proposals from disk by specifying the sampling function and proposal type.
+#' It is useful for managing cached proposals and freeing up storage space.
 #'
 #' @param sampling_function String. The name of the sampling distribution's function in STORS.
 #' For example, \code{"srgamma"} or \code{"srchisq"}.
-#' @param proposal_type String. Either \code{"custom"} to delete the custom grid or \code{"scaled"} to delete the scaled grid.
+#' @param proposal_type String. Either \code{"custom"} to delete the custom proposal or \code{"scaled"} to delete the scaled proposal.
 #' Defaults to \code{"custom"}.
 #'
 #' @details
-#' The function looks for the specified grid type associated with the sampling function in the built-in grids directory.
-#' If the grid exists, it deletes the corresponding grid file from disk and frees its cached resources.
-#' If the specified sampling function or grid type does not exist, an error is thrown.
+#' The function looks for the specified proposal type associated with the sampling function in the built-in proposals directory.
+#' If the proposal exists, it deletes the corresponding proposal file from disk and frees its cached resources.
+#' If the specified sampling function or proposal type does not exist, an error is thrown.
 #'
 #' @return
 #' A message indicating the status of the deletion process, or an error if the operation fails.
 #'
 #' @examples
-#' # Delete a custom grid for the srgamma function
-#' delete_build_in_grid(sampling_function = "srgamma", proposal_type = "custom")
+#' # Delete a custom proposal for the srgamma function
+#' delete_build_in_proposal(sampling_function = "srgamma", proposal_type = "custom")
 #'
-#' # Delete a scaled grid for the srnorm function
-#' delete_build_in_grid(sampling_function = "srnorm", proposal_type = "scaled")
+#' # Delete a scaled proposal for the srnorm function
+#' delete_build_in_proposal(sampling_function = "srnorm", proposal_type = "scaled")
 #'
 #' @export
-delete_build_in_grid <- function(sampling_function, proposal_type = "custom") {
+delete_build_in_proposal <- function(sampling_function, proposal_type = "custom") {
   proposal_type <- match.arg(proposal_type, c("scaled", "custom"))
 
   if (sampling_function %in% names(built_in_proposals)) {
     if (proposal_type == "scaled") {
-      grid_number <- built_in_proposals[[sampling_function]]$c_num
+      proposal_number <- built_in_proposals[[sampling_function]]$c_num
     } else {
-      grid_number <- built_in_proposals[[sampling_function]]$c_num + 1
+      proposal_number <- built_in_proposals[[sampling_function]]$c_num + 1
     }
 
   } else {
@@ -446,21 +446,21 @@ delete_build_in_grid <- function(sampling_function, proposal_type = "custom") {
 
   }
 
-  builtin_grids <- list.files(stors_env$builtin_grids_dir)
+  builtin_proposals <- list.files(stors_env$builtin_proposals_dir)
 
-  for (proposal_name in builtin_grids) {
-    proposal_path <- file.path(stors_env$builtin_grids_dir, proposal_name)
-    grid <- readRDS(proposal_path)
+  for (proposal_name in builtin_proposals) {
+    proposal_path <- file.path(stors_env$builtin_proposals_dir, proposal_name)
+    proposal <- readRDS(proposal_path)
 
-    if ("lock" %in% names(grid)) {
-      temp <- grid[setdiff(names(grid), "lock")]
+    if ("lock" %in% names(proposal)) {
+      temp <- proposal[setdiff(names(proposal), "lock")]
       key <- digest(temp)
 
-      if (key == grid$lock) {
-        if (grid$cnum == grid_number) {
+      if (key == proposal$lock) {
+        if (proposal$cnum == proposal_number) {
           file.remove(proposal_path)
-          free_cache_cnum_c(grid$cnum)
-          message(" grid number ", grid$cnum, " DELETED !")
+          free_cache_cnum_c(proposal$cnum)
+          message(" proposal number ", proposal$cnum, " DELETED !")
         }
 
       }

@@ -26,7 +26,7 @@ microbenchmark::microbenchmark(
 )
 
 
-norm_grid = proposal_optimizer("srnorm", steps = os$steps[2])
+norm_proposal = proposal_optimizer("srnorm", steps = os$steps[2])
 
 
 microbenchmark::microbenchmark(
@@ -36,7 +36,7 @@ microbenchmark::microbenchmark(
 )
 
 
-norm_grid = proposal_optimizer("srnorm", steps = os$steps[3])
+norm_proposal = proposal_optimizer("srnorm", steps = os$steps[3])
 
 
 microbenchmark::microbenchmark(
@@ -46,7 +46,7 @@ microbenchmark::microbenchmark(
 )
 
 
-norm_grid = proposal_optimizer("srnorm", steps = os$steps[4])
+norm_proposal = proposal_optimizer("srnorm", steps = os$steps[4])
 
 
 microbenchmark::microbenchmark(
@@ -55,7 +55,7 @@ microbenchmark::microbenchmark(
   times = times
 )
 
-norm_grid = proposal_optimizer("srnorm", steps = os$steps[5])
+norm_proposal = proposal_optimizer("srnorm", steps = os$steps[5])
 
 
 microbenchmark::microbenchmark(
@@ -64,7 +64,7 @@ microbenchmark::microbenchmark(
   times = times
 )
 
-norm_grid = proposal_optimizer("srnorm", steps = os$steps[6])
+norm_proposal = proposal_optimizer("srnorm", steps = os$steps[6])
 
 
 microbenchmark::microbenchmark(
@@ -74,7 +74,7 @@ microbenchmark::microbenchmark(
 )
 
 
-norm_grid = proposal_optimizer("srnorm", steps = os$steps[7])
+norm_proposal = proposal_optimizer("srnorm", steps = os$steps[7])
 
 
 microbenchmark::microbenchmark(
@@ -105,7 +105,7 @@ samples <- rpareto(n, k = shape, xmin = scale)
 
 plot(density(samples), main = "Density of Pareto Distributed Samples using distributionsrd Package")
 
-grid <- srpareto_optimize(scale = scale, shape = shape, steps = 8000)
+proposal <- srpareto_optimize(scale = scale, shape = shape, steps = 8000)
 
 
 # Generate random samples using STORS Package

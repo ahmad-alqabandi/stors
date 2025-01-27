@@ -16,33 +16,33 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-The aim of the [stors] package is to generate samples from uni- and multimodal distributions using the Rejection Sampling technique. Stors stands out for its ability to leverage the system's capabilities to optimize the sampling process.
+The aim of the `stors` package is to generate samples from uni- and multimodal distributions using the Rejection Sampling technique. Stors stands out for its ability to leverage the system's capabilities to optimize the sampling process.
 
-Stors maximizes the sampling speed from the proposal distribution by constructing steps with uniform areas that cover the target distribution from which sampling is needed. To address potential efficiency issues in heavy and light-tailed distributions, we switch to Adaptive Rejection Sampling (ARS) for the tails, specifically for the grids created by the user. Fortunately, since ARS is used only for the tails, it eliminates the requirement for log concavity in most distributions, allowing us to cover a wide range of distributions that have log-concave tails such as normal multimodal distrebutions.
+Stors maximizes the sampling speed from the proposal distribution by constructing steps with uniform areas that cover the target distribution from which sampling is needed. To address potential efficiency issues in heavy and light-tailed distributions, we switch to Adaptive Rejection Sampling (ARS) for the tails, specifically for the proposals created by the user. Fortunately, since ARS is used only for the tails, it eliminates the requirement for log concavity in most distributions, allowing us to cover a wide range of distributions that have log-concave tails such as normal multimodal distrebutions.
 
-To use the [stors] package, we need to differentiate between two phases. The first phase involves building the grid for the proposal distribution. The second step is caching this grid in memory for sampling. This ensures optimum speed performance, as the proposal data is constructed independently from the sampling process. Most R base sampling functions are already covered in the stors package, making sampling straightforward.
+To use the `stors` package, we need to differentiate between two phases. The first phase involves building the proposal for the proposal distribution. The second step is caching this proposal in memory for sampling. This ensures optimum speed performance, as the proposal data is constructed independently from the sampling process. Most R base sampling functions are already covered in the stors package, making sampling straightforward.
 
 ## Sampling from Built-in Distrubutions
 
-To sample from any built-in distribution, a proposal grid for each distribution is pre-optimized using 4091 steps when the package is loaded for the first time. This optimization process constructs the grid and stores it in the internal R data directory. The grid is then cached in memory for efficient sampling whenever needed.
+To sample from any built-in distribution, a proposal for each distribution is pre-optimized using 4091 steps when the package is loaded for the first time. This optimization process constructs the proposal and stores it in the internal R data directory. The proposal is then cached in memory for efficient sampling whenever needed.
 
-You can also visualize the grid data using the \code{plot()} function to better understand its structure.
+You can also visualize the proposal data using the \code{plot()} function to better understand its structure.
 
-Here’s an example of optimizing a grid for the Normal distribution (note: this process is performed automatically when the package is installed and loaded for the first time):
+Here’s an example of optimizing a proposal for the Normal distribution (note: this process is performed automatically when the package is installed and loaded for the first time):
 
 ```{r setup, echo = TRUE}
 
 library(stors)
 
-# Optimize a grid for the Normal distribution with 4091 steps
-grid <- srnorm_optimize(steps = 4091)
+# Optimize a proposal for the Normal distribution with 4091 steps
+proposal <- srnorm_optimize(steps = 4091)
 
-# Visualize the optimized grid
-plot(grid)
+# Visualize the optimized proposal
+plot(proposal)
 ```
 
 
-With the optimized grid ready, sampling from a Normal distribution with specific \code{mean} and \code{sd} is straightforward using the \code{srnorm} function.
+With the optimized proposal ready, sampling from a Normal distribution with specific \code{mean} and \code{sd} is straightforward using the \code{srnorm} function.
 
 ```{r , echo = TRUE}
 
@@ -52,12 +52,12 @@ print(standard_normal_samples)
 
 ```
 
-On the other hand, users can optimize a proposal grid for a specific Normal distribution by calling \code{srnorm_optimize()} and passing the desired \code{mean} and \code{sd} arguments. In this case, a unique grid will be optimized and cached in memory. To sample from this custom grid, the user can use the \code{srnorm_custom()} function by simply specifying the sample size.
+On the other hand, users can optimize a proposal for a specific Normal distribution by calling \code{srnorm_optimize()} and passing the desired \code{mean} and \code{sd} arguments. In this case, a unique proposal will be optimized and cached in memory. To sample from this custom proposal, the user can use the \code{srnorm_custom()} function by simply specifying the sample size.
 
 ```{r , echo = TRUE}
 
-# Optimize a custom proposal grid for N(3, 2)
-grid <- srnorm_optimize(mean = 3, sd = 2, steps = 2000)
+# Optimize a custom proposal for N(3, 2)
+proposal <- srnorm_optimize(mean = 3, sd = 2, steps = 2000)
 
 # Generate a sample of size 10^3 from N(3, 2)
 sample <- srnorm_custom(10^3)
@@ -69,7 +69,7 @@ hist(sample, main = "Histogram of Samples from N(3, 2)", xlab = "Value", col = "
 ```
 
 
-To sample from a truncated Normal distribution, users need to optimize either the scalable grid or a custom grid and specify the truncation bounds using the \code{xl} (lower bound) and \code{xr} (upper bound) arguments.
+To sample from a truncated Normal distribution, users need to optimize either the scalable proposal or a custom proposal and specify the truncation bounds using the \code{xl} (lower bound) and \code{xr} (upper bound) arguments.
 
 ```{r , echo = TRUE}
 
@@ -77,8 +77,8 @@ To sample from a truncated Normal distribution, users need to optimize either th
 lower_bound <- -1
 upper_bound <- 1
 
-# Optimize the scalable grid with truncation bounds
-grid <- srnorm_optimize(xl = lower_bound, xr = upper_bound, steps = 4091)
+# Optimize the scalable proposal with truncation bounds
+proposal <- srnorm_optimize(xl = lower_bound, xr = upper_bound, steps = 4091)
 
 # Generate samples from the truncated standard Normal distribution
 sample <- srnorm(10^3)
@@ -91,7 +91,7 @@ hist(sample, main = "Truncated Normal N(2, 1) (-1, 1)", xlab = "Value", col = "l
 
 ```
 
-The same process can be applied to a custom grid. A custom grid can be truncated and used for sampling by following this example:
+The same process can be applied to a custom proposal. A custom proposal can be truncated and used for sampling by following this example:
 
 ```{r , echo = TRUE}
 
@@ -99,92 +99,93 @@ The same process can be applied to a custom grid. A custom grid can be truncated
 lower_bound <- 2
 upper_bound <- 6
 
-# Optimize a custom grid with truncation bounds and mean = 4
-grid <- srnorm_optimize(mean = 4, xl = lower_bound, xr = upper_bound, steps = 4091)
+# Optimize a custom proposal with truncation bounds and mean = 4
+proposal <- srnorm_optimize(mean = 4, xl = lower_bound, xr = upper_bound, steps = 4091)
 
 # Generate samples from the truncated Normal distribution
 sample <- srnorm_custom(10^3)
 hist(sample, main = "Truncated Custom Normal (2, 6)", xlab = "Value", col = "lightblue", border = "white")
 
 
-```
-
-The \code{proposal_optimizer} functions not only optimize the grid but also return a detailed list describing the properties of the optimized grid. This list provides insights into the grid's structure and characteristics. You can use the base \code{print()} function to view these details or the \code{plot()} function to visualize the grid.
-
-```{r , echo = TRUE}
-
-# Optimize a grid for the Laplace distribution
-grid <- srlaplace_optimize(steps = 4091)
-
-# View the details of the optimized grid
-print(grid)
-
-# Visualize the grid
-plot(grid)
 
 ```
 
-In cases where the grid is dense and difficult to visualize in its entirety, you can focus on a specific region by using the \code{plot()} function with the \code{x_min} and \code{x_max} parameters. These parameters allow you to set limits on the x-axis, making it easier to zoom in on areas of interest within the grid.
+The \code{proposal_optimizer} functions not only optimize the proposal but also return a detailed list describing the properties of the optimized proposal. This list provides insights into the proposal's structure and characteristics. You can use the base \code{print()} function to view these details or the \code{plot()} function to visualize the proposal.
 
 ```{r , echo = TRUE}
 
-# Optimize a grid for the Normal distribution
-grid <- srlaplace_optimize(steps = 1020)
+# Optimize a proposal for the Laplace distribution
+proposal <- srlaplace_optimize(steps = 4091)
 
-# Visualize the entire grid
-plot(grid, main = "Full Grid Visualization")
+# View the details of the optimized proposal
+print(proposal)
 
-# Focus on a specific region of the grid (e.g., x-axis range -2 to 2)
-plot(grid, x_min = -1, x_max = 1, main = "Zoomed-In Grid (-1, 1)")
+# Visualize the proposal
+plot(proposal)
 
 ```
 
-These functionalists of the proposal_optimizers and the subsequent visualization tools provide users with in-depth insights into the characteristics of the generated grid, enabling them to understand and fine-tune the sampling process.
-
-
-If the user is not satisfied with the automatically optimized grid, the proposal_optimizers functions offers several arguments for customization. One such argument is `target_sample_size`, which defaults to 1000. If the user wishes to optimize the grid for significantly larger or smaller sample sizes, this argument can be altered.
-
-Another important argument is the pre-acceptance threshold `theta`, which essentially is the ratio between the lower and upper linear bounds for each step. This is typically set to a very small number close to zero. The reason is that the cost of rejecting samples, even in heavy-tailed distributions, is usually less than the cost of using alternative exact sampling methods (like Inverse Transform) for dense grids, as the probability of hitting these inefficient steps is low. However, for very large sample sizes (e.g., 10^9), these inefficient steps might be hit more frequently, leading to an increase in sampling time due to lower efficiency. In such cases, the user can set a higher pre-acceptance threshold using the `theta` parameter.
-
-For users who are less familiar with the target distribution, or want to focus on a specific range of the distribution, the `grid_range` argument can be used. This parameter limits the step construction to a specified range on the x-axis, offering more control over the grid structure.
+In cases where the proposal is dense and difficult to visualize in its entirety, you can focus on a specific region by using the \code{plot()} function with the \code{x_min} and \code{x_max} parameters. These parameters allow you to set limits on the x-axis, making it easier to zoom in on areas of interest within the proposal.
 
 ```{r , echo = TRUE}
-# Customizing the grid for a specific sample size
-custom_grid <- srnorm_optimize(target_sample_size = 10000)
 
-print(custom_grid)
+# Optimize a proposal for the Normal distribution
+proposal <- srlaplace_optimize(steps = 1020)
 
-plot(custom_grid)
+# Visualize the entire proposal
+plot(proposal, main = "Full Proposal Visualization")
 
-# Customizing the grid with a specific pre-acceptance threshold
-custom_grid_high_theta <- srnorm_optimize(theta = 0.9)
-
-print(custom_grid_high_theta)
-
-plot(custom_grid_high_theta)
-
-# Customizing the grid within a specific range
-custom_grid_range <- srnorm_optimize(grid_range = c(-1, 1))
-
-print(custom_grid_range)
-
-plot(custom_grid_range)
+# Focus on a specific region of the proposal (e.g., x-axis range -2 to 2)
+plot(proposal, x_min = -1, x_max = 1, main = "Zoomed-In Proposal (-1, 1)")
 
 ```
 
-In addition to the `target_sample_size`, `theta`, and `grid_range` parameters, users have the flexibility to directly control the number of steps in the proposal grid. This can be particularly useful when users have specific requirements or preferences for the granularity of the grid. To specify the number of steps, the `steps` argument can be passed to the proposal_optimizer function.
+These functionalists of the proposal_optimizers and the subsequent visualization tools provide users with in-depth insights into the characteristics of the generated proposal, enabling them to understand and fine-tune the sampling process.
 
-By setting the `steps` parameter, users can determine the resolution of the grid, which can impact the balance between computational efficiency and the granularity of the sampling. A higher number of steps typically provides a more detailed grid, potentially leading to more precise sampling, but at the cost of increased memory usage and possibly longer computation times.
+
+If the user is not satisfied with the automatically optimized proposal, the proposal_optimizers functions offers several arguments for customization. One such argument is `target_sample_size`, which defaults to 1000. If the user wishes to optimize the proposal for significantly larger or smaller sample sizes, this argument can be altered.
+
+Another important argument is the pre-acceptance threshold `theta`, which essentially is the ratio between the lower and upper linear bounds for each step. This is typically set to a very small number close to zero. The reason is that the cost of rejecting samples, even in heavy-tailed distributions, is usually less than the cost of using alternative exact sampling methods (like Inverse Transform) for dense proposals, as the probability of hitting these inefficient steps is low. However, for very large sample sizes (e.g., 10^9), these inefficient steps might be hit more frequently, leading to an increase in sampling time due to lower efficiency. In such cases, the user can set a higher pre-acceptance threshold using the `theta` parameter.
+
+For users who are less familiar with the target distribution, or want to focus on a specific range of the distribution, the `proposal_range` argument can be used. This parameter limits the step construction to a specified range on the x-axis, offering more control over the proposal structure.
 
 ```{r , echo = TRUE}
-# Customizing the grid with a specific number of steps
-custom_grid_steps <- srnorm_optimize(steps = 50)
+# Customizing the proposal for a specific sample size
+custom_proposal <- srnorm_optimize(target_sample_size = 10000)
 
-plot(custom_grid_steps)
+print(custom_proposal)
 
-custom_grid_steps <- srnorm_optimize(steps = 500)
+plot(custom_proposal)
 
-plot(custom_grid_steps)
+# Customizing the proposal with a specific pre-acceptance threshold
+custom_proposal_high_theta <- srnorm_optimize(theta = 0.9)
+
+print(custom_proposal_high_theta)
+
+plot(custom_proposal_high_theta)
+
+# Customizing the proposal within a specific range
+custom_proposal_range <- srnorm_optimize(proposal_range = c(-1, 1))
+
+print(custom_proposal_range)
+
+plot(custom_proposal_range)
+
+```
+
+In addition to the `target_sample_size`, `theta`, and `proposal_range` parameters, users have the flexibility to directly control the number of steps in the proposal. This can be particularly useful when users have specific requirements or preferences for the granularity of the proposal. To specify the number of steps, the `steps` argument can be passed to the proposal_optimizer function.
+
+By setting the `steps` parameter, users can determine the resolution of the proposal, which can impact the balance between computational efficiency and the granularity of the sampling. A higher number of steps typically provides a more detailed proposal, potentially leading to more precise sampling, but at the cost of increased memory usage and possibly longer computation times.
+
+```{r , echo = TRUE}
+# Customizing the proposal with a specific number of steps
+custom_proposal_steps <- srnorm_optimize(steps = 50)
+
+plot(custom_proposal_steps)
+
+custom_proposal_steps <- srnorm_optimize(steps = 500)
+
+plot(custom_proposal_steps)
 
 ```
 
@@ -192,18 +193,18 @@ The user can also create a symmetric proposal for built-in distributions by sett
 
 Example: Creating a Symmetric Proposal for the Standard Normal Distribution
 
-In this example, we create a symmetric proposal for the standard Normal distribution. Before doing so, we first delete all previously constructed non-symmetric grids (both scaled and custom) using the \code{delete_build_in_grid()} function.
+In this example, we create a symmetric proposal for the standard Normal distribution. Before doing so, we first delete all previously constructed non-symmetric proposals (both scaled and custom) using the \code{delete_build_in_proposal()} function.
 ```{r, echo = FALSE}
 
-# Delete all non-symmetric grids for the Normal distribution
-delete_build_in_grid(sampling_function = "srnorm", proposal_type = "scaled")
-delete_build_in_grid(sampling_function = "srnorm", proposal_type = "custom")
+# Delete all non-symmetric proposals for the Normal distribution
+delete_build_in_proposal(sampling_function = "srnorm", proposal_type = "scaled")
+delete_build_in_proposal(sampling_function = "srnorm", proposal_type = "custom")
 
-# Create a symmetric proposal grid for the standard Normal distribution
-grid <- srnorm_optimize(symmetric = 0, steps = 2040)
+# Create a symmetric proposal for the standard Normal distribution
+proposal <- srnorm_optimize(symmetric = 0, steps = 2040)
 
-# Visualize the symmetric proposal grid
-plot(grid)
+# Visualize the symmetric proposal
+plot(proposal)
 
 ```
 
@@ -215,15 +216,14 @@ In this example, we demonstrate how to sample from a truncated standard Normal d
 
 ```{r, echo = FALSE}
 
-# Delete all non-symmetric grids for the Normal distribution
-delete_build_in_grid(sampling_function = "srnorm", proposal_type = "scaled")
-delete_build_in_grid(sampling_function = "srnorm", proposal_type = "custom")
+# Delete all non-symmetric proposals for the Normal distribution
+delete_build_in_proposal(sampling_function = "srnorm", proposal_type = "scaled")
 
-# Optimize the grid for a truncated standard Normal distribution
-grid <- srnorm_optimize(mean = 0, sd = 1, xl = -1, xr = 1, steps = 4020)
+# Optimize the proposal for a truncated standard Normal distribution
+proposal <- srnorm_optimize(mean = 0, sd = 1, xl = -1, xr = 1, steps = 4020)
 
-# Visualize the truncated grid
-plot(grid, main = "Truncated Standard Normal Grid (-1, 1)", xlab = "Value", col = "lightblue")
+# Visualize the truncated proposal
+plot(proposal, main = "Truncated Standard Normal Proposal (-1, 1)", xlab = "Value", col = "lightblue")
 
 # Generate 10^4 samples from the truncated distribution
 sample <- srnorm_custom(10^4)
@@ -235,7 +235,7 @@ hist(sample, main = "Histogram of Samples from Truncated Standard Normal", xlab 
 
 
 
-There are many built-in functions in stors, the list below shows all available functions that can be used directly by the user after optimizing the grids:
+There are many built-in functions in stors, the list below shows all available functions that can be used directly by the user after optimizing the proposals:
 
 ```{r, echo = FALSE}
 funcs <- character()
@@ -244,12 +244,12 @@ for (name in names(stors:::built_in_proposals)) {
 }
 ```
 
-For each built-in distribution, there is a corresponding proposal distribution optimizer that can be invoked using the format \code{"sampling_function_name"_optimize()}. This function optimizes the grid for the specified distribution, enabling efficient sampling.
+For each built-in distribution, there is a corresponding proposal distribution optimizer that can be invoked using the format \code{"sampling_function_name"_optimize()}. This function optimizes the proposal for the specified distribution, enabling efficient sampling.
 
 
 ## Sampling from Users' Distributions
 
-For distributions not covered by the built-in functions and that satisfy the log concavity condition, users have the flexibility to create their own grids using the `build_proposal()` function. This function is designed to handle a variety of distributions by accepting a range of parameters tailored to the specific needs of the distribution being sampled from.
+For distributions not covered by the built-in functions and that satisfy the log concavity condition, users have the flexibility to create their own proposals using the `build_proposal()` function. This function is designed to handle a variety of distributions by accepting a range of parameters tailored to the specific needs of the distribution being sampled from.
 
 The following example demonstrates the process of sampling from a bimodal normal distribution. Let's assume that the user wants to sample from a bimodal distribution, which is a combination of two normal distributions $f(x) = 0.5 w_1(x) + 0.5 w_2(x)$, where $w_1(x) \sim N(0, 1)$ and $w_2(x) \sim N(4, 1)$:
 
@@ -274,32 +274,32 @@ h_prime_bi <- function(x) {
   (-(exp(-1 / 2 * (-4 + x)^2) * 0.5 * (-4 + x)) / sqrt(2 * pi) - (exp(-x^2 / 2) * 0.5 * x) / sqrt(2 *  pi)) / ((exp(-x^2 / 2) * 0.5) / sqrt(2 * pi) + (exp(-1 / 2 * (-4 + x)^2) * 0.5) / sqrt(2 * pi))
 }
 
-bi_grid <- build_proposal(lb = -Inf, rb = Inf, modes = modes_bi, f = f_bi, h = h_bi, h_prime = h_prime_bi)
+bi_proposal <- build_proposal(lb = -Inf, rb = Inf, modes = modes_bi, f = f_bi, h = h_bi, h_prime = h_prime_bi)
 
-plot(bi_grid)
-
-```
-
-After building the desired grid with `build_proposal()`, users can explore its properties using the `print()` function and visualize its structure using the `plot()` function. This step is similar to what was done previously with the built-in grid and helps in understanding the grid's configuration and ensuring that it aligns with the requirements of the target distribution.
-
-```{r , echo = TRUE}
-
-# Printing the properties of the custom grid
-print(bi_grid)
-
-# Visualizing the custom grid
-plot(bi_grid)
+plot(bi_proposal)
 
 ```
 
-Once the grid is configured and validated, it can be passed to the `stors()` function. `stors()` caches the grid in memory, providing fast access for sampling, and returns a sampler function for the target distribution. This sampler function can then be used to generate samples as needed.
+After building the desired proposal with `build_proposal()`, users can explore its properties using the `print()` function and visualize its structure using the `plot()` function. This step is similar to what was done previously with the built-in proposal and helps in understanding the proposal's configuration and ensuring that it aligns with the requirements of the target distribution.
 
 ```{r , echo = TRUE}
 
-# Creating a sampler function using the custom grid
-bi_sampler <- stors(bi_grid)
+# Printing the properties of the custom proposal
+print(bi_proposal)
 
-plot(bi_grid)
+# Visualizing the custom proposal
+plot(bi_proposal)
+
+```
+
+Once the proposal is configured and validated, it can be passed to the `build_sampler()` function. `build_sampler()` caches the proposal in memory, providing fast access for sampling, and returns a sampler function for the target distribution. This sampler function can then be used to generate samples as needed.
+
+```{r , echo = TRUE}
+
+# Creating a sampler function using the custom proposal
+bi_sampler <- build_sampler(bi_proposal)
+
+plot(bi_proposal)
 
 # Generating samples from the target distribution
 sample <- bi_sampler(10^3)
@@ -318,8 +318,8 @@ Example: Sampling from a Truncated Multi-Modal Distribution
 # Define modes for the multi-modal distribution
 modes_bi <- c(0.00134865, 3.99865)
 
-# Build a truncated grid for the multi-modal distribution
-bi_grid_trunc_grid <- build_proposal(
+# Build a truncated proposal for the multi-modal distribution
+bi_trunc_proposal <- build_proposal(
   lb = -1,
   rb = 6,
   modes = modes_bi,
@@ -329,11 +329,11 @@ bi_grid_trunc_grid <- build_proposal(
   steps = 2040
 )
 
-# Visualize the truncated grid
-plot(bi_grid_trunc_grid, main = "Truncated Multi-Modal Grid (-1, 6)", xlab = "Value", col = "skyblue")
+# Visualize the truncated proposal
+plot(bi_trunc_proposal, main = "Truncated Multi-Modal Proposal (-1, 6)", xlab = "Value", col = "skyblue")
 
 # Create a sampler for the truncated distribution
-bi_sampler_trunc_sampler <- stors(bi_grid_trunc_grid)
+bi_sampler_trunc_sampler <- build_sampler(bi_trunc_proposal)
 
 # Generate 10^3 samples from the truncated distribution
 sample <- bi_sampler_trunc_sampler(10^3)
@@ -355,32 +355,32 @@ hist(
 ```
 
 
-## Saving, Loading and Deleting Users' Grids
+## Saving, Loading and Deleting Users' Proposals
 
-The grid stored in `bi_grid` will not be preserved across sessions. Therefore, if the user is satisfied with the sampling results and wishes to store the grid for future use, they should save the grid using the `save_proposal()` function. This function takes the optimized grid and a filename chosen by the user to save the grid in the internal R data directory on their machine. This is recommended if the user plans to use the grid frequently across sessions, to avoid re-optimizing the grid in future sessions.
+The proposal stored in `bi_proposal` will not be preserved across sessions. Therefore, if the user is satisfied with the sampling results and wishes to store the proposal for future use, they should save the proposal using the `save_proposal()` function. This function takes the optimized proposal and a filename chosen by the user to save the proposal in the internal R data directory on their machine. This is recommended if the user plans to use the proposal frequently across sessions, to avoid re-optimizing the proposal in future sessions.
 
 ```{r , echo = TRUE}
 
-save_proposal(bi_grid, "bimodal_grid")
+save_proposal(bi_proposal, "bimodal_proposal")
 
 ```
 
 ```{r , include = FALSE}
 for (i in 1:3) {
-  save_proposal(bi_grid, paste0("bimodal_grid_", i))
+  save_proposal(bi_proposal, paste0("bimodal_proposal_", i))
 }
 
 ```
 
-To load and use the grid in future sessions, the user only needs to use the `load_proposal()` function.
+To load and use the proposal in future sessions, the user only needs to use the `load_proposal()` function.
 
 ```{r , echo = TRUE}
 
-bi_grid <- load_proposal("bimodal_grid")
+bi_proposal <- load_proposal("bimodal_proposal")
 
 ```
 
-In case the user wants to view a list of all previously stored grids, the `print_proposals()` function will provide the user with all stored grids.
+In case the user wants to view a list of all previously stored proposals, the `print_proposals()` function will provide the user with all stored proposals.
 
 ```{r , echo = TRUE}
 
@@ -388,11 +388,11 @@ print_proposals()
 
 ```
 
-Be aware that the saved grid can be quite large in size, depending on the user's system. Therefore, if the user wants to delete a grid, the `delete_grid()` function can be used by providing the grid's name.
+Be aware that the saved proposal can be quite large in size, depending on the user's system. Therefore, if the user wants to delete a proposal, the `delete_proposal()` function can be used by providing the proposal's name.
 
 ```{r , echo = TRUE}
 
-delete_grid("bimodal_grid")
+delete_proposal("bimodal_proposal")
 
 print_proposals()
 
@@ -400,6 +400,11 @@ print_proposals()
 
 ```{r , include = FALSE}
 for (i in 1:3) {
-  delete_grid(paste0("bimodal_grid_", i))
+  delete_proposal(paste0("bimodal_proposal_", i))
+}
+
+for (name in names(stors:::built_in_proposals)) {
+  fun_name <- paste0(name, "_optimize")
+  do.call(fun_name, list(steps = 4091))
 }
 ```

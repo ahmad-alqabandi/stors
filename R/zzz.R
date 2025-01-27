@@ -191,12 +191,12 @@ stors_env <- new.env(parent = emptyenv())
     vers <- suppressWarnings(readLines(file.path(data_dir, "version"), n = 1))
     if (!identical(paste(utils::packageVersion("stors"), sep = "."),
                    vers)) {
-      warning("Package version updated, old grids being archived.")
-      if (file.exists(file.path(data_dir, paste0("builtin_grids_", vers)))) {
-        unlink(file.path(data_dir, c(paste0("builtin_grids_", vers), paste0("user_proposals_", vers))), recursive = TRUE, force = TRUE)
+      warning("Package version updated, old proposals being archived.")
+      if (file.exists(file.path(data_dir, paste0("builtin_proposals_", vers)))) {
+        unlink(file.path(data_dir, c(paste0("builtin_proposals_", vers), paste0("user_proposals_", vers))), recursive = TRUE, force = TRUE)
       }
-      file.rename(file.path(data_dir, "builtin_grids"),
-                  file.path(data_dir, paste0("builtin_grids_", vers)))
+      file.rename(file.path(data_dir, "builtin_proposals"),
+                  file.path(data_dir, paste0("builtin_proposals_", vers)))
       file.rename(file.path(data_dir, "user_proposals"),
                   file.path(data_dir, paste0("user_proposals_", vers)))
       cat(paste(utils::packageVersion("stors"), sep = "."),
@@ -204,30 +204,30 @@ stors_env <- new.env(parent = emptyenv())
     }
   }
 
-  builtin_grids_dir <- file.path(data_dir, "builtin_grids")
+  builtin_proposals_dir <- file.path(data_dir, "builtin_proposals")
 
   user_proposals_dir <- file.path(data_dir, "user_proposals")
 
 
-  if (!dir.exists(builtin_grids_dir))
-    dir.create(builtin_grids_dir, recursive = TRUE)
+  if (!dir.exists(builtin_proposals_dir))
+    dir.create(builtin_proposals_dir, recursive = TRUE)
 
 
   if (!dir.exists(user_proposals_dir))
     dir.create(user_proposals_dir, recursive = TRUE)
 
   user_cnum_counter <- 101
-  user_session_cached_grid_locks <- data.frame(lock = character(), cnum = numeric())
+  user_session_cached_proposals_locks <- data.frame(lock = character(), cnum = numeric())
 
-  assign("builtin_grids_dir", builtin_grids_dir, envir = stors_env)
+  assign("builtin_proposals_dir", builtin_proposals_dir, envir = stors_env)
   assign("user_proposals_dir", user_proposals_dir, envir = stors_env)
   assign("user_cnum_counter", user_cnum_counter, envir = stors_env)
-  assign("user_session_cached_grid_locks", user_session_cached_grid_locks, envir = stors_env)
+  assign("user_session_cached_proposals_locks", user_session_cached_proposals_locks, envir = stors_env)
 
 
-  builtin_grids <- list.files(builtin_grids_dir)
+  builtin_proposals_files <- list.files(builtin_proposals_dir)
 
-  if (length(builtin_grids) == 0) {
+  if (length(builtin_proposals_files) == 0) {
 
 
     for (name in names(built_in_proposals)) {
@@ -239,13 +239,13 @@ stors_env <- new.env(parent = emptyenv())
 
   } else {
 
-    for (proposal_name in builtin_grids) {
+    for (proposal_name in builtin_proposals_files) {
 
-      proposal_path <- file.path(builtin_grids_dir, proposal_name)
-      grid <- readRDS(proposal_path)
+      proposal_path <- file.path(builtin_proposals_dir, proposal_name)
+      proposal <- readRDS(proposal_path)
 
-      if (is_valid_proposal(grid))
-        cache_proposal_c(grid$cnum, grid)
+      if (is_valid_proposal(proposal))
+        cache_proposal_c(proposal$cnum, proposal)
 
 
 

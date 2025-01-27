@@ -62,7 +62,7 @@
 #' Alternatively, if the user wishes to create the steps within certain limits on the
 #' x-axis, they can do so by specifying the proposal limits using the \code{proposal_range} argument.
 #'
-#'#' @param modes
+#' @param modes
 #'        Numeric vector of modes of the density function.
 #' @param f
 #'        A function which returns the (unnormalised) probability density function of the target distribution.

@@ -10,8 +10,8 @@
 #   cnum_custom <- dendata$c_num + 1
 #   choosen_grid_num <- NULL
 #
-#   scalable_info <-  cached_grid_info(cnum_scalable)
-#   custom_info <-  cached_grid_info(cnum_custom)
+#   scalable_info <-  cached_proposal_info(cnum_scalable)
+#   custom_info <-  cached_proposal_info(cnum_custom)
 #
 #   res <- truncate_error_checking(xl, xr, dendata)
 #   xl <- res$xl; xr <- res$xr

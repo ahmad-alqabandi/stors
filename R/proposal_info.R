@@ -1,4 +1,3 @@
-
 #' Plot Method for Proposal Objects
 #'
 #' This method extends the generic \code{plot()} function for objects of class \code{proposal}.
@@ -246,7 +245,7 @@ print_proposals <- function() {
   user_proposals <- list.files(stors_env$user_proposals_dir)
 
   if (length(user_proposals) == 0) {
-    message("No proposals are currently stored.")
+    message("No stored proposals")
   } else {
     proposals <- list.files(path = stors_env$user_proposals_dir,
                         full.names = TRUE)

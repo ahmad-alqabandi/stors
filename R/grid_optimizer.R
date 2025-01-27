@@ -102,7 +102,7 @@ proposal_optimizer <- function(dendata,
 
   class(opt_proposal) <- "proposal"
 
-  save_builtin_grid(cnum, opt_proposal)
+  save_builtin_proposal(cnum, opt_proposal)
 
   return(opt_proposal)
 
