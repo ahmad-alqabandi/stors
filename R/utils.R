@@ -1,17 +1,17 @@
 #' @noRd
-create_function <- function(f, arg_list) {
+create_function <- function(fun, arg_list) {
 
-  fun_args <- names(formals(f))
+  fun_args <- names(formals(fun))
 
   arg_list <- arg_list[names(arg_list) %in% fun_args]
 
-  build_closure <- function(f, ...) {
+  build_closure <- function(fun, ...) {
     return(\(x) {
-      f(x, ...)
+      fun(x, ...)
     })
   }
 
-  f <- do.call("build_closure", c(f, arg_list))
+  f <- do.call("build_closure", c(fun, arg_list))
 
   return(f)
 }
@@ -142,24 +142,21 @@ proposal_error_checking_and_preparation <- function(gp) {
     stop("Error: 'steps' must be greater than or equal to 1.")
   }
 
-  if (is.null(theta))
-    theta <- 0
+  # if (theta != 0 && !is.null(proposal_range)) {
+  #   stop(
+  #     "Error: You must provide either a pre-acceptance threshold 'theta' value or a proposal x-axis limit 'proposal_range'."
+  #   )
+  # }
+  #
+  # if ((theta != 0 || !is.null(proposal_range)) && !is.null(steps)) {
+  #   warning(
+  #     "Warning: The pre-acceptance threshold 'theta' value and proposal x-axis limit 'proposal_range' will not take effect because you are specifying a target 'steps' number."
+  #   )
+  # }
 
-  if (theta != 0 && !is.null(proposal_range)) {
-    stop(
-      "Error: You must provide either a pre-acceptance threshold 'theta' value or a proposal x-axis limit 'proposal_range'."
-    )
-  }
-
-  if ((theta != 0 || !is.null(proposal_range)) && !is.null(steps)) {
-    warning(
-      "Warning: The pre-acceptance threshold 'theta' value and proposal x-axis limit 'proposal_range' will not take effect because you are specifying a target 'steps' number."
-    )
-  }
-
-  if (theta != 0 && (theta < 0 || theta > 1)) {
+  if ( !is.numeric(theta) || (theta <  0.1 || theta > 1)) {
     stopifnot(theta >= 0 && theta <= 1,
-              "Error: 'theta' must be in the range [0,1]")
+              "Error: 'theta' must be in the range [0.1,1]")
   }
 
   if (!is.null(proposal_range)) {

@@ -76,7 +76,7 @@ srbeta_custom <- function(n = 1, x = NULL) {
 #' @param xr Numeric. Right truncation bound for the target distribution. Defaults to \code{1}, as the Beta distribution is defined only on the interval \code{[0, 1]}.
 #' @param steps (optional) Integer. Desired number of steps in the proposal. Defaults to \code{4091}.
 #' @param proposal_range (optional) Numeric vector. Specifies the range for optimizing the steps part of the proposal. Defaults to \code{NULL}, indicating automatic range selection.
-#' @param theta (optional) Numeric. A parameter for proposal optimization. Defaults to \code{NULL}.
+#' @param theta Numeric. A parameter for proposal optimization. Defaults to 0.1.
 #' @param target_sample_size (optional) Integer. Target sample size for proposal optimization. Defaults to \code{1000}.
 #' @param verbose Boolean. If \code{TRUE}, detailed optimization information, including areas and steps, will be displayed. Defaults to \code{FALSE}.
 #'
@@ -107,7 +107,7 @@ srbeta_optimize <- function(
     xr = 1,
     steps = NULL,
     proposal_range = NULL,
-    theta = NULL,
+    theta = 0.1,
     target_sample_size = 1000,
     verbose = FALSE) {
 

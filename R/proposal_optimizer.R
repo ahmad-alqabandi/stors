@@ -1,20 +1,19 @@
 #' @noRd
 proposal_optimizer <- function(dendata,
-                           density_name,
-                           xl = NULL,
-                           xr = NULL,
-                           f,
-                           modes,
-                           f_params = NULL,
-                           steps = NULL,
-                           proposal_range = NULL,
-                           theta = NULL,
-                           target_sample_size = NULL,
-                           proposal_type,
-                           symmetric = NULL,
-                           cnum = NULL,
-                           verbose = FALSE) {
-
+                               density_name,
+                               xl = NULL,
+                               xr = NULL,
+                               f,
+                               modes,
+                               f_params = NULL,
+                               steps = NULL,
+                               proposal_range = NULL,
+                               theta = 0.1,
+                               target_sample_size = NULL,
+                               proposal_type,
+                               symmetric = NULL,
+                               cnum = NULL,
+                               verbose = FALSE) {
   free_cache_cnum_c(cnum)
 
   if ((is.null(xl) || (xl < dendata$lower)))
@@ -65,10 +64,9 @@ proposal_optimizer <- function(dendata,
   )
 
   if (identical(dendata$tails_method, "ARS")) {
-
     h <- function(x) {
       log(f(x))
-      }
+    }
 
     h_prime <- estimate_slope(modes, h)
 
@@ -156,7 +154,6 @@ find_optimal_proposal <- function(gp) {
   if ((theta == 0 &&
        identical(proposal_range, c(lower, upper))) ||
       !is.null(steps)) {
-
     if (!is.null(steps)) {
       opt_area <- 1 / steps * f_area
     } else {
@@ -195,7 +192,9 @@ find_optimal_proposal <- function(gp) {
 
   }
 
-  performance <- data.frame(area = numeric(), time = numeric(), steps = numeric())
+  performance <- data.frame(area = numeric(),
+                            time = numeric(),
+                            steps = numeric())
 
 
   if (gp$built_in) {
@@ -224,17 +223,18 @@ find_optimal_proposal <- function(gp) {
       cat(
         "\n=====================================\n",
         sprintf("Step: %10s | Area: %10.9f", step, area),
-        "\n-------------------------------------\n",
-        "       Area       |    Best Sim Time\n",
-        "-------------------------------------\n"
+        "\n-----------------------------------------------\n",
+        "       Steps      |       Area       |    Best Sim Time\n",
+        "-----------------------------------------------\n"
       )
     }
 
     area_seq <- seq(from = area * 0.95,
-                   to = area * 1.05,
-                   length.out = opt_alpha_length)
+                    to = area * 1.05,
+                    length.out = opt_alpha_length)
 
     steps_time <- double()
+    steps_number <- double()
 
     for (j in seq_along(area_seq)) {
       grid <- build_final_proposal(gp = gp, opt_area = area_seq[j])
@@ -256,23 +256,27 @@ find_optimal_proposal <- function(gp) {
       free_cache_cnum_c(cnum)
 
       steps_time <- append(steps_time, stats::median(cost$time[cost$expr == "st"]))
+      steps_number <- append(steps_number, grid$steps_number)
 
       if (verbose) {
-        cat(sprintf("--- %10.9f ---   --- %10.2f ---\n", area_seq[j], steps_time[j]))
+        cat(sprintf("--- %10s ---  --- %10.9f ---   --- %10.2f ---\n", grid$steps_number, area_seq[j], steps_time[j]))
       }
     }
 
     if (i != 1 &&
         min(steps_time) >= min(performance$time, na.rm = TRUE)) {
-      if (verbose) {
+
+        performance <- na.omit(performance)
+
+        if (verbose) {
         cat("\n=====================================\n")
         cat("\nPerformance Data:\n")
         cat("     Area       |     Time     |   Steps\n")
         cat("-----------------------------------------\n")
-        for (k in seq_along(row(performance))) {
+        for (k in seq_len(nrow(performance))) {
           cat(
             sprintf(
-              "%13.10f | %10.2f | %7.2f\n",
+              "%13.10f | %10.2f | %7s\n",
               performance$area[k],
               performance$time[k],
               performance$steps[k]
@@ -285,7 +289,8 @@ find_optimal_proposal <- function(gp) {
     }
 
     min_ind <- which(steps_time == min(steps_time, na.rm = TRUE))[1]
-    performance[nrow(performance) + 1, ] <- c(area_seq[min_ind], steps_time[min_ind], step)
+
+    performance[nrow(performance) + 1, ] <- c(area_seq[min_ind], steps_time[min_ind], steps_number[min_ind])
 
   }
 

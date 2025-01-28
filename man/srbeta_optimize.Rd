@@ -11,7 +11,7 @@ srbeta_optimize(
   xr = 1,
   steps = NULL,
   proposal_range = NULL,
-  theta = NULL,
+  theta = 0.1,
   target_sample_size = 1000,
   verbose = FALSE
 )
@@ -29,7 +29,7 @@ srbeta_optimize(
 
 \item{proposal_range}{(optional) Numeric vector. Specifies the range for optimizing the steps part of the proposal. Defaults to \code{NULL}, indicating automatic range selection.}
 
-\item{theta}{(optional) Numeric. A parameter for proposal optimization. Defaults to \code{NULL}.}
+\item{theta}{Numeric. A parameter for proposal optimization. Defaults to 0.1.}
 
 \item{target_sample_size}{(optional) Integer. Target sample size for proposal optimization. Defaults to \code{1000}.}
 

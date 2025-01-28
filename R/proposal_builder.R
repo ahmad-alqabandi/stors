@@ -86,7 +86,7 @@
 #'        Optional numeric vector of length 2 specifying the lower and upper range of the steps in the step optimised part of the proposal density and squeezing function.
 #'        This range should be contained within the interval defined by `lower` and `upper`.
 #' @param theta
-#'        Optional numeric scalar (between 0 and 1) defining the pre-acceptance threshold.
+#'        Optional numeric scalar (between 0.1 and 1) defining the pre-acceptance threshold.
 #'        This dictates when no further steps should be added in the step optimised part of the proposal density and squeezing function, based on the probability of pre-acceptance.
 #' @param target_sample_size
 #'        Integer scalar indicating the typical sample size that will be requested when sampling from this density using build_sampler.
@@ -208,7 +208,7 @@ build_proposal <- function(f = NULL,
                            h_prime = NULL,
                            steps = NULL,
                            proposal_range = NULL,
-                           theta = NULL,
+                           theta = 0.1,
                            target_sample_size = 1000,
                            verbose = FALSE,
                            ...) {
@@ -235,7 +235,6 @@ build_proposal <- function(f = NULL,
   } else {
     h_prime <- create_function(h_prime, density_arguments)
   }
-
 
   modes <- adjust_modes(modes, lower, upper, f)
 
@@ -275,9 +274,6 @@ build_proposal <- function(f = NULL,
 
 
   proposal_param <- proposal_error_checking_and_preparation(proposal_param)
-
-  if (!is.null(steps))
-    proposal_param$proposal$pre_acceptance_thres_hold <- 0.1
 
   optimal_proposal_params <- find_optimal_proposal(proposal_param)
   opt_proposal <- build_final_proposal(gp = optimal_proposal_params)
@@ -683,6 +679,7 @@ h_upper <- function(proposals_point, val, h_prime, h) {
 
 #' @noRd
 tails_ars <- function(grid, f, h, h_prime, modes, lower, upper) {
+
   steps <- length(grid$x)
   modes_n <- length(modes)
   # left tail
@@ -727,7 +724,10 @@ estimate_slope <- function(mode, h) {
 
       return(0)
     }
-    (h(x0) - h(x)) / (x0 - x)
+
+    res <- (h(x0) - h(x)) / (x0 - x)
+
+    return(res)
   }
 
 }
