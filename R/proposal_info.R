@@ -38,9 +38,9 @@
 #' @method plot proposal
 #' @export
 plot.proposal <- function(x,
-                      x_min = NA,
-                      x_max = NA,
-                      ...) {
+                          x_min = NA,
+                          x_max = NA,
+                          ...) {
   proposal <- x
   n <- nrow(proposal$data)
   f <- eval(parse(text = proposal$dens_func))
@@ -52,11 +52,13 @@ plot.proposal <- function(x,
 
   if (proposal$tails_method == "ARS") {
     if (!all(proposal$lt_properties == 0)) {
-      lf  <- function(x) exp(proposal$lt_properties[5] * (x - proposal$data$x[1]) + proposal$lt_properties[3])
+      lf  <- function(x)
+        exp(proposal$lt_properties[5] * (x - proposal$data$x[1]) + proposal$lt_properties[3])
     }
 
     if (!all(proposal$rt_properties == 0)) {
-      rf  <- function(x) exp(proposal$rt_properties[5] * (x - proposal$data$x[n]) + proposal$rt_properties[6])
+      rf  <- function(x)
+        exp(proposal$rt_properties[5] * (x - proposal$data$x[n]) + proposal$rt_properties[6])
     }
   }
 
@@ -70,24 +72,18 @@ plot.proposal <- function(x,
   if (is.finite(proposal$proposal_bounds[2])) {
     x_to <- proposal$proposal_bounds[2]
   } else {
-   x_to <- proposal$data$x[n] + 5
+    x_to <- proposal$data$x[n] + 5
   }
 
-  xx <- seq(
-    from = x_from,
-    to = x_to,
-    by = min(0.01, proposal$alpha)
-  )
-  xl <- seq(
-    from = x_from,
-    to = proposal$data$x[1],
-    by = 0.01
-  )
-  xr <- seq(
-    from = proposal$data$x[n],
-    to = x_to,
-    by = 0.01
-  )
+  xx <- seq(from = x_from,
+            to = x_to,
+            by = min(0.01, proposal$alpha))
+  xl <- seq(from = x_from,
+            to = proposal$data$x[1],
+            by = 0.01)
+  xr <- seq(from = proposal$data$x[n],
+            to = x_to,
+            by = 0.01)
   xs <- c(xl, xx, xr)
 
   yy <- f(xx)
@@ -111,32 +107,36 @@ plot.proposal <- function(x,
 
   if (requireNamespace("ggplot2", quietly = TRUE)) {
     suppressWarnings({
-    ggplot2::ggplot() +
-      ggplot2::geom_step(ggplot2::aes(proposal$data[1:(n), ]$x, proposal$data[1:(n), ]$s_upper),
-                         color = "red") +
-      ggplot2::geom_step(
-        ggplot2::aes(
-          proposal$data[2:(n - 1), ]$x,
-          proposal$data[2:(n - 1), ]$s_upper * proposal$data[2:(n - 1), ]$p_a
-        ),
-        color = "green"
-      ) +
-      ggplot2::geom_line(ggplot2::aes(x = xx, y = yy), color = "black")  +
-      ggplot2::geom_line(ggplot2::aes(x = xl, y = yl), color = "red", linetype = "dotted") +
-      ggplot2::geom_line(ggplot2::aes(x = xr, y = yr), color = "red", linetype = "dotted") +
-      ggplot2::geom_segment(
-        ggplot2::aes(
-          x = proposal$data$x[(n - 1)],
-          y = proposal$data$s_upper[(n - 1)] * proposal$data$p_a[(n - 1)],
-          xend = proposal$data$x[(n)],
-          yend = proposal$data$s_upper[(n - 1)] * proposal$data$p_a[(n - 1)]
-        ),
-        color = "green"
-      ) +
-      ggplot2::xlab("x") +
-      ggplot2::ylab("Density") +
-      ggplot2::coord_cartesian(xlim = c(x_min, x_max),
-                               ylim = c(y_min, y_max))
+      ggplot2::ggplot() +
+        ggplot2::geom_step(ggplot2::aes(proposal$data[1:(n), ]$x, proposal$data[1:(n), ]$s_upper),
+                           color = "red") +
+        ggplot2::geom_step(
+          ggplot2::aes(
+            proposal$data[2:(n - 1), ]$x,
+            proposal$data[2:(n - 1), ]$s_upper * proposal$data[2:(n - 1), ]$p_a
+          ),
+          color = "green"
+        ) +
+        ggplot2::geom_line(ggplot2::aes(x = xx, y = yy), color = "black")  +
+        ggplot2::geom_line(ggplot2::aes(x = xl, y = yl),
+                           color = "red",
+                           linetype = "dotted") +
+        ggplot2::geom_line(ggplot2::aes(x = xr, y = yr),
+                           color = "red",
+                           linetype = "dotted") +
+        ggplot2::geom_segment(
+          ggplot2::aes(
+            x = proposal$data$x[(n - 1)],
+            y = proposal$data$s_upper[(n - 1)] * proposal$data$p_a[(n - 1)],
+            xend = proposal$data$x[(n)],
+            yend = proposal$data$s_upper[(n - 1)] * proposal$data$p_a[(n - 1)]
+          ),
+          color = "green"
+        ) +
+        ggplot2::xlab("x") +
+        ggplot2::ylab("Density") +
+        ggplot2::coord_cartesian(xlim = c(x_min, x_max),
+                                 ylim = c(y_min, y_max))
     })
   } else {
     class(proposal) <- "list"
@@ -179,11 +179,12 @@ plot.proposal <- function(x,
 #' @method print proposal
 #' @export
 print.proposal <- function(x, ...) {
-
   proposal <- x
 
   # Format the number of steps with commas and without scientific notation
-  formatted_steps <- format(proposal$steps_number, big.mark = ",", scientific = FALSE)
+  formatted_steps <- format(proposal$steps_number,
+                            big.mark = ",",
+                            scientific = FALSE)
 
   # Calculate the domain range
   domain_start <- proposal$data$x[1]
@@ -198,8 +199,15 @@ print.proposal <- function(x, ...) {
   message("Proposal Summary\n")
   message("-----------------------------------------\n")
   message("Total steps:      ", formatted_steps, "\n")
-  message("Steps range:     [", sprintf("%.6f", domain_start), ", ", sprintf("%.6f", domain_end), "]\n")
-  message(sprintf("Sampling efficiency: %.2f%%", sampling_efficiency), "\n")
+  message(
+    "Steps range:     [",
+    sprintf("%.6f", domain_start),
+    ", ",
+    sprintf("%.6f", domain_end),
+    "]\n"
+  )
+  message(sprintf("Sampling efficiency: %.2f%%", sampling_efficiency),
+          "\n")
   message("=========================================\n\n")
 
 }
@@ -241,20 +249,49 @@ print.proposal <- function(x, ...) {
 #'
 #' @export
 print_proposals <- function() {
-
   user_proposals <- list.files(stors_env$user_proposals_dir)
 
   if (length(user_proposals) == 0) {
     message("No stored proposals")
   } else {
-    proposals <- list.files(path = stors_env$user_proposals_dir,
+    files <- list.files(path = stors:::stors_env$user_proposals_dir,
                         full.names = TRUE)
-    proposals_details <- file.info(proposals)
-    proposals_sizes <- proposals_details[proposals_details$isdir == FALSE, ]$size
-    proposals_sizes <- formatC(sum(as.double(proposals_sizes)) / 1028,
-                           format = "f",
-                           digits = 2)
-    message("proposals_size : ", proposals_sizes, " KB")
+
+    files_details <- file.info(files)
+
+    files_names <- tools::file_path_sans_ext(basename(files))
+
+    files_date <- file.mtime(files)
+
+    files_sizes <- files_details[files_details$isdir == FALSE, ]$size
+
+    files_sizes_KB <- formatC(as.double(files_sizes) / 1028,
+                              format = "f",
+                              digits = 2)
+
+    files_total_size_KB <- formatC(as.double(sum(files_sizes)) / 1028,
+                                   format = "f",
+                                   digits = 2)
+
+    output <- paste0(
+      "\n=====================================\n",
+      "Proposals Data:\n",
+      sprintf("%-15s | %-15s | %s\n", "Name", "Size (KB)", "Date"),
+      "---------------------------------------------\n",
+      paste(sapply(seq_along(files_names), function(k) {
+        sprintf(
+          "%-15s | %-15s | %s",
+          files_names[k],
+          files_sizes_KB[k],
+          format(files_date[k], "%Y-%m-%d %H:%M:%S")
+        )
+      }), collapse = "\n"),
+      "\n---------------------------------------------\n",
+      sprintf("Total Size:     | %5s\n", files_total_size_KB),
+      "=====================================\n"
+    )
+
+    message(output)
   }
 
 }
@@ -297,7 +334,8 @@ save_proposal <- function(proposal, proposal_name) {
   if (!is_valid_proposal(proposal))
     stop("This proposal is not valid")
 
-  proposals_file_path <- file.path(stors_env$user_proposals_dir, paste0(proposal_name, ".rds"))
+  proposals_file_path <- file.path(stors_env$user_proposals_dir,
+                                   paste0(proposal_name, ".rds"))
   saveRDS(proposal, proposals_file_path)
 }
 
@@ -335,7 +373,6 @@ save_proposal <- function(proposal, proposal_name) {
 #' print_proposals()
 #'
 delete_proposal <- function(proposal_name) {
-
   user_proposals <- list.files(stors_env$user_proposals_dir)
   proposal_name <- paste0(proposal_name, ".rds")
 
@@ -373,13 +410,11 @@ delete_proposal <- function(proposal_name) {
 #' print(loaded_normal_proposal)
 #' @export
 load_proposal <- function(proposal_name) {
-
   proposal_name <- paste0(proposal_name, ".rds")
 
   user_proposals <- list.files(stors_env$user_proposals_dir)
 
   if (proposal_name %in% user_proposals) {
-
     proposal_path <- file.path(stors_env$user_proposals_dir, proposal_name)
 
     proposal <- readRDS(proposal_path)
@@ -390,7 +425,7 @@ load_proposal <- function(proposal_name) {
     return(proposal)
 
 
-  }else {
+  } else {
     stop("There is no proposal named '",
          proposal_name,
          "' stored on your machine.")
