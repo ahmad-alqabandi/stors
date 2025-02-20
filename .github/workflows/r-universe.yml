@@ -15,4 +15,4 @@ jobs:
       - uses: actions/checkout@v3
       - name: Build and Publish to R-universe
         run: |
-          curl -X POST "https://r-universe.dev/update?user=YOUR-GITHUB-USERNAME"
+          curl -X POST "https://r-universe.dev/update?user=ahmad-alqabandi"
