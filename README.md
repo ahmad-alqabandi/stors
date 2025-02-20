@@ -1,9 +1,3 @@
----
-editor_options: 
-  markdown: 
-    wrap: sentence
----
-
 # 📦 `{STORS}` R package <img src="man/figures/logo.png" align="right" height="278"/>
 
 **STORS** is an optimized rejection sampling method designed for efficient sampling from univariate statistical distributions.
