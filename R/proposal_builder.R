@@ -200,8 +200,8 @@
 #'
 #' @import digest
 #' @export
-build_proposal <- function(f = NULL,
-                           modes = NA,
+build_proposal <- function(f,
+                           modes,
                            lower = -Inf,
                            upper = Inf,
                            h = NULL,

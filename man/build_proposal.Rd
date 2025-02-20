@@ -5,8 +5,8 @@
 \title{Build Proposal}
 \usage{
 build_proposal(
-  f = NULL,
-  modes = NA,
+  f,
+  modes,
   lower = -Inf,
   upper = Inf,
   h = NULL,
