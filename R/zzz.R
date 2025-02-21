@@ -185,11 +185,12 @@ stors_env <- new.env(parent = emptyenv())
     # No versioning file so make sure directory is empty and create new version file
     unlink(list.files(tools::R_user_dir("stors", "data"), full.names = TRUE),
            recursive = TRUE, force = TRUE)
-    cat(paste(utils::packageVersion("stors"), sep = "."),
-        file = file.path(data_dir, "version"))
+    fd <- file(file.path(data_dir, "version"), open = "wt")
+    write(as.character(utils::packageVersion("stors")), file = fd)
+    close(fd)
   } else {
     vers <- suppressWarnings(readLines(file.path(data_dir, "version"), n = 1))
-    if (!identical(paste(utils::packageVersion("stors"), sep = "."),
+    if (!identical(as.character(utils::packageVersion("stors")),
                    vers)) {
       warning("Package version updated, old proposals being archived.")
       if (file.exists(file.path(data_dir, paste0("builtin_proposals_", vers)))) {
@@ -199,8 +200,9 @@ stors_env <- new.env(parent = emptyenv())
                   file.path(data_dir, paste0("builtin_proposals_", vers)))
       file.rename(file.path(data_dir, "user_proposals"),
                   file.path(data_dir, paste0("user_proposals_", vers)))
-      cat(paste(utils::packageVersion("stors"), sep = "."),
-          file = file.path(data_dir, "version"))
+      fd <- file(file.path(data_dir, "version"), open = "wt")
+      write(as.character(utils::packageVersion("stors")), file = fd)
+      close(fd)
     }
   }
 
