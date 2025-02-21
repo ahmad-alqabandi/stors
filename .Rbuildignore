@@ -8,3 +8,6 @@
 ^pkg_testing$
 ^\.lintr$
 ^\.github$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

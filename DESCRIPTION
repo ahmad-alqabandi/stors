@@ -33,3 +33,4 @@ Config/testthat/edition: 3
 Depends: 
     R (>= 3.60)
 VignetteBuilder: knitr
+URL: https://ahmad-alqabandi.github.io/stors/
