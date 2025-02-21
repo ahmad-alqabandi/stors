@@ -201,7 +201,7 @@ delete_build_in_proposal(sampling_function = "srnorm", proposal_type = "scaled")
 delete_build_in_proposal(sampling_function = "srnorm", proposal_type = "custom")
 
 # Create a symmetric proposal for the standard Normal distribution
-proposal <- srnorm_optimize(symmetric = 0, steps = 2040)
+proposal <- srnorm_optimize(symmetric = TRUE, steps = 2040)
 
 # Visualize the symmetric proposal
 plot(proposal)
@@ -216,7 +216,7 @@ In this example, we demonstrate how to sample from a truncated standard Normal d
 
 ```{r, echo = FALSE}
 
-# Delete all non-symmetric proposals for the Normal distribution
+# Delete symmetric proposals for the Normal distribution
 delete_build_in_proposal(sampling_function = "srnorm", proposal_type = "scaled")
 
 # Optimize the proposal for a truncated standard Normal distribution
@@ -399,6 +399,9 @@ print_proposals()
 ```
 
 ```{r , include = FALSE}
+
+srnorm_optimize() # optimize the scaled non-symmetric proposal, since we have deleted it earlier
+
 for (i in 1:3) {
   delete_proposal(paste0("bimodal_proposal_", i))
 }

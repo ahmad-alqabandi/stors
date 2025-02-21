@@ -29,7 +29,9 @@ f_bimodal <- function(x) {
   0.5 * (1 / sqrt(2 * pi)) * exp(-((x - 4)^2) / 2)
 }
 modes_bimodal = c(0, 4)
-bimodal_proposal = build_proposal(f = f_bimodal, modes = modes_bimodal, lower = -Inf, upper = Inf, steps = 1000)
+bimodal_proposal = build_proposal(f = f_bimodal, modes = modes_bimodal,
+lower = -Inf, upper = Inf, steps = 1000)
+
 save_proposal(bimodal_proposal, "bimodal")
 print(bimodal_proposal)
 

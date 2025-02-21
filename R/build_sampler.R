@@ -50,7 +50,8 @@
 #'    modes_bimodal <- c(0.00316841, 3.99942)
 #'
 #' # Build the proposal for the bimodal distribution
-#' bimodal_proposal = build_proposal(f = f_bimodal, modes = modes_bimodal, lower = -Inf, upper = Inf, steps = 1000)
+#' bimodal_proposal = build_proposal(f = f_bimodal, modes = modes_bimodal,
+#'  lower = -Inf, upper = Inf, steps = 1000)
 #'
 #' # Create the sampling function using \code{build_sampler()}
 #' sample_bimodal <- build_sampler(bimodal_proposal)
@@ -59,7 +60,8 @@
 #' bimodal_samples <- sample_bimodal(1000)
 #' hist(bimodal_samples, breaks = 30, main = "Bimodal Distribution Samples")
 #'
-#' # Create the truncated sampling function using \code{build_sampler()} with truncation bounds [-0.5, 6]
+#' # Create the truncated sampling function using
+#' # \code{build_sampler()} with truncation bounds [-0.5, 6]
 #' truncated_bimodal_proposal <- build_proposal(f = f_bimodal,
 #'  modes = modes_bimodal, lower = -0.5, upper = 6, steps = 1000)
 #'

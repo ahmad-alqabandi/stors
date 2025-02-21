@@ -240,7 +240,9 @@ print.proposal <- function(x, ...) {
 #'   0.5 * (1 / sqrt(2 * pi)) * exp(-((x - 4)^2) / 2)
 #' }
 #' modes_bimodal = c(0, 4)
-#' bimodal_proposal = build_proposal(f = f_bimodal, modes = modes_bimodal, lower = -Inf, upper = Inf, steps = 1000)
+#' bimodal_proposal = build_proposal(f = f_bimodal, modes = modes_bimodal,
+#' lower = -Inf, upper = Inf, steps = 1000)
+#'
 #' save_proposal(bimodal_proposal, "bimodal")
 #' print(bimodal_proposal)
 #'
@@ -254,7 +256,7 @@ print_proposals <- function() {
   if (length(user_proposals) == 0) {
     message("No stored proposals")
   } else {
-    files <- list.files(path = stors:::stors_env$user_proposals_dir,
+    files <- list.files(path = stors_env$user_proposals_dir,
                         full.names = TRUE)
 
     files_details <- file.info(files)
@@ -358,8 +360,8 @@ save_proposal <- function(proposal, proposal_name) {
 #' normal_proposal = build_proposal(f = f_normal, modes = 0, lower = -Inf, upper = Inf, steps = 1000)
 #' print(normal_proposal)
 #'
-#' # Then, save this proposal in R's internal data directory using `save_proposal()` with the name "normal"
-#' save_proposal(normal_proposal, "normal")
+#' # Then, save this proposal in R's internal data directory using
+#' # `save_proposal()` with the name "normal" save_proposal(normal_proposal, "normal")
 #'
 #' # Now, we can print all proposals stored on this machine using `print_proposals()`
 #' print_proposals()
@@ -401,8 +403,8 @@ delete_proposal <- function(proposal_name) {
 #' normal_proposal = build_proposal(f = f_normal, modes = 0, lower = -Inf, upper = Inf, steps = 1000)
 #' print(normal_proposal)
 #'
-#' # Then, save this proposal in R's internal data directory using `save_proposal()` with the name "normal"
-#' save_proposal(normal_proposal, "normal")
+#' # Then, save this proposal in R's internal data directory using
+#' # `save_proposal()` with the name "normal" save_proposal(normal_proposal, "normal")
 #'
 #' # Now, in case the R session is restarted and the proposal is no longer in memory,
 #' # it can be loaded from the machine as follows:

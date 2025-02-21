@@ -21,8 +21,8 @@ f_normal <- function(x) { 0.3989423 * exp(-0.5 * x^2) }
 normal_proposal = build_proposal(f = f_normal, modes = 0, lower = -Inf, upper = Inf, steps = 1000)
 print(normal_proposal)
 
-# Then, save this proposal in R's internal data directory using `save_proposal()` with the name "normal"
-save_proposal(normal_proposal, "normal")
+# Then, save this proposal in R's internal data directory using
+# `save_proposal()` with the name "normal" save_proposal(normal_proposal, "normal")
 
 # Now, we can print all proposals stored on this machine using `print_proposals()`
 print_proposals()

@@ -183,7 +183,7 @@
 #' modes_bimodal = c(0.00134865, 3.99865)
 #'
 #' # Build the proposal for the bimodal distribution
-#' bimodal_proposal = build_proposal(lower = -Inf, upper = Inf, mode = modes_bimodal, f = f_bimodal)
+#' bimodal_proposal = build_proposal( f = f_bimodal, lower = -Inf, upper = Inf, mode = modes_bimodal)
 #'
 #' # Print and plot the bimodal proposal
 #' print(bimodal_proposal)
@@ -193,7 +193,8 @@
 #' # This example demonstrates constructing a proposal with 500 steps,
 #' # for the bimodal distribution used in Example 2.
 #'
-#' bimodal_proposal_500 = build_proposal(lower = -Inf, upper = Inf, mode = modes_bimodal, f = f_bimodal, steps = 500)
+#' bimodal_proposal_500 = build_proposal(f = f_bimodal, lower = -Inf, upper = Inf,
+#'  mode = modes_bimodal, steps = 500)
 #'
 #' # Print and plot the proposal with 500 steps
 #' print(bimodal_proposal_500)
