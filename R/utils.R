@@ -421,11 +421,16 @@ cached_proposal_info <- function(cnum) {
 #' A message indicating the status of the deletion process, or an error if the operation fails.
 #'
 #' @examples
+#' \donttest{
+#' # Should not be run during check to avoid deleting built-in proposal grids,
+#' # which would cause testthat tests to fail
+#'
 #' # Delete a custom proposal for the srgamma function
 #' delete_build_in_proposal(sampling_function = "srgamma", proposal_type = "custom")
 #'
 #' # Delete a scaled proposal for the srnorm function
 #' delete_build_in_proposal(sampling_function = "srnorm", proposal_type = "scaled")
+#' }
 #'
 #' @export
 delete_build_in_proposal <- function(sampling_function, proposal_type = "custom") {

@@ -22,7 +22,8 @@ normal_proposal = build_proposal(f = f_normal, modes = 0, lower = -Inf, upper = 
 print(normal_proposal)
 
 # Then, save this proposal in R's internal data directory using
-# `save_proposal()` with the name "normal" save_proposal(normal_proposal, "normal")
+# `save_proposal()` with the name "normal"
+save_proposal(normal_proposal, "normal")
 
 # Now, we can print all proposals stored on this machine using `print_proposals()`
 print_proposals()

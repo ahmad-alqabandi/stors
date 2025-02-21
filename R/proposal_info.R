@@ -361,7 +361,8 @@ save_proposal <- function(proposal, proposal_name) {
 #' print(normal_proposal)
 #'
 #' # Then, save this proposal in R's internal data directory using
-#' # `save_proposal()` with the name "normal" save_proposal(normal_proposal, "normal")
+#' # `save_proposal()` with the name "normal"
+#' save_proposal(normal_proposal, "normal")
 #'
 #' # Now, we can print all proposals stored on this machine using `print_proposals()`
 #' print_proposals()
@@ -404,7 +405,8 @@ delete_proposal <- function(proposal_name) {
 #' print(normal_proposal)
 #'
 #' # Then, save this proposal in R's internal data directory using
-#' # `save_proposal()` with the name "normal" save_proposal(normal_proposal, "normal")
+#' # `save_proposal()` with the name "normal"
+#' save_proposal(normal_proposal, "normal")
 #'
 #' # Now, in case the R session is restarted and the proposal is no longer in memory,
 #' # it can be loaded from the machine as follows:

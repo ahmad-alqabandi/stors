@@ -26,10 +26,15 @@ If the proposal exists, it deletes the corresponding proposal file from disk and
 If the specified sampling function or proposal type does not exist, an error is thrown.
 }
 \examples{
+\donttest{
+# Should not be run during check to avoid deleting built-in proposal grids,
+# which would cause testthat tests to fail
+
 # Delete a custom proposal for the srgamma function
 delete_build_in_proposal(sampling_function = "srgamma", proposal_type = "custom")
 
 # Delete a scaled proposal for the srnorm function
 delete_build_in_proposal(sampling_function = "srnorm", proposal_type = "scaled")
+}
 
 }
