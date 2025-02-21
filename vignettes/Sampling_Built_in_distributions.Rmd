@@ -1,8 +1,8 @@
 ---
-title: "Sampling from Built-in Distributions using STORS"
+title: "Sampling from Built-in Distributions using stors"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Sampling_Built_in_distributions}
+  %\VignetteIndexEntry{Sampling_from_Built_in_Distributions_using_stors}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
