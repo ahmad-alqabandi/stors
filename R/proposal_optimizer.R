@@ -266,7 +266,7 @@ find_optimal_proposal <- function(gp) {
     if (i != 1 &&
         min(steps_time) >= min(performance$time, na.rm = TRUE)) {
 
-        performance <- na.omit(performance)
+        performance <- stats::na.omit(performance)
 
         if (verbose) {
         cat("\n=====================================\n")
