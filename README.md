@@ -1,14 +1,14 @@
-# 📦 `{STORS}` R package <img src="man/figures/logo.png" align="right" height="278"/>
+# 📦 `{StORS}` R package <img src="man/figures/logo.png" align="right" height="278"/>
 
-**STORS** is an optimized rejection sampling method designed for efficient sampling from univariate statistical distributions.
+**StORS** is an optimized rejection sampling method designed for efficient sampling from univariate statistical distributions.
 It constructs a proposal distribution using computationally efficient steps that adapt around the target distribution.
 
-Built-in distributions can have any type of unbounded tails, as **IT sampling** is used when necessary.
+Built-in distributions can have any type of unbounded tails, as **Inverse Transform** sampling is used when necessary.
 However, for user-provided distributions, if unbounded, the tails must be log-concave since only **Adaptive Rejection Sampling (ARS)** is applied in this case.
 
 ## Installation
 
-You can install **STORS** directly from R-universe:
+You can install **StORS** directly from R-universe:
 
 ``` r
 install.packages('stors', repos = c('https://ahmad-alqabandi.r-universe.dev', 'https://cloud.r-project.org'))
