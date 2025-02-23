@@ -6,7 +6,7 @@ create_function <- function(fun, arg_list) {
   arg_list <- arg_list[names(arg_list) %in% fun_args]
 
   build_closure <- function(fun, ...) {
-    return(\(x) {
+    return(function(x) {
       fun(x, ...)
     })
   }
