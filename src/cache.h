@@ -1,7 +1,7 @@
 #ifndef CACH_H
 #define CACH_H
 
-#define MAX_GRIDS_NUMBER 100
+#define MAX_GRIDS_NUMBER 200
 
 
 struct grid {
