@@ -370,6 +370,10 @@ cache_user_proposal_c <- function(proposal) {
 
   }
 
+  if(stors_env$user_cnum_counter > 199){
+    stop("Cache limit exceeded: Users can cache up to 100 proposals in memory.")
+  }
+
   c_num <- stors_env$user_cnum_counter
 
   cache_proposal_c(c_num, proposal)
