@@ -196,15 +196,15 @@ Example: Creating a Symmetric Proposal for the Standard Normal Distribution
 In this example, we create a symmetric proposal for the standard Normal distribution. Before doing so, we first delete all previously constructed non-symmetric proposals (both scaled and custom) using the \code{delete_build_in_proposal()} function.
 ```{r, echo = FALSE}
 
-# Delete all non-symmetric proposals for the Normal distribution
-delete_build_in_proposal(sampling_function = "srnorm", proposal_type = "scaled")
-delete_build_in_proposal(sampling_function = "srnorm", proposal_type = "custom")
-
-# Create a symmetric proposal for the standard Normal distribution
-proposal <- srnorm_optimize(symmetric = TRUE, steps = 2040)
-
-# Visualize the symmetric proposal
-plot(proposal)
+# # Delete all non-symmetric proposals for the Normal distribution
+# delete_build_in_proposal(sampling_function = "srnorm", proposal_type = "scaled")
+# delete_build_in_proposal(sampling_function = "srnorm", proposal_type = "custom")
+# 
+# # Create a symmetric proposal for the standard Normal distribution
+# proposal <- srnorm_optimize(symmetric = TRUE, steps = 2040)
+# 
+# # Visualize the symmetric proposal
+# plot(proposal)
 
 ```
 

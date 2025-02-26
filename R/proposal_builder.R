@@ -438,8 +438,8 @@ build_final_proposal <- function(gp, opt_area = NULL) {
   xm <- final_proposal$x[steps_number + 1]
 
 
-  if (!is.null(symmetric))
-    steps_number <- steps_number * 2
+  # if (!is.null(symmetric))
+  #   steps_number <- steps_number * 2
 
   if (identical(tails_method, "ARS")) {
     tails_area <- tails_ars(final_proposal, f, h, h_prime, modes, lower, upper)
