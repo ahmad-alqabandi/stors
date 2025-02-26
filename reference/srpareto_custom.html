@@ -99,17 +99,17 @@ The proposal distribution is pre-optimized at package load time using <code><a h
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Generate 10 samples from Pareto Distribution</span></span></span>
 <span class="r-in"><span><span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu">srpareto_custom</span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">samples</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1.584088   5.890515  19.971413   6.670035 800.060846   4.291055</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  28.867629  98.159839   1.592667  34.211237</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  5.352964 10.679309  2.859713  7.211471  2.050879 10.232595  1.158949</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8]  1.154238  3.641656  1.309234</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Generate 10 samples using a pre-allocated vector</span></span></span>
 <span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">srpareto_custom</span><span class="op">(</span><span class="fl">10</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  2.334009  5.945377  2.845756 11.258657  2.964156  1.376649  1.115614</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8]  1.262185  1.115902  1.453773</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 1.241575 9.129689 1.223397 9.421310 2.577567 1.454625 1.308318 6.044803</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9] 8.670544 3.131264</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  2.334009  5.945377  2.845756 11.258657  2.964156  1.376649  1.115614</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8]  1.262185  1.115902  1.453773</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 1.241575 9.129689 1.223397 9.421310 2.577567 1.454625 1.308318 6.044803</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9] 8.670544 3.131264</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
