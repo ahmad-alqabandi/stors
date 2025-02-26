@@ -32,10 +32,10 @@ SEXP cache_grid(SEXP R_Cnum, SEXP R_x, SEXP R_s_upper,
       grids.grid[j].is_symmetric = 0;
     }
 
-  grids.grid[j].x =  calloc( (m + 1) , sizeof(double) );
-  grids.grid[j].p_a = calloc( (m + 1) , sizeof(double) );
-  grids.grid[j].s_upper = calloc( (m + 1) , sizeof(double) );
-  grids.grid[j].s_upper_lower = calloc( (m + 1) ,  sizeof(double) );
+  grids.grid[j].x =  R_Calloc( (m + 1) , double );
+  grids.grid[j].p_a = R_Calloc( (m + 1) , double );
+  grids.grid[j].s_upper = R_Calloc( (m + 1) , double );
+  grids.grid[j].s_upper_lower = R_Calloc( (m + 1) ,  double );
 
   grids.grid[j].steps_number = m;
   grids.grid[j].unif_scaler = unif_scaler;
@@ -93,13 +93,13 @@ SEXP free_cache(void){
 
     if(grids.grid[i].x != NULL){
 
-      free(grids.grid[i].x);
+      R_Free(grids.grid[i].x);
       grids.grid[i].x = NULL;
-      free(grids.grid[i].p_a);
+      R_Free(grids.grid[i].p_a);
       grids.grid[i].p_a = NULL;
-      free(grids.grid[i].s_upper);
+      R_Free(grids.grid[i].s_upper);
       grids.grid[i].s_upper = NULL;
-      free(grids.grid[i].s_upper_lower);
+      R_Free(grids.grid[i].s_upper_lower);
       grids.grid[i].s_upper_lower = NULL;
 
     }
@@ -119,13 +119,13 @@ SEXP free_cache_cnum( SEXP Rcnum){
 
   int cnum = asInteger(Rcnum);
 
-  free(grids.grid[cnum].x);
+  R_Free(grids.grid[cnum].x);
   grids.grid[cnum].x = NULL;
-  free(grids.grid[cnum].p_a);
+  R_Free(grids.grid[cnum].p_a);
   grids.grid[cnum].p_a = NULL;
-  free(grids.grid[cnum].s_upper);
+  R_Free(grids.grid[cnum].s_upper);
   grids.grid[cnum].s_upper = NULL;
-  free(grids.grid[cnum].s_upper_lower);
+  R_Free(grids.grid[cnum].s_upper_lower);
   grids.grid[cnum].s_upper_lower = NULL;
 
   grids.incache-=1;
