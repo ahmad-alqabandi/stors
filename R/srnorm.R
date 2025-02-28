@@ -212,7 +212,7 @@ srnorm_optimize <- function(
   f <- dendata$create_f(f_params$mean, f_params$sd)
 
 
-  check_proposal_opt_criteria(symmetric, cnum, dendata)
+  check_proposal_opt_criteria(symmetric, proposal_type, dendata )
 
   proposal_optimizer(dendata, dist_name, xl, xr, f, modes, f_params, steps,
                  proposal_range, theta, target_sample_size,

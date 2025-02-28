@@ -22,8 +22,11 @@ proposal_optimizer <- function(dendata,
   if (is.null(xr) || (xr > dendata$upper))
     xr <- dendata$upper
 
-  if (xl > xr)
-    stop("xl must be smaller than xr.")
+  if (xl > xr) {
+    cli::cli_abort("{.strong xl must be smaller than xr.}
+
+                 You provided: xl = {.val {xl}}, xr = {.val {xr}}.")
+  }
 
   modes <- adjust_modes(modes, xl, xr, f)
 
@@ -141,12 +144,15 @@ find_optimal_proposal <- function(gp) {
   relative_error <- f_integrate$abs.error / f_integrate$value * 100
 
   if (relative_error > 0.1) {
-    stop(paste0(
-      "provided density has large relative error = ",
-      relative_error,
-      "%"
-    ))
+    cli::cli_abort("The provided density function has a large relative integration error: {.val {sprintf('%.4f%%', relative_error)}}.
+
+               This may indicate numerical instability or an issue with the function's behavior over the truncation range.
+
+               Integration was performed over the range: {.val [{lower}, {upper}]}.
+
+               Consider adjusting the truncation limits or reviewing the density function.")
   }
+
 
   f_area <- f_integrate$value
   gp$target$estimated_area <- f_area

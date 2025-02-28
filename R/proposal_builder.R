@@ -199,7 +199,7 @@
 #' # Print and plot the proposal with 500 steps
 #' print(bimodal_proposal_500)
 #'
-#' @import digest
+#' @import digest cli
 #' @export
 build_proposal <- function(f,
                            modes,
@@ -217,7 +217,7 @@ build_proposal <- function(f,
 
 
   if (!is.function(f)) {
-    stop("Error: 'f' density function must be provided.")
+    cli::cli_abort("{.var f} must be a function representing the density function.")
   }
 
   preserved_f <- f

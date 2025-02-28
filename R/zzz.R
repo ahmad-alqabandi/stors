@@ -4,6 +4,7 @@
 
 built_in_proposals <- list(
   srnorm = list(
+    name = "srnorm",
     c_num = 1,
     tails_method = "ARS",
     scalable = TRUE,
@@ -27,6 +28,7 @@ built_in_proposals <- list(
     lower = -Inf,
     upper = Inf
   ), srlaplace = list(
+    name = "srlaplace",
     c_num = 3,
     tails_method = "IT",
     scalable = TRUE,
@@ -55,6 +57,7 @@ built_in_proposals <- list(
     lower = -Inf,
     upper = Inf
   ), srexp = list(
+    name = "srexp",
     c_num = 5,
     tails_method = "IT",
     scalable = TRUE,
@@ -76,6 +79,7 @@ built_in_proposals <- list(
     lower = 0,
     upper = Inf
   ), srchisq = list(
+    name = "srchisq",
     c_num = 7,
     tails_method = "ARS",
     scalable = FALSE,
@@ -100,6 +104,7 @@ built_in_proposals <- list(
     lower = 0,
     upper = Inf
   ), srgamma = list(
+    name = "srgamma",
     c_num = 9,
     std_params = list(shape = 1, scale = 1),
     tails_method = "ARS",
@@ -124,6 +129,7 @@ built_in_proposals <- list(
     lower = 0,
     upper = Inf
   ),  srbeta = list(
+    name = "srbeta",
     c_num = 11,
     tails_method = "ARS",
     scalable = FALSE,
@@ -145,6 +151,7 @@ built_in_proposals <- list(
     lower = 0,
     upper = 1
   ), srpareto = list(
+    name = "srpareto",
     c_num = 13,
     tails_method = "IT",
     scalable = FALSE,

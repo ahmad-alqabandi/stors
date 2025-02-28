@@ -181,7 +181,6 @@ plot.proposal <- function(x,
 print.proposal <- function(x, ...) {
   proposal <- x
 
-  # Format the number of steps with commas and without scientific notation
   formatted_steps <- format(proposal$steps_number,
                             big.mark = ",",
                             scientific = FALSE)
@@ -192,24 +191,16 @@ print.proposal <- function(x, ...) {
   domain_end <- proposal$data$x[n]
 
   # Calculate sampling efficiency
-  sampling_efficiency <- (proposal$target_function_area / (sum(proposal$areas))) * 100
+  sampling_efficiency <- (proposal$target_function_area / sum(proposal$areas)) * 100
 
-  # Improved printing with clearer structure
-  message("\n=========================================\n")
-  message("Proposal Summary\n")
-  message("-----------------------------------------\n")
-  message("Total steps:      ", formatted_steps, "\n")
-  message(
-    "Steps range:     [",
-    sprintf("%.6f", domain_start),
-    ", ",
-    sprintf("%.6f", domain_end),
-    "]\n"
-  )
-  message(sprintf("Sampling efficiency: %.2f%%", sampling_efficiency),
-          "\n")
-  message("=========================================\n\n")
+  # Clearer formatting using `cli`
+  cli::cli_h1("Proposal Summary")
 
+  cli::cli_ul(c(
+    "Total steps: {.val {formatted_steps}}",
+    "Steps range: [{.val {sprintf('%.6f', domain_start)}}, {.val {sprintf('%.6f', domain_end)}}]",
+    "Sampling efficiency: {.val {sprintf('%.2f%%', sampling_efficiency)}}"
+  ))
 }
 
 
@@ -254,46 +245,29 @@ print_proposals <- function() {
   user_proposals <- list.files(stors_env$user_proposals_dir)
 
   if (length(user_proposals) == 0) {
-    message("No stored proposals")
+    cli::cli_inform("{.strong No stored proposals.}")
   } else {
-    files <- list.files(path = stors_env$user_proposals_dir,
-                        full.names = TRUE)
-
+    files <- list.files(path = stors_env$user_proposals_dir, full.names = TRUE)
     files_details <- file.info(files)
 
     files_names <- tools::file_path_sans_ext(basename(files))
-
     files_date <- file.mtime(files)
-
     files_sizes <- files_details[files_details$isdir == FALSE, ]$size
 
-    files_sizes_KB <- formatC(as.double(files_sizes) / 1028,
-                              format = "f",
-                              digits = 2)
+    files_sizes_KB <- formatC(as.double(files_sizes) / 1028, format = "f", digits = 2)
+    files_total_size_KB <- formatC(as.double(sum(files_sizes)) / 1028, format = "f", digits = 2)
 
-    files_total_size_KB <- formatC(as.double(sum(files_sizes)) / 1028,
-                                   format = "f",
-                                   digits = 2)
+    cli::cli_h1("Proposals Data")
 
-    output <- paste0(
-      "\n=====================================\n",
-      "Proposals Data:\n",
-      sprintf("%-15s | %-15s | %s\n", "Name", "Size (KB)", "Date"),
-      "---------------------------------------------\n",
-      paste(sapply(seq_along(files_names), function(k) {
-        sprintf(
-          "%-15s | %-15s | %s",
-          files_names[k],
-          files_sizes_KB[k],
-          format(files_date[k], "%Y-%m-%d %H:%M:%S")
-        )
-      }), collapse = "\n"),
-      "\n---------------------------------------------\n",
-      sprintf("Total Size:     | %5s\n", files_total_size_KB),
-      "=====================================\n"
-    )
+    # Table Header
+    cli::cli_text("{.strong Name}            | {.strong Size (KB)}      | {.strong Date}")
 
-    message(output)
+    # Print each proposal entry
+    for (k in seq_along(files_names)) {
+      cli::cli_text("{.val {files_names[k]}} | {.val {files_sizes_KB[k]}} KB | {format(files_date[k], '%Y-%m-%d %H:%M:%S')}")
+    }
+
+    cli::cli_text("Total Size: {.val {files_total_size_KB}} KB")
   }
 
 }
@@ -333,8 +307,12 @@ print_proposals <- function() {
 #' @import digest digest
 #' @export
 save_proposal <- function(proposal, proposal_name) {
-  if (!is_valid_proposal(proposal))
-    stop("This proposal is not valid")
+
+  if (!is_valid_proposal(proposal)) {
+    cli::cli_abort("{.strong This proposal is not valid.}
+
+               Only proposals created using {.fn build_proposal} can be used.")
+  }
 
   proposals_file_path <- file.path(stors_env$user_proposals_dir,
                                    paste0(proposal_name, ".rds"))
@@ -379,7 +357,11 @@ delete_proposal <- function(proposal_name) {
   user_proposals <- list.files(stors_env$user_proposals_dir)
   proposal_name <- paste0(proposal_name, ".rds")
 
-  stopifnot("This proposal does not exist." = proposal_name %in% user_proposals)
+  if (!(proposal_name %in% user_proposals)) {
+    cli::cli_abort("The proposal {.val {proposal_name}} does not exist.
+
+                  Please provide a valid proposal from the available proposals: {.val {paste(user_proposals, collapse = ', ')}}.")
+  }
 
   file.remove(file.path(stors_env$user_proposals_dir, proposal_name))
   message(proposal_name, "proposal deleted successfully")
@@ -396,7 +378,6 @@ delete_proposal <- function(proposal_name) {
 #'
 #' @return
 #' Returns a list representing the proposal stored under \code{proposal_name} in R's internal data directory. If the proposal corresponding to the specified name does not exist, an error message is displayed.
-#'
 #'
 #' @examples
 #' # First, let's create a proposal to sample from a standard normal distribution
@@ -424,15 +405,18 @@ load_proposal <- function(proposal_name) {
     proposal <- readRDS(proposal_path)
 
     if (!is_valid_proposal(proposal))
-      stop("This proposal is not valid")
+      cli::cli_abort("This proposal is not valid.
+
+               Only proposals created using {.fn build_proposal} can be used.")
 
     return(proposal)
 
-
   } else {
-    stop("There is no proposal named '",
-         proposal_name,
-         "' stored on your machine.")
+    cli::cli_abort("There is no proposal named {.val {proposal_name}} stored on your machine.
+
+               Expected location: {.path {proposal_path}}.
+
+               Please check the name or ensure the file exists.")
   }
 
 
