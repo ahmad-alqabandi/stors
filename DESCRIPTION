@@ -23,7 +23,9 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports:
     digest,
-    microbenchmark 
+    microbenchmark,
+    cli,
+    rlang
 Suggests: 
     knitr,
     rmarkdown,
