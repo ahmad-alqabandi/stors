@@ -152,9 +152,9 @@ requirements of the target distribution.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">bi_proposal</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Proposal Summary</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; • Total steps: 4,315</span></span>
-<span><span class="co">#&gt; • Steps range: [-3.888020, 7.887194]</span></span>
-<span><span class="co">#&gt; • Sampling efficiency: 99.79%</span></span>
+<span><span class="co">#&gt; • Total steps: 8,626</span></span>
+<span><span class="co">#&gt; • Steps range: [-3.814665, 7.813697]</span></span>
+<span><span class="co">#&gt; • Sampling efficiency: 99.90%</span></span>
 <span></span>
 <span><span class="co"># Visualizing the custom proposal</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">bi_proposal</span><span class="op">)</span></span></code></pre></div>
@@ -256,14 +256,14 @@ user with all stored proposals.</p>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Proposals Data</span> <span style="color: #00BBBB;">──────────────────────────────────────────────────────────────</span></span></span>
 <span><span class="co">#&gt; Name                 | Size (KB)       | Date</span></span>
 <span><span class="co">#&gt; -----------------------------------------------</span></span>
-<span><span class="co">#&gt; bimodal_proposal_1   | 132.16          | 2025-03-02 20:03:07</span></span>
-<span><span class="co">#&gt; bimodal_proposal_2   | 132.16          | 2025-03-02 20:03:07</span></span>
-<span><span class="co">#&gt; bimodal_proposal_3   | 132.16          | 2025-03-02 20:03:07</span></span>
-<span><span class="co">#&gt; bimodal_proposal     | 132.16          | 2025-03-02 20:03:07</span></span>
-<span><span class="co">#&gt; bimodal              | 26.88           | 2025-03-02 20:02:37</span></span>
-<span><span class="co">#&gt; normal               | 23.05           | 2025-03-02 20:02:37</span></span>
+<span><span class="co">#&gt; bimodal_proposal_1   | 258.15          | 2025-03-02 20:35:53</span></span>
+<span><span class="co">#&gt; bimodal_proposal_2   | 258.15          | 2025-03-02 20:35:53</span></span>
+<span><span class="co">#&gt; bimodal_proposal_3   | 258.15          | 2025-03-02 20:35:53</span></span>
+<span><span class="co">#&gt; bimodal_proposal     | 258.15          | 2025-03-02 20:35:53</span></span>
+<span><span class="co">#&gt; bimodal              | 26.88           | 2025-03-02 20:35:17</span></span>
+<span><span class="co">#&gt; normal               | 23.05           | 2025-03-02 20:35:17</span></span>
 <span><span class="co">#&gt; -----------------------------------------------</span></span>
-<span><span class="co">#&gt; Total Size: 578.56</span></span></code></pre></div>
+<span><span class="co">#&gt; Total Size: 1082.54</span></span></code></pre></div>
 <p>Be aware that the saved proposal can be quite large in size,
 depending on the user’s system. Therefore, if the user wants to delete a
 proposal, the <code><a href="../reference/delete_proposal.html">delete_proposal()</a></code> function can be used by
@@ -278,13 +278,13 @@ providing the proposal’s name.</p>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Proposals Data</span> <span style="color: #00BBBB;">──────────────────────────────────────────────────────────────</span></span></span>
 <span><span class="co">#&gt; Name                 | Size (KB)       | Date</span></span>
 <span><span class="co">#&gt; -----------------------------------------------</span></span>
-<span><span class="co">#&gt; bimodal_proposal_1   | 132.16          | 2025-03-02 20:03:07</span></span>
-<span><span class="co">#&gt; bimodal_proposal_2   | 132.16          | 2025-03-02 20:03:07</span></span>
-<span><span class="co">#&gt; bimodal_proposal_3   | 132.16          | 2025-03-02 20:03:07</span></span>
-<span><span class="co">#&gt; bimodal              | 26.88           | 2025-03-02 20:02:37</span></span>
-<span><span class="co">#&gt; normal               | 23.05           | 2025-03-02 20:02:37</span></span>
+<span><span class="co">#&gt; bimodal_proposal_1   | 258.15          | 2025-03-02 20:35:53</span></span>
+<span><span class="co">#&gt; bimodal_proposal_2   | 258.15          | 2025-03-02 20:35:53</span></span>
+<span><span class="co">#&gt; bimodal_proposal_3   | 258.15          | 2025-03-02 20:35:53</span></span>
+<span><span class="co">#&gt; bimodal              | 26.88           | 2025-03-02 20:35:17</span></span>
+<span><span class="co">#&gt; normal               | 23.05           | 2025-03-02 20:35:17</span></span>
 <span><span class="co">#&gt; -----------------------------------------------</span></span>
-<span><span class="co">#&gt; Total Size: 446.40</span></span></code></pre></div>
+<span><span class="co">#&gt; Total Size: 824.38</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
