@@ -106,23 +106,23 @@ from the standard Laplace Distribution, then scaled and location shifted accordi
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Generate 10 samples from the standard Laplace Distribution</span></span></span>
 <span class="r-in"><span><span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu">srlaplace</span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">samples</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  0.58683258  1.04426623  1.43171488  1.19366695 -0.09266302  1.60380903</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.08090301 -0.32876477 -0.51215347  1.78106547</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -1.56300316  0.05019233  0.84952961  0.18926481 -1.40728830  0.19597883</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  0.14554929  0.22583154  0.03765379 -0.78231778</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Generate 10 samples using a pre-allocated vector</span></span></span>
 <span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">srlaplace</span><span class="op">(</span><span class="fl">10</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  2.27550369 -0.71524746 -0.01855857  1.35508327 -0.27177054 -0.72594136</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  1.03834360  0.42594707  0.95552643  0.99248608</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -2.3944150 -0.2491354 -2.0363334 -0.9243983 -0.6228961 -0.8948905</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.2114678  0.7833916 -1.1610652  1.7761068</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  2.27550369 -0.71524746 -0.01855857  1.35508327 -0.27177054 -0.72594136</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  1.03834360  0.42594707  0.95552643  0.99248608</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -2.3944150 -0.2491354 -2.0363334 -0.9243983 -0.6228961 -0.8948905</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.2114678  0.7833916 -1.1610652  1.7761068</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Generate 10 samples from a Laplace Distribution with mu = 2 and b = 3</span></span></span>
 <span class="r-in"><span><span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu">srlaplace</span><span class="op">(</span><span class="fl">10</span>, mu <span class="op">=</span> <span class="fl">2</span>, b <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">samples</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -2.3770661  3.0011642  1.4313608  0.3743626  0.4175430 -3.9414494</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 15.3791471  4.3759561  5.8721902  0.1872712</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  7.5546225  1.4622282  1.6120691  0.1460096  3.7542291 14.9156475</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  0.7113049  3.0384021  2.2427217  3.5994518</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
