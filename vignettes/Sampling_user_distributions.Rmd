@@ -2,7 +2,7 @@
 title: "Sampling from User-Defined Distributions using stors"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Sampling_from_User_Defined_Distributions_using_stors}
+  %\VignetteIndexEntry{Sampling from User-Defined Distributions using stors}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

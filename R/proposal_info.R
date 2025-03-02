@@ -372,7 +372,7 @@ delete_proposal <- function(proposal_name) {
   }
 
   file.remove(file.path(stors_env$user_proposals_dir, proposal_name))
-  cli::cli_alert_success("{.val {rpoposal_name}} proposal deleted successfully")
+  cli::cli_alert_success("{.val {proposal_name}} proposal deleted successfully")
 
 }
 
