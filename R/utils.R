@@ -1,6 +1,5 @@
 #' @noRd
 create_function <- function(fun, arg_list) {
-
   fun_args <- names(formals(fun))
 
   arg_list <- arg_list[names(arg_list) %in% fun_args]
@@ -25,9 +24,9 @@ fix_function <- function(func) {
   func_args <- names(formals(func))
 
   if (length(func_args) != 1) {
-    cli::cli_abort("All provided functions must have exactly one parameter.
-
-                 Your function has {.val {length(func_args)}} parameters.")
+    cli::cli_abort(c("x" = "All provided functions must have exactly one parameter",
+                     "i" = "Your function has {length(func_args)} parameters")
+    )
   }
 
   # Remove parameters from the environment to exclude them from substitution
@@ -35,7 +34,10 @@ fix_function <- function(func) {
   captured_env <- captured_env[!names(captured_env) %in% func_args]
 
   # Replace free variables in the body with their values from the environment
-  fixed_body <- eval(substitute(substitute(func_body, captured_env), list(func_body = func_body)))
+  fixed_body <- eval(substitute(
+    substitute(func_body, captured_env),
+    list(func_body = func_body)
+  ))
 
   # Create a new function with the modified body
   new_func <- func
@@ -77,7 +79,6 @@ adjust_modes <- function(mode, xl, xr, f) {
 #' @noRd
 check_proposal_opt_criteria <- function(symmetric, grid_type, dendata) {
   if (dendata$scalable) {
-
     symmetric <- !is.null(symmetric)
     cnum <- dendata$c_num
 
@@ -88,52 +89,52 @@ check_proposal_opt_criteria <- function(symmetric, grid_type, dendata) {
     if (!is.null(scaled_params[1]) &&
         (scaled_params[1] != symmetric) &&
         identical(grid_type, "custom")) {
+      cli::cli_abort(c("x" = "You need to delete the {.strong {if (scaled_params[1]) 'symmetric' else 'non-symmetric'}} scaled built-in proposal first.",
+          "i" = "To delete it, run: {.run delete_built_in_proposal(\"{dendata$name}\", \"scaled\")}."
+        ),
+        call = rlang::caller_env(),
+        .frame = rlang::caller_env()
+      )
 
-      cli::cli_abort("You need to delete the {.strong {if (scaled_params[1])
-    'symmetric' else 'non-symmetric'}} scaled built-in proposal first.
-
-    To delete it, run: {.code delete_build_in_proposal(\"{dendata$name}\", \"scaled\")}.")
     }
 
     if (!is.null(custom_params[1]) &&
         (custom_params[1] != symmetric) &&
         identical(grid_type, "scaled")) {
-
-      cli::cli_abort("You need to delete the {.strong {if (custom_params[1])
-    'symmetric' else 'non-symmetric'}} custom built-in proposal first.
-
-    To delete it, run: {.code delete_build_in_proposal(\"{dendata$name}\", \"custom\")}.")
+      cli::cli_abort(c("x" = "You need to delete the {.strong {if (custom_params[1]) 'symmetric' else 'non-symmetric'}} custom built-in proposal first.",
+          "i" = "To delete it, run: {.run delete_built_in_proposal(\"{dendata$name}\", \"custom\")}."
+        ),
+        call = rlang::caller_env(),
+        .frame = rlang::caller_env()
+      )
     }
   }
 }
 
 #' @noRd
 truncate_error_checking <- function(xl, xr, density) {
-
   if (!(is.numeric(xl) && length(xl) == 1)) {
     cli::cli_abort("{.strong xl} must be a scalar numeric value.")
   }
 
   if (!(is.numeric(xr) && length(xr) == 1)) {
-    cli::cli_abort("{.strong xr} must be a scalar numeric value.")
+    cli::cli_abort(c("x" = "{.strong xr} must be a scalar numeric value."))
   }
 
   if (xl >= xr) {
-    cli::cli_abort("{.strong xl} must be smaller than {.strong xr}.
-
-                  You provided: xl = {.val {xl}}, xr = {.val {xr}}.")
+    cli::cli_abort(c("x" = "{.strong xl} must be smaller than {.strong xr}",
+                     "i" = "You provided: xl = {xl}, xr = {xr}."))
   }
 
   if (xl < density$lower) {
-    cli::cli_abort("{.strong xl} must be greater than or equal to the density lower bound ({.val {density$lower}}).
-
-                  You provided: xl = {.val {xl}}.")
+    cli::cli_abort(c("x" = "{.strong xl} must be greater than or equal to the density lower bound ({density$lower}}).",
+        "i" = "You provided: xl = {xl}}."
+    ))
   }
 
   if (xr > density$upper) {
-    cli::cli_abort("{.strong xr} must be smaller than or equal to the density upper bound ({.val {density$upper}}).
-
-                  You provided: xr = {.val {xr}}.")
+    cli::cli_abort(c("x" = "{.strong xr} must be smaller than or equal to the density upper bound ({density$upper}})",
+        "i" = "You provided: xr = {xr}}."))
   }
 
 
@@ -152,44 +153,40 @@ proposal_error_checking_and_preparation <- function(gp) {
   lower <- gp$target$left_bound
   upper <- gp$target$right_bound
   if (is.null(modes)) {
-    cli::cli_abort("{.strong modes} must be provided.
-
-                  Ensure you specify the density modes.")
+    cli::cli_abort(c("x" = "{.strong modes} must be provided",
+                     "i" = "Ensure you specify the density modes."))
   }
 
   if (!is.function(f)) {
-    cli::cli_abort("{.strong f} must be a valid density function.")
+    cli::cli_abort(c("x" = "{.strong f} must be a valid density function."))
   }
 
   if (!is.null(steps) && steps < 1) {
-    cli::cli_abort("{.strong steps} must be greater than or equal to {.val 1}.
-
-                  You provided: {.val {steps}}.")
+    cli::cli_abort(c("x" = "{.strong steps} must be greater than or equal to {1}",
+                     "i" = "You provided: steps = {steps}."))
   }
   if (!is.numeric(theta) || theta < 0.1 || theta > 1) {
-    cli::cli_abort("{.strong theta} must be a numeric value in the range [{.val 0.1}, {.val 1}].
-
-                  You provided: {.val {theta}}.")
+    cli::cli_abort(c("x" = "{.strong theta} must be a numeric value in the range [{0.1}, {1}]",
+        "i" = "You provided theta = {theta}"))
   }
 
   if (!is.null(proposal_range)) {
     if (length(proposal_range) != 2) {
-      cli::cli_abort("{.strong proposal_range} must be a vector of two elements.
-
-                    You provided: {.val {length(proposal_range)}} elements.")
+      cli::cli_abort(c("x" = "{.strong proposal_range} must be a vector of two elements",
+                       "i" = "You provided: {length(proposal_range)} elements"))
     }
 
     if (proposal_range[1] < lower || proposal_range[2] > upper) {
-      cli::cli_abort("{.strong proposal_range} must be within the distribution bounds [{.val {lower}}, {.val {upper}}].
-
-                    You provided: {.val {proposal_range[1]}}, {.val {proposal_range[2]}}.")
+      cli::cli_abort(c("x" = "{.strong proposal_range} must be within the distribution bounds [{lower}, {upper}]",
+                       "i" = "You provided: proposal_range = [{proposal_range[1]}, {proposal_range[2]}]"
+      ))
     }
 
-    if (proposal_range[1] > modes[1] || proposal_range[2] < modes[length(modes)]) {
-      cli::cli_abort("{.strong proposal_range} must include the distribution's modes.
-
-                    Provided range: [{.val {proposal_range[1]}}, {.val {proposal_range[2]}}]
-                    First mode: {.val {modes[1]}}, Last mode: {.val {modes[length(modes)]}}.")
+    if (proposal_range[1] > modes[1] ||
+        proposal_range[2] < modes[length(modes)]) {
+      cli::cli_abort(c("x" = "{.strong proposal_range} must include the distribution's modes",
+                       "i" = "Provided range: [{proposal_range[1]}, {proposal_range[2]}]",
+                       "i" =  "First mode: {modes[1]}, Last mode: {modes[length(modes)]}"))
     }
   } else {
     proposal_range <- gp$proposal_range <- c(lower, upper)
@@ -197,25 +194,22 @@ proposal_error_checking_and_preparation <- function(gp) {
 
   if (!is.null(between_minima)) {
     if (between_minima < lower || between_minima > upper) {
-      cli::cli_abort("{.strong between_minima} must be within the distribution bounds [{.val {lower}}, {.val {upper}}].
-
-                    You provided: {.val {between_minima}}.")
+      cli::cli_abort(c("x" = "{.strong between_minima} must be within the distribution bounds [{lower}, {upper}]",
+          "i" = "You provided: between_minima = {between_minima}."))
     }
 
-    if (length(between_minima) != (length(modes) - 1)) {
-      cli::cli_abort("{.strong between_minima} must have exactly {.val {length(modes) - 1}} elements.
-
-                    You provided: {.val {length(between_minima)}} elements.")
+    if (length(between_minima) != (length(modes) - 1))
+      {cli::cli_abort(c("x" =  "{.strong between_minima} must have exactly {length(modes) - 1} elements",
+        "i" = "You provided: {length(between_minima)} elements"))
     }
 
     minima_len <- length(between_minima)
 
     for (i in seq_len(minima_len)) {
-      if (!(between_minima[i] > modes[i] && between_minima[i] < modes[i + 1])) {
-        cli::cli_abort("{.strong between_minima} must be positioned between the distribution's modes.
-
-                      Issue found at index {.val {i}}: {.val {between_minima[i]}} is not between
-                      {.val {modes[i]}} and {.val {modes[i + 1]}}.")
+      if (!(between_minima[i] > modes[i] &&
+            between_minima[i] < modes[i + 1])) {
+        cli::cli_abort(c("x" = "{.strong between_minima} must be positioned between the distribution's modes",
+                         "i" = "Issue found at index {i}: {between_minima[i]} is not between {modes[i]} and {modes[i + 1]}"))
       }
     }
   }
@@ -246,8 +240,6 @@ is_valid_proposal <- function(proposal) {
 
 #' @noRd
 proposal_check_symmetric <- function(gp) {
-
-
   if (!is.null(gp$target$symmetric)) {
     proposal_range <- gp$proposal$proposal_range
     center <- gp$target$modes
@@ -265,7 +257,6 @@ proposal_check_symmetric <- function(gp) {
 
 #' @noRd
 get_buildin_sampling_function <- function(cnum, name) {
-
   if (cnum %% 2 == 0) {
     even <- TRUE
     cnum_search <- cnum - 1
@@ -290,7 +281,7 @@ get_buildin_sampling_function <- function(cnum, name) {
       }
     }
   } else {
-    cli::cli_abort("{.strong Check the proposal caching number c_num}")
+    cli::cli_abort(c("x" = "{.strong Check the proposal caching number c_num}"))
   }
 
   return(fun)
@@ -350,28 +341,26 @@ cache_proposal_c <- function(c_num, proposal) {
 
 #' @noRd
 cache_user_proposal_c <- function(proposal) {
-
   if (!is_valid_proposal(proposal)) {
-    cli::cli_abort("{.strong This proposal is not valid.}
-
-                  Ensure that the proposal was created using {.fn build_proposal}.")
+    cli::cli_abort(c("x" = "{.strong This proposal is not valid}",
+                     "i" = "Ensure that the proposal was created using {.fn build_proposal}"))
   }
 
   if (proposal$lock %in% stors_env$user_session_cached_proposals_locks[["lock"]]) {
-    cli::cli_inform("Detected cached proposal for this distribution.
+    cli::cli_inform(
+      "Detected cached proposal for this distribution.
 
-                   {.strong Replacing with a new proposal.}")
+                   {.strong Replacing with a new proposal.}"
+    )
 
-    c_num <- stors_env$user_session_cached_proposals_locks[
-      stors_env$user_session_cached_proposals_locks$lock == proposal$lock, ]$cnum
+    c_num <- stors_env$user_session_cached_proposals_locks[stors_env$user_session_cached_proposals_locks$lock == proposal$lock, ]$cnum
 
     return(c_num)
   }
 
   if (stors_env$user_cnum_counter > 199) {
-    cli::cli_abort("Cache limit exceeded: Users can cache up to {.val 100} proposals in memory.
-
-                  To clear cache, consider removing old proposals before adding new ones.")
+    cli::cli_abort(c("x" =   "Cache limit exceeded: Users can cache up to { 100} proposals in memory",
+        "i" =  "To clear cache, consider removing old proposals before adding new ones"))
   }
 
   c_num <- stors_env$user_cnum_counter
@@ -380,8 +369,10 @@ cache_user_proposal_c <- function(proposal) {
 
   user_session_cached_proposals_locks <- data.frame(lock = proposal$lock, cnum = c_num)
 
-  stors_env$user_session_cached_proposals_locks <- rbind(stors_env$user_session_cached_proposals_locks,
-                                                    user_session_cached_proposals_locks)
+  stors_env$user_session_cached_proposals_locks <- rbind(
+    stors_env$user_session_cached_proposals_locks,
+    user_session_cached_proposals_locks
+  )
 
   stors_env$user_cnum_counter <- stors_env$user_cnum_counter + 1
 
@@ -432,13 +423,13 @@ cached_proposal_info <- function(cnum) {
 #' # build system, hence they are commented.
 #'
 #' # Delete a custom proposal for the srgamma function (uncomment to run)
-#' #delete_build_in_proposal(sampling_function = "srgamma", proposal_type = "custom")
+#' #delete_built_in_proposal(sampling_function = "srgamma", proposal_type = "custom")
 #'
 #' # Delete a scaled proposal for the srnorm function (uncomment to run)
-#' #delete_build_in_proposal(sampling_function = "srnorm", proposal_type = "scaled")
+#' #delete_built_in_proposal(sampling_function = "srnorm", proposal_type = "scaled")
 #'
 #' @export
-delete_build_in_proposal <- function(sampling_function, proposal_type = "custom") {
+delete_built_in_proposal <- function(sampling_function, proposal_type = "custom") {
   proposal_type <- match.arg(proposal_type, c("scaled", "custom"))
 
   if (sampling_function %in% names(built_in_proposals)) {
@@ -449,9 +440,8 @@ delete_build_in_proposal <- function(sampling_function, proposal_type = "custom"
     }
 
   } else {
-    cli::cli_abort("The sampling function {.fn {sampling_function}} does not exist!
-
-                Please check the function name or ensure it is correctly defined.")
+    cli::cli_abort(c("x" = "The sampling function {.fn {sampling_function}} does not exist!",
+       "i" = "Please check the function name or ensure it is correctly defined"))
 
   }
 
@@ -469,7 +459,7 @@ delete_build_in_proposal <- function(sampling_function, proposal_type = "custom"
         if (proposal$cnum == proposal_number) {
           file.remove(proposal_path)
           free_cache_cnum_c(proposal$cnum)
-          message(" proposal number ", proposal$cnum, " DELETED !")
+          cli::cli_alert_success("Proposal number {.val {proposal$cnum}} deleted")
         }
 
       }

@@ -118,7 +118,9 @@ srbeta_optimize <- function(
   dendata <- built_in_proposals[[dist_name]]
 
   if (shape1 <= 1 || shape2 <= 1) {
-    message("proposal building is not available for shape1 <= 1 or shape2 <= 1.")
+    cli::cli_alert_warning(c("Proposal building is not available for {.strong shape1 ≤ 1} or {.strong shape2 ≤ 1}.
+
+                             Consider using different parameters."))
     return()
   }
 

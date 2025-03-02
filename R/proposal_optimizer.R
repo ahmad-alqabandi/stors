@@ -23,9 +23,8 @@ proposal_optimizer <- function(dendata,
     xr <- dendata$upper
 
   if (xl > xr) {
-    cli::cli_abort("{.strong xl must be smaller than xr.}
-
-                 You provided: xl = {.val {xl}}, xr = {.val {xr}}.")
+    cli::cli_abort(c("x" = "{.strong xl must be smaller than xr.}",
+                     "i" = "You provided: xl = {xl}, xr = {xr}."))
   }
 
   modes <- adjust_modes(modes, xl, xr, f)
@@ -144,13 +143,9 @@ find_optimal_proposal <- function(gp) {
   relative_error <- f_integrate$abs.error / f_integrate$value * 100
 
   if (relative_error > 0.1) {
-    cli::cli_abort("The provided density function has a large relative integration error: {.val {sprintf('%.4f%%', relative_error)}}.
-
-               This may indicate numerical instability or an issue with the function's behavior over the truncation range.
-
-               Integration was performed over the range: {.val [{lower}, {upper}]}.
-
-               Consider adjusting the truncation limits or reviewing the density function.")
+    cli::cli_abort(c("x" ="The provided density function has a large relative integration error: {sprintf('%.3f', relative_error)} ",
+                     "i" = "This may indicate numerical instability or an issue with the function's behavior over the truncation range.",
+                     "i"="Integration was performed over the range: [{lower}, {upper}]. Consider adjusting the truncation limits or reviewing the density function."))
   }
 
 
@@ -226,8 +221,11 @@ find_optimal_proposal <- function(gp) {
     }
 
     if (verbose) {
-      cat(
-        "\n=====================================\n",
+
+      if(i == 1)
+      cli::cli_h1("Optimization Summary")
+
+      cat("\n\n",
         sprintf("Step: %10s | Area: %10.9f", step, area),
         "\n-----------------------------------------------\n",
         "       Steps      |       Area       |    Best Sim Time\n",
@@ -275,8 +273,9 @@ find_optimal_proposal <- function(gp) {
         performance <- stats::na.omit(performance)
 
         if (verbose) {
-        cat("\n=====================================\n")
-        cat("\nPerformance Data:\n")
+          cat("\n")
+          cli::cli_rule()
+          cli::cli_h1("Performance Data:")
         cat("     Area       |     Time     |   Steps\n")
         cat("-----------------------------------------\n")
         for (k in seq_len(nrow(performance))) {
@@ -289,8 +288,8 @@ find_optimal_proposal <- function(gp) {
             )
           )
         }
-        cat("=====================================\n\n")
-      }
+        cli::cli_rule()
+        }
       break
     }
 

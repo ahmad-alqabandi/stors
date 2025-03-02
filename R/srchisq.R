@@ -178,8 +178,10 @@ srchisq_optimize <- function(df = 2,
   }
 
   if (df == 1) {
-    message(
-      "proposal building is not available for df = 1. You can square the result of srnorm() to sample from this distribution."
+    cli::cli_alert_warning(c("proposal building is not available for df = 1.
+
+      You can square the result of srnorm() to sample from this distribution."
+    )
     )
     return()
   }

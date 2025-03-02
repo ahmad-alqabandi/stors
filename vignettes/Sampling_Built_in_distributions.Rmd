@@ -188,12 +188,12 @@ The user can also create a symmetric proposal for built-in distributions by sett
 
 Example: Creating a Symmetric Proposal for the Standard Normal Distribution
 
-In this example, we create a symmetric proposal for the standard Normal distribution. Before doing so, we first delete all previously constructed non-symmetric proposals (both scaled and custom) using the \code{delete_build_in_proposal()} function.
+In this example, we create a symmetric proposal for the standard Normal distribution. Before doing so, we first delete all previously constructed non-symmetric proposals (both scaled and custom) using the \code{delete_built_in_proposal()} function.
 ```{r, echo = FALSE}
 
 # Delete all non-symmetric proposals for the Normal distribution
-delete_build_in_proposal(sampling_function = "srnorm", proposal_type = "scaled")
-delete_build_in_proposal(sampling_function = "srnorm", proposal_type = "custom")
+delete_built_in_proposal(sampling_function = "srnorm", proposal_type = "scaled")
+delete_built_in_proposal(sampling_function = "srnorm", proposal_type = "custom")
 
 # Create a symmetric proposal for the standard Normal distribution
 proposal <- srnorm_optimize(symmetric = TRUE, steps = 2040)
@@ -213,7 +213,7 @@ In this example, we demonstrate how to sample from a truncated standard Normal d
 ```{r, echo = FALSE}
 
 # Delete symmetric proposals for the Normal distribution
-delete_build_in_proposal(sampling_function = "srnorm", proposal_type = "scaled")
+delete_built_in_proposal(sampling_function = "srnorm", proposal_type = "scaled")
 
 # Optimize the proposal for a truncated standard Normal distribution
 proposal <- srnorm_optimize(mean = 0, sd = 1, xl = -1, xr = 1, steps = 4020)
@@ -238,18 +238,15 @@ hist(
 There are many built-in functions in stors, the list below shows all available functions that can be used directly by the user after optimizing the proposals:
 
 ```{r, echo = FALSE}
+name <- names(stors:::built_in_proposals)
+formatted_names <- sprintf("{.fun %s_custom}", name)
+cli::cli_ul(formatted_names)
 
-funcs <- character()
 for (name in names(stors:::built_in_proposals)) {
-  funcs <- message(funcs, " ", name)
+  fun_name <- paste0(name, "_optimize")
+  do.call(fun_name, list(steps = 4091))
+  
 }
-
-  for (name in names(stors:::built_in_proposals)) {
-
-    fun_name <- paste0(name, "_optimize")
-    do.call(fun_name, list(steps = 4091))
-
-  }
 
 ```
 

@@ -197,9 +197,9 @@ print.proposal <- function(x, ...) {
   cli::cli_h1("Proposal Summary")
 
   cli::cli_ul(c(
-    "Total steps: {.val {formatted_steps}}",
-    "Steps range: [{.val {sprintf('%.6f', domain_start)}}, {.val {sprintf('%.6f', domain_end)}}]",
-    "Sampling efficiency: {.val {sprintf('%.2f%%', sampling_efficiency)}}"
+    "Total steps: {formatted_steps}",
+    "Steps range: [{sprintf('%.6f', domain_start)}, {sprintf('%.6f', domain_end)}]",
+    "Sampling efficiency: {sprintf('%.2f%%', sampling_efficiency)}"
   ))
 }
 
@@ -259,20 +259,30 @@ print_proposals <- function() {
 
     cli::cli_h1("Proposals Data")
 
-    # Table Header
-    cli::cli_text("{.strong Name}            | {.strong Size (KB)}      | {.strong Date}")
+    name_width <- 20
+    size_width <- 15
+    date_width <- 20
 
-    # Print each proposal entry
+    cli::cli_verbatim(sprintf("%-*s | %-*s | %-*s",
+                              name_width, "Name",
+                              size_width, "Size (KB)",
+                              date_width, "Date"))
+    cat("-----------------------------------------------\n")
+
     for (k in seq_along(files_names)) {
-      cli::cli_text("{.val {files_names[k]}} | {.val {files_sizes_KB[k]}} KB | {format(files_date[k], '%Y-%m-%d %H:%M:%S')}")
+      cli::cli_verbatim(sprintf("%-*s | %-*s | %-*s",
+                                name_width, files_names[k],
+                                size_width, paste0(files_sizes_KB[k]),
+                                date_width, format(files_date[k], '%Y-%m-%d %H:%M:%S')))
     }
 
-    cli::cli_text("Total Size: {.val {files_total_size_KB}} KB")
+    cat("-----------------------------------------------\n")
+
+    cli::cli_verbatim(sprintf("Total Size: %s", files_total_size_KB))
+
   }
 
 }
-
-
 
 
 
@@ -309,9 +319,8 @@ print_proposals <- function() {
 save_proposal <- function(proposal, proposal_name) {
 
   if (!is_valid_proposal(proposal)) {
-    cli::cli_abort("{.strong This proposal is not valid.}
-
-               Only proposals created using {.fn build_proposal} can be used.")
+    cli::cli_abort(c("x" = "{.strong This proposal is not valid.}",
+                     "i" = "Only proposals created using {.fn build_proposal} can be used."))
   }
 
   proposals_file_path <- file.path(stors_env$user_proposals_dir,
@@ -358,13 +367,12 @@ delete_proposal <- function(proposal_name) {
   proposal_name <- paste0(proposal_name, ".rds")
 
   if (!(proposal_name %in% user_proposals)) {
-    cli::cli_abort("The proposal {.val {proposal_name}} does not exist.
-
-                  Please provide a valid proposal from the available proposals: {.val {paste(user_proposals, collapse = ', ')}}.")
+    cli::cli_abort(c("x" = "The proposal {proposal_name} does not exist.",
+                     "i" = "Please provide a valid proposal from the available proposals: {paste(user_proposals, collapse = ', ')}."))
   }
 
   file.remove(file.path(stors_env$user_proposals_dir, proposal_name))
-  message(proposal_name, "proposal deleted successfully")
+  cli::cli_alert_success("{.val {rpoposal_name}} proposal deleted successfully")
 
 }
 
@@ -405,18 +413,15 @@ load_proposal <- function(proposal_name) {
     proposal <- readRDS(proposal_path)
 
     if (!is_valid_proposal(proposal))
-      cli::cli_abort("This proposal is not valid.
-
-               Only proposals created using {.fn build_proposal} can be used.")
+      cli::cli_abort(c("x" = "This proposal is not valid"
+, "i" = "Only proposals created using {.fn build_proposal} can be used."))
 
     return(proposal)
 
   } else {
-    cli::cli_abort("There is no proposal named {.val {proposal_name}} stored on your machine.
-
-               Expected location: {.path {proposal_path}}.
-
-               Please check the name or ensure the file exists.")
+    cli::cli_abort(c("x" = "There is no proposal named {.val {proposal_name}} stored on your machine",
+   "i" = "Expected location: {.path {proposal_path}}",
+   "i" = "Please check the name or ensure the file exists."))
   }
 
 
