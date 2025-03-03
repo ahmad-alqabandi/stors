@@ -157,16 +157,14 @@ srexp_custom <- function(n = 1, x = NULL) {
 #' scalable_proposal <- srexp_optimize(rate = 4)
 #'
 #' @export
-srexp_optimize <- function(
-    rate = NULL,
-    xl = NULL,
-    xr = NULL,
-    steps = 4091,
-    proposal_range = NULL,
-    theta = 0.1,
-    target_sample_size = 1000,
-    verbose = FALSE
-    ) {
+srexp_optimize <- function(rate = NULL,
+                           xl = NULL,
+                           xr = NULL,
+                           steps = 4091,
+                           proposal_range = NULL,
+                           theta = 0.1,
+                           target_sample_size = 1000,
+                           verbose = FALSE) {
 
   dist_name <- "srexp"
 
@@ -202,7 +200,7 @@ srexp_optimize <- function(
   f <- dendata$create_f(f_params$rate)
 
   proposal_optimizer(dendata, dist_name, xl, xr, f, modes, f_params, steps,
-                 proposal_range, theta, target_sample_size, proposal_type,
-                 symmetric, cnum, verbose)
+                     proposal_range, theta, target_sample_size, proposal_type,
+                     symmetric, cnum, verbose)
 
 }

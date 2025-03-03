@@ -56,7 +56,7 @@ test_that("Built_in sampling functions, samples properties tests", {
     x <- eval(srname_exp)
 
     expect_true((min(x) >= l_trunc) && (max(x) <= u_trunc), info = paste0("generated samples must be within ",
-                                                                           name, " distrebution\'s TRUNCATION BOUNDS"))
+                                                                          name, " distrebution\'s TRUNCATION BOUNDS"))
   }
 
   for (name in names(built_in_proposals)) {

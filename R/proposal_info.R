@@ -52,13 +52,11 @@ plot.proposal <- function(x,
 
   if (proposal$tails_method == "ARS") {
     if (!all(proposal$lt_properties == 0)) {
-      lf  <- function(x)
-        exp(proposal$lt_properties[5] * (x - proposal$data$x[1]) + proposal$lt_properties[3])
+      lf  <- function(x) exp(proposal$lt_properties[5] * (x - proposal$data$x[1]) + proposal$lt_properties[3])
     }
 
     if (!all(proposal$rt_properties == 0)) {
-      rf  <- function(x)
-        exp(proposal$rt_properties[5] * (x - proposal$data$x[n]) + proposal$rt_properties[6])
+      rf  <- function(x) exp(proposal$rt_properties[5] * (x - proposal$data$x[n]) + proposal$rt_properties[6])
     }
   }
 
@@ -254,8 +252,8 @@ print_proposals <- function() {
     files_date <- file.mtime(files)
     files_sizes <- files_details[files_details$isdir == FALSE, ]$size
 
-    files_sizes_KB <- formatC(as.double(files_sizes) / 1028, format = "f", digits = 2)
-    files_total_size_KB <- formatC(as.double(sum(files_sizes)) / 1028, format = "f", digits = 2)
+    files_sizes_kb <- formatC(as.double(files_sizes) / 1028, format = "f", digits = 2)
+    files_total_size_kb <- formatC(as.double(sum(files_sizes)) / 1028, format = "f", digits = 2)
 
     cli::cli_h1("Proposals Data")
 
@@ -272,13 +270,13 @@ print_proposals <- function() {
     for (k in seq_along(files_names)) {
       cli::cli_verbatim(sprintf("%-*s | %-*s | %-*s",
                                 name_width, files_names[k],
-                                size_width, paste0(files_sizes_KB[k]),
-                                date_width, format(files_date[k], '%Y-%m-%d %H:%M:%S')))
+                                size_width, paste0(files_sizes_kb[k]),
+                                date_width, format(files_date[k], "%Y-%m-%d %H:%M:%S")))
     }
 
     cat("-----------------------------------------------\n")
 
-    cli::cli_verbatim(sprintf("Total Size: %s", files_total_size_KB))
+    cli::cli_verbatim(sprintf("Total Size: %s", files_total_size_kb))
 
   }
 
@@ -413,16 +411,14 @@ load_proposal <- function(proposal_name) {
     proposal <- readRDS(proposal_path)
 
     if (!is_valid_proposal(proposal))
-      cli::cli_abort(c("x" = "This proposal is not valid"
-, "i" = "Only proposals created using {.fn build_proposal} can be used."))
+      cli::cli_abort(c("x" = "This proposal is not valid",
+                       "i" = "Only proposals created using {.fn build_proposal} can be used."))
 
     return(proposal)
 
   } else {
     cli::cli_abort(c("x" = "There is no proposal named {.val {proposal_name}} stored on your machine",
-   "i" = "Expected location: {.path {proposal_path}}",
-   "i" = "Please check the name or ensure the file exists."))
+                     "i" = "Expected location: {.path {proposal_path}}",
+                     "i" = "Please check the name or ensure the file exists."))
   }
-
-
 }

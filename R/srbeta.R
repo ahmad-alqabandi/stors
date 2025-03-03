@@ -133,6 +133,6 @@ srbeta_optimize <- function(
   f <- dendata$create_f(f_params$shape1, f_params$shape2)
 
   proposal_optimizer(dendata, dist_name, xl, xr, f, modes, f_params, steps,
-                 proposal_range, theta, target_sample_size,
-                 proposal_type, symmetric, cnum, verbose)
+                     proposal_range, theta, target_sample_size,
+                     proposal_type, symmetric, cnum, verbose)
 }

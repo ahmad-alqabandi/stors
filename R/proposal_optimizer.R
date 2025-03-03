@@ -143,9 +143,9 @@ find_optimal_proposal <- function(gp) {
   relative_error <- f_integrate$abs.error / f_integrate$value * 100
 
   if (relative_error > 0.1) {
-    cli::cli_abort(c("x" ="The provided density function has a large relative integration error: {sprintf('%.3f', relative_error)} ",
+    cli::cli_abort(c("x" = "The provided density function has a large relative integration error: {sprintf('%.3f', relative_error)} ",
                      "i" = "This may indicate numerical instability or an issue with the function's behavior over the truncation range.",
-                     "i"="Integration was performed over the range: [{lower}, {upper}]. Consider adjusting the truncation limits or reviewing the density function."))
+                     "i" = "Integration was performed over the range: [{lower}, {upper}]. Consider adjusting the truncation limits or reviewing the density function."))
   }
 
 
@@ -222,8 +222,8 @@ find_optimal_proposal <- function(gp) {
 
     if (verbose) {
 
-      if(i == 1)
-      cli::cli_h1("Optimization Summary")
+      if (i == 1)
+        cli::cli_h1("Optimization Summary")
 
       cat("\n\n",
         sprintf("Step: %10s | Area: %10.9f", step, area),
@@ -270,12 +270,12 @@ find_optimal_proposal <- function(gp) {
     if (i != 1 &&
         min(steps_time) >= min(performance$time, na.rm = TRUE)) {
 
-        performance <- stats::na.omit(performance)
+      performance <- stats::na.omit(performance)
 
-        if (verbose) {
-          cat("\n")
-          cli::cli_rule()
-          cli::cli_h1("Performance Data:")
+      if (verbose) {
+        cat("\n")
+        cli::cli_rule()
+        cli::cli_h1("Performance Data:")
         cat("     Area       |     Time     |   Steps\n")
         cat("-----------------------------------------\n")
         for (k in seq_len(nrow(performance))) {
@@ -289,7 +289,7 @@ find_optimal_proposal <- function(gp) {
           )
         }
         cli::cli_rule()
-        }
+      }
       break
     }
 

@@ -145,13 +145,13 @@ srchisq_custom <- function(n = 1, x = NULL) {
 #'
 #' @export
 srchisq_optimize <- function(df = 2,
-                            xl = NULL,
-                            xr = NULL,
-                            steps = 4091,
-                            proposal_range = NULL,
-                            theta = 0.1,
-                            target_sample_size = 1000,
-                            verbose = FALSE) {
+                             xl = NULL,
+                             xr = NULL,
+                             steps = 4091,
+                             proposal_range = NULL,
+                             theta = 0.1,
+                             target_sample_size = 1000,
+                             verbose = FALSE) {
 
   dist_name <- "srchisq"
 

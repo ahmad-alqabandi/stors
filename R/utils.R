@@ -90,12 +90,9 @@ check_proposal_opt_criteria <- function(symmetric, grid_type, dendata) {
         (scaled_params[1] != symmetric) &&
         identical(grid_type, "custom")) {
       cli::cli_abort(c("x" = "You need to delete the {.strong {if (scaled_params[1]) 'symmetric' else 'non-symmetric'}} scaled built-in proposal first.",
-          "i" = "To delete it, run: {.run delete_built_in_proposal(\"{dendata$name}\", \"scaled\")}."
-        ),
-        call = rlang::caller_env(),
-        .frame = rlang::caller_env()
-      )
-
+                       "i" = "To delete it, run: {.run delete_built_in_proposal(\"{dendata$name}\", \"scaled\")}."),
+                     call = rlang::caller_env(),
+                     .frame = rlang::caller_env())
     }
 
     if (!is.null(custom_params[1]) &&
@@ -128,13 +125,12 @@ truncate_error_checking <- function(xl, xr, density) {
 
   if (xl < density$lower) {
     cli::cli_abort(c("x" = "{.strong xl} must be greater than or equal to the density lower bound ({density$lower}}).",
-        "i" = "You provided: xl = {xl}}."
-    ))
+                     "i" = "You provided: xl = {xl}}."))
   }
 
   if (xr > density$upper) {
     cli::cli_abort(c("x" = "{.strong xr} must be smaller than or equal to the density upper bound ({density$upper}})",
-        "i" = "You provided: xr = {xr}}."))
+                     "i" = "You provided: xr = {xr}}."))
   }
 
 
@@ -167,7 +163,7 @@ proposal_error_checking_and_preparation <- function(gp) {
   }
   if (!is.numeric(theta) || theta < 0.1 || theta > 1) {
     cli::cli_abort(c("x" = "{.strong theta} must be a numeric value in the range [{0.1}, {1}]",
-        "i" = "You provided theta = {theta}"))
+                     "i" = "You provided theta = {theta}"))
   }
 
   if (!is.null(proposal_range)) {
@@ -178,8 +174,7 @@ proposal_error_checking_and_preparation <- function(gp) {
 
     if (proposal_range[1] < lower || proposal_range[2] > upper) {
       cli::cli_abort(c("x" = "{.strong proposal_range} must be within the distribution bounds [{lower}, {upper}]",
-                       "i" = "You provided: proposal_range = [{proposal_range[1]}, {proposal_range[2]}]"
-      ))
+                       "i" = "You provided: proposal_range = [{proposal_range[1]}, {proposal_range[2]}]"))
     }
 
     if (proposal_range[1] > modes[1] ||
@@ -195,12 +190,12 @@ proposal_error_checking_and_preparation <- function(gp) {
   if (!is.null(between_minima)) {
     if (between_minima < lower || between_minima > upper) {
       cli::cli_abort(c("x" = "{.strong between_minima} must be within the distribution bounds [{lower}, {upper}]",
-          "i" = "You provided: between_minima = {between_minima}."))
+                       "i" = "You provided: between_minima = {between_minima}."))
     }
 
-    if (length(between_minima) != (length(modes) - 1))
-      {cli::cli_abort(c("x" =  "{.strong between_minima} must have exactly {length(modes) - 1} elements",
-        "i" = "You provided: {length(between_minima)} elements"))
+    if (length(between_minima) != (length(modes) - 1)) {
+      cli::cli_abort(c("x" =  "{.strong between_minima} must have exactly {length(modes) - 1} elements",
+                       "i" = "You provided: {length(between_minima)} elements"))
     }
 
     minima_len <- length(between_minima)
@@ -360,7 +355,7 @@ cache_user_proposal_c <- function(proposal) {
 
   if (stors_env$user_cnum_counter > 199) {
     cli::cli_abort(c("x" =   "Cache limit exceeded: Users can cache up to { 100} proposals in memory",
-        "i" =  "To clear cache, consider removing old proposals before adding new ones"))
+                     "i" =  "To clear cache, consider removing old proposals before adding new ones"))
   }
 
   c_num <- stors_env$user_cnum_counter
@@ -441,8 +436,7 @@ delete_built_in_proposal <- function(sampling_function, proposal_type = "custom"
 
   } else {
     cli::cli_abort(c("x" = "The sampling function {.fn {sampling_function}} does not exist!",
-       "i" = "Please check the function name or ensure it is correctly defined"))
-
+                     "i" = "Please check the function name or ensure it is correctly defined"))
   }
 
   builtin_proposals <- list.files(stors_env$builtin_proposals_dir)

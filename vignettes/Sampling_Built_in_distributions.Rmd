@@ -245,9 +245,7 @@ cli::cli_ul(formatted_names)
 for (name in names(stors:::built_in_proposals)) {
   fun_name <- paste0(name, "_optimize")
   do.call(fun_name, list(steps = 4091))
-  
 }
-
 ```
 
 For each built-in distribution, there is a corresponding proposal distribution optimizer that can be invoked using the format \code{"sampling_function_name"_optimize()}. This function optimizes the proposal for the specified distribution, enabling efficient sampling.

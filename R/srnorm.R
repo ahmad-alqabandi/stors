@@ -165,17 +165,16 @@ srnorm_custom <- function(n = 1, x = NULL) {
 #'
 #'
 #' @export
-srnorm_optimize <- function(
-  mean = NULL,
-  sd = NULL,
-  xl = -Inf,
-  xr = Inf,
-  steps = NULL,
-  proposal_range = NULL,
-  theta = 0.1,
-  target_sample_size = 1000,
-  verbose = FALSE,
-  symmetric = FALSE) {
+srnorm_optimize <- function(mean = NULL,
+                            sd = NULL,
+                            xl = -Inf,
+                            xr = Inf,
+                            steps = NULL,
+                            proposal_range = NULL,
+                            theta = 0.1,
+                            target_sample_size = 1000,
+                            verbose = FALSE,
+                            symmetric = FALSE) {
 
   dist_name <- "srnorm"
 
@@ -207,15 +206,15 @@ srnorm_optimize <- function(
     symmetric <- modes
   } else {
     symmetric <- NULL
-    }
+  }
 
   f <- dendata$create_f(f_params$mean, f_params$sd)
 
 
-  check_proposal_opt_criteria(symmetric, proposal_type, dendata )
+  check_proposal_opt_criteria(symmetric, proposal_type, dendata)
 
   proposal_optimizer(dendata, dist_name, xl, xr, f, modes, f_params, steps,
-                 proposal_range, theta, target_sample_size,
-                 proposal_type, symmetric, cnum, verbose)
+                     proposal_range, theta, target_sample_size,
+                     proposal_type, symmetric, cnum, verbose)
 
 }

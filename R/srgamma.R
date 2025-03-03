@@ -102,15 +102,15 @@ srgamma_custom <- function(n = 1, x = NULL) {
 #'
 #' @export
 srgamma_optimize <- function(shape = NULL,
-                            rate = NULL,
-                            scale = NULL,
-                            xl = NULL,
-                            xr = NULL,
-                            steps = 4091,
-                            proposal_range = NULL,
-                            theta = 0.1,
-                            target_sample_size = 1000,
-                            verbose = FALSE) {
+                             rate = NULL,
+                             scale = NULL,
+                             xl = NULL,
+                             xr = NULL,
+                             steps = 4091,
+                             proposal_range = NULL,
+                             theta = 0.1,
+                             target_sample_size = 1000,
+                             verbose = FALSE) {
 
   dist_name <- "srgamma"
 

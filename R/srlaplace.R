@@ -164,18 +164,16 @@ srlaplace_custom <- function(n = 1, x = NULL) {
 #' scalable_proposal <- srlaplace_optimize(mu = 2, b = 1)
 #'
 #' @export
-srlaplace_optimize <- function(
-    mu = NULL,
-    b = NULL,
-    xl = NULL,
-    xr = NULL,
-    steps = 4091,
-    proposal_range = NULL,
-    theta = 0.1,
-    target_sample_size = 1000,
-    verbose = FALSE,
-    symmetric = FALSE
-) {
+srlaplace_optimize <- function(mu = NULL,
+                               b = NULL,
+                               xl = NULL,
+                               xr = NULL,
+                               steps = 4091,
+                               proposal_range = NULL,
+                               theta = 0.1,
+                               target_sample_size = 1000,
+                               verbose = FALSE,
+                               symmetric = FALSE) {
 
   dist_name <- "srlaplace"
 
@@ -216,7 +214,7 @@ srlaplace_optimize <- function(
   check_proposal_opt_criteria(symmetric, proposal_type, dendata)
 
   proposal_optimizer(dendata, dist_name, xl, xr, f, modes, f_params, steps,
-                 proposal_range, theta, target_sample_size,
-                 proposal_type, symmetric, cnum, verbose)
+                     proposal_range, theta, target_sample_size,
+                     proposal_type, symmetric, cnum, verbose)
 
 }
