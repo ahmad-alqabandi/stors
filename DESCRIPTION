@@ -1,6 +1,6 @@
 Package: stors
 Type: Package
-Title: Steps Optimized Rejection Sampling
+Title: Step Optimised Rejection Sampling
 Version: 0.2.1
 Authors@R: c(
     person("Ahmad", "ALQabandi", email = "ahmad.alqabandi@durham.ac.uk",
@@ -12,10 +12,10 @@ Authors@R: c(
 Maintainer: Ahmad S. ALQabandi <ahmad.alqabandi@durham.ac.uk>
 Description: Fast and efficient sampling from general univariate probability
     density functions. Implements a rejection sampling approach designed to take
-    advantage of modern CPU caches and minimise evaluation of the the target
+    advantage of modern CPU caches and minimise evaluation of the target
     density for most samples. Many standard densities are internally implemented
     in 'C' for high performance, with general user defined densities also
-    supported.
+    supported. A paper describing the methodology will be released soon.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -33,6 +33,6 @@ Suggests:
     ggplot2
 Config/testthat/edition: 3
 Depends: 
-    R (>= 3.60)
+    R (>= 4.2.0)
 VignetteBuilder: knitr
 URL: https://ahmad-alqabandi.github.io/stors/

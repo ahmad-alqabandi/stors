@@ -8,7 +8,13 @@ However, for user-provided distributions, if unbounded, the tails must be log-co
 
 ## Installation
 
-You can install **StORS** directly from R-universe:
+The stable binary release can be install from CRAN:
+
+``` r
+install.packages("stors")
+```
+
+The latest development binary can be installed from R-universe:
 
 ``` r
 install.packages('stors', repos = c('https://ahmad-alqabandi.r-universe.dev', 'https://cloud.r-project.org'))
