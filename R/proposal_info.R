@@ -207,7 +207,7 @@ print.proposal <- function(x, ...) {
 #' @description
 #' This function prints details of all proposals stored by the user. It provides information on each proposal, including the proposal name, size, efficiency, and other relevant details.
 #'
-#'
+#' @return Prints a summary of all proposals, but does not return any value.
 #'
 #' @examples
 #' # First, let's create a proposal to sample from a standard normal distribution
