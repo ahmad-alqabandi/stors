@@ -99,23 +99,23 @@ from the standard Exponential Distribution, then scaled accordingly.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Generate 10 samples from the standard Exponential Distribution</span></span></span>
 <span class="r-in"><span><span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu">srexp</span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">samples</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.08721098 0.71289139 0.86819797 2.09785883 0.15156574 0.69868192</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 3.97532483 1.82903795 0.86555835 3.88570077</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.34683361 0.68745189 0.92173370 1.21578696 1.15512400 1.41496344</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 3.23727017 0.06957194 0.89301286 0.25477153</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Generate 10 samples using a pre-allocated vector</span></span></span>
 <span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">srexp</span><span class="op">(</span><span class="fl">10</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 4.62659893 2.18698872 0.65503573 1.28844958 0.01287737 0.04139821</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 0.07888465 0.57704357 0.86804670 0.19796102</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.2573039 0.5619869 0.8805999 0.9416232 0.4190001 0.7521173 0.3207950</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] 0.1099657 0.3171651 0.1259927</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 4.62659893 2.18698872 0.65503573 1.28844958 0.01287737 0.04139821</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 0.07888465 0.57704357 0.86804670 0.19796102</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.2573039 0.5619869 0.8805999 0.9416232 0.4190001 0.7521173 0.3207950</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] 0.1099657 0.3171651 0.1259927</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Generate 10 samples from a Exponential Distribution with rate = 4</span></span></span>
 <span class="r-in"><span><span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu">srexp</span><span class="op">(</span><span class="fl">10</span>, rate <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">samples</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.19398248 0.25860041 0.06331532 0.33801212 0.77460021 0.06748873</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 0.10611432 0.28309432 0.03746756 0.23645145</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.12354585 0.01603225 0.06471152 0.10000609 0.08219156 0.07803309</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 0.36156588 0.17077077 0.08990590 0.25072462</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
