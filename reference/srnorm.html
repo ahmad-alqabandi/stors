@@ -105,23 +105,23 @@ from the standard Normal distribution, then scaled and location shifted accordin
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Generate 10 samples from the standard Normal distribution</span></span></span>
 <span class="r-in"><span><span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu">srnorm</span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">samples</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  2.03728123  0.41111626  0.34566191  1.46516343 -0.01972227  1.24894223</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.44929989 -0.82803345  0.19652037  0.71982460</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -1.80728185  1.11369551  1.85308441  0.29746071 -1.06182531 -1.50272733</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  0.00691527 -1.97190030  0.13493475 -0.36023222</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Generate 10 samples using a pre-allocated vector</span></span></span>
 <span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">srnorm</span><span class="op">(</span><span class="fl">10</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  0.5446454 -0.3029088  1.8287268 -0.6599516  0.6009763 -0.3801140</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.5009043 -0.1040030  0.9949371 -1.6761112</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  1.2495848  0.4926980 -0.3462907  2.3178749  0.2645103  0.5143103</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.9124941  1.2197388 -0.5882185 -1.2420318</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  0.5446454 -0.3029088  1.8287268 -0.6599516  0.6009763 -0.3801140</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.5009043 -0.1040030  0.9949371 -1.6761112</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  1.2495848  0.4926980 -0.3462907  2.3178749  0.2645103  0.5143103</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.9124941  1.2197388 -0.5882185 -1.2420318</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Generate 10 samples from a Normal distribution with mean = 2 and sd = 3</span></span></span>
 <span class="r-in"><span><span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu">srnorm</span><span class="op">(</span><span class="fl">10</span>, mean <span class="op">=</span> <span class="fl">2</span>, sd <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">samples</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  1.9116677  2.3891215 -0.1879674  6.5951238 -3.1391790  0.2139980</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -3.3120532  1.3358493  5.0119622  4.8385109</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  1.2073594  3.4156938  0.3625853  1.9758830  2.7747820  3.6019435</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  3.4432165  4.0891317  7.2777433 -2.5024249</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
