@@ -163,12 +163,15 @@
 #' h_norm <- function(x) { log(f_norm(x)) }
 #' h_prime_norm <- function(x) { -x }
 #'
+#' # Following example takes slightly too long to run on CRAN.
+#' \donttest{
 #' # Build the proposal for the standard normal distribution
 #' norm_proposal = build_proposal(lower = -Inf, upper = Inf, mode = modes_norm,
 #'  f = f_norm, h = h_norm, h_prime = h_prime_norm, verbose = TRUE)
 #'
 #' # Plot the generated proposal
 #' plot(norm_proposal)
+#' }
 #'
 #' # Example 2: proposal for a Bimodal Distribution
 #' # This example shows how to build a proposal for sampling from a bimodal distribution,
