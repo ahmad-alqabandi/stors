@@ -36,7 +36,7 @@ this function is sampling from proposal that has been constructed using \code{\l
 
 By default, \code{srchisq_custom()} samples from Chi-squared Distribution \code{df = 2}.
 The proposal distribution is pre-optimized at package load time using \code{srchisq_optimize()} with
-\code{steps = 4091}, creating a scalable proposal centered around the mode.
+\code{steps = 4091}, creating a scalable proposal centred around the mode.
 }
 \note{
 This function is not scalable. Therefore, only the \code{srchisq_custom()} version is available, which requires the proposal to be pre-optimized using \code{srchisq_optimize()} before calling this function.

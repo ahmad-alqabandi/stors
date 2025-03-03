@@ -20,7 +20,7 @@
 #'
 #' By default, \code{srlaplace()} samples from a standard Laplace Distribution (\code{mu = 0}, \code{b = 1}).
 #' The proposal distribution is pre-optimized at package load time using \code{srlaplace_optimize()} with
-#' \code{steps = 4091}, creating a scalable proposal centered around the mode.
+#' \code{steps = 4091}, creating a scalable proposal centred around the mode.
 #'
 #' If \code{srlaplace()} is called with custom \code{mu} or \code{b} parameters, the samples are generated
 #' from the standard Laplace Distribution, then scaled and location shifted accordingly.

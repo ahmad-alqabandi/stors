@@ -20,7 +20,7 @@
 #'
 #' By default, \code{srexp()} samples from a standard Exponential Distribution \code{rate = 1}.
 #' The proposal distribution is pre-optimized at package load time using \code{srexp_optimize()} with
-#' \code{steps = 4091}, creating a scalable proposal centered around the mode.
+#' \code{steps = 4091}, creating a scalable proposal centred around the mode.
 #'
 #' If \code{srexp()} is called with custom \code{rate} parameter, the samples are generated
 #' from the standard Exponential Distribution, then scaled accordingly.

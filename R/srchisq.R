@@ -21,7 +21,7 @@
 #'
 #' By default, \code{srchisq_custom()} samples from Chi-squared Distribution \code{df = 2}.
 #' The proposal distribution is pre-optimized at package load time using \code{srchisq_optimize()} with
-#' \code{steps = 4091}, creating a scalable proposal centered around the mode.
+#' \code{steps = 4091}, creating a scalable proposal centred around the mode.
 #'
 #'
 #' @param n Integer, length 1. Number of samples to draw.

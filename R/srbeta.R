@@ -16,13 +16,13 @@
 #'   \item{\eqn{\alpha}}{is the first shape parameter (\eqn{\alpha > 0}).}
 #'   \item{\eqn{\beta}}{is the second shape parameter (\eqn{\beta > 0}).}
 #' }
-#' The Beta distribution is widely used in Bayesian statistics and in modeling probabilities and proportions.
+#' The Beta distribution is widely used in Bayesian statistics and in modelling probabilities and proportions.
 #' # TODO : This density instead of this function.
 #' This function samples from a proposal constructed using \code{\link{srbeta_optimize}}, employing the STORS algorithm.
 #'
 #' By default, \code{srbeta_custom()} samples from the standard Beta distribution with \code{shape1 = 1} and \code{shape2 = 1}.
 #' The proposal distribution is pre-optimized at package load time using \code{srbeta_optimize()} with
-#' \code{steps = 4091}, creating a scalable proposal centered around the mode.
+#' \code{steps = 4091}, creating a scalable proposal centred around the mode.
 #'
 #' @param n Integer, length 1. Number of samples to draw.
 #' @param x (optional) Numeric vector of length \eqn{n}. If provided, this vector is overwritten in place to avoid any memory allocation.

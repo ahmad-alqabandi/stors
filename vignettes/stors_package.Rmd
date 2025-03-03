@@ -18,11 +18,11 @@ knitr::opts_chunk$set(
 
 The aim of the `stors` package is to generate samples from uni- and multimodal distributions using the Rejection Sampling technique. Stors stands out for its ability to leverage the system's capabilities to optimize the sampling process.
 
-Stors maximizes the sampling speed from the proposal distribution by constructing steps with uniform areas that cover the target distribution from which sampling is needed. To address potential efficiency issues in heavy and light-tailed distributions, we switch to Adaptive Rejection Sampling (ARS) for the tails, specifically for the proposals created by the user. Fortunately, since ARS is used only for the tails, it eliminates the requirement for log concavity in most distributions, allowing us to cover a wide range of distributions that have log-concave tails such as normal multimodal distrebutions.
+Stors maximizes the sampling speed from the proposal distribution by constructing steps with uniform areas that cover the target distribution from which sampling is needed. To address potential efficiency issues in heavy and light-tailed distributions, we switch to Adaptive Rejection Sampling (ARS) for the tails, specifically for the proposals created by the user. Fortunately, since ARS is used only for the tails, it eliminates the requirement for log concavity in most distributions, allowing us to cover a wide range of distributions that have log-concave tails such as normal multimodal distributions.
 
 To use the `stors` package, we need to differentiate between two phases. The first phase involves building the proposal for the proposal distribution. The second step is caching this proposal in memory for sampling. This ensures optimum speed performance, as the proposal data is constructed independently from the sampling process. Most R base sampling functions are already covered in the stors package, making sampling straightforward.
 
-## Sampling from Built-in Distrubutions
+## Sampling from Built-in Distributions
 
 To sample from any built-in distribution, a proposal for each distribution is pre-optimized using 4091 steps when the package is loaded for the first time. This optimization process constructs the proposal and stores it in the internal R data directory. The proposal is then cached in memory for efficient sampling whenever needed.
 

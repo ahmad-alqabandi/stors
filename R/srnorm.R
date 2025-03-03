@@ -12,7 +12,7 @@
 #' \eqn{f(x | \mu, \sigma) = \frac{1}{\sigma\sqrt{2\pi}} \exp\left(-\frac{(x - \mu)^2}{2\sigma^2}\right),}
 #' where:
 #' \describe{
-#'   \item{\eqn{\mu}}{ is the mean of the distribution, which determines the center of the bell curve.}
+#'   \item{\eqn{\mu}}{ is the mean of the distribution, which determines the centre of the bell curve.}
 #'   \item{\eqn{\sigma}}{ is the standard deviation, which controls the spread of the distribution (\eqn{\sigma > 0}).}
 #' }
 #'
@@ -20,7 +20,7 @@
 #'
 #' By default, \code{srnorm()} samples from a standard Normal distribution (\code{mean = 0}, \code{sd = 1}).
 #' The proposal distribution is pre-optimized at package load time using \code{srnorm_optimize()} with
-#' \code{steps = 4091}, creating a scalable proposal centered around the mode.
+#' \code{steps = 4091}, creating a scalable proposal centred around the mode.
 #'
 #' If \code{srnorm()} is called with custom \code{mean} or \code{sd} parameters, the samples are generated
 #' from the standard Normal distribution, then scaled and location shifted accordingly.

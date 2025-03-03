@@ -16,13 +16,13 @@
 #'   \item{\eqn{\alpha}}{is the shape parameter (\eqn{\alpha > 0}), which determines the shape of the distribution.}
 #'   \item{\eqn{\beta}}{is the rate parameter (\eqn{\beta > 0}), which determines the rate of decay.}
 #' }
-#' The Gamma distribution is widely used in statistics, particularly in Bayesian inference and modeling waiting times.
+#' The Gamma distribution is widely used in statistics, particularly in Bayesian inference and modelling waiting times.
 #'
 #' This function samples from a proposal constructed using \code{\link{srgamma_optimize}}, employing the STORS algorithm.
 #'
 #' By default, \code{srgamma_custom()} samples from the standard Gamma distribution with \code{shape = 1} and \code{rate = 1}.
 #' The proposal distribution is pre-optimized at package load time using \code{srgamma_optimize()} with
-#' \code{steps = 4091}, creating a scalable proposal centered around the mode.
+#' \code{steps = 4091}, creating a scalable proposal centred around the mode.
 #'
 #' @param n Integer, length 1. Number of samples to draw.
 #' @param x (optional) Numeric vector of length \eqn{n}. If provided, this vector is overwritten in place to avoid any memory allocation.

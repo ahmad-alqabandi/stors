@@ -31,7 +31,7 @@ where:
 \item{\eqn{\alpha}}{is the first shape parameter (\eqn{\alpha > 0}).}
 \item{\eqn{\beta}}{is the second shape parameter (\eqn{\beta > 0}).}
 }
-The Beta distribution is widely used in Bayesian statistics and in modeling probabilities and proportions.
+The Beta distribution is widely used in Bayesian statistics and in modelling probabilities and proportions.
 }
 \note{
 This function is not scalable. Therefore, only the \code{srbeta_custom()} version is available, which requires the proposal to be pre-optimized using \code{srbeta_optimize()} before calling this function.
@@ -41,7 +41,7 @@ This function samples from a proposal constructed using \code{\link{srbeta_optim
 
 By default, \code{srbeta_custom()} samples from the standard Beta distribution with \code{shape1 = 1} and \code{shape2 = 1}.
 The proposal distribution is pre-optimized at package load time using \code{srbeta_optimize()} with
-\code{steps = 4091}, creating a scalable proposal centered around the mode.
+\code{steps = 4091}, creating a scalable proposal centred around the mode.
 }
 
 \examples{

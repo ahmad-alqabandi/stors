@@ -17,13 +17,13 @@
 #'   \item{\eqn{\alpha}}{is the shape parameter (\eqn{\alpha > 0}), which determines the tail heaviness of the distribution.}
 #'   \item{\eqn{\sigma}}{is the scale parameter (\eqn{\sigma > 0}), which determines the minimum possible value of \eqn{x}.}
 #' }
-#' The Pareto distribution is widely used in modeling phenomena with heavy tails, such as wealth distribution, insurance losses, and natural events.
+#' The Pareto distribution is widely used in modelling phenomena with heavy tails, such as wealth distribution, insurance losses, and natural events.
 #'
 #' This function samples from a proposal constructed using \code{\link{srpareto_optimize}}, employing the STORS algorithm.
 #'
 #' By default, \code{srpareto_custom()} samples from the standard Pareto distribution with \code{shape = 1} and \code{rate = 1}.
 #' The proposal distribution is pre-optimized at package load time using \code{srpareto_optimize()} with
-#' \code{steps = 4091}, creating a scalable proposal centered around the mode.
+#' \code{steps = 4091}, creating a scalable proposal centred around the mode.
 #'
 #' @param n Integer, length 1. Number of samples to draw.
 #' @param x (optional) Numeric vector of length \eqn{n}. If provided, this vector is overwritten in place to avoid any memory allocation.
