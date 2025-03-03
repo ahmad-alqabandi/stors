@@ -9,7 +9,7 @@ Authors@R: c(
     person("Louis", "Aslett", email = "louis.aslett@durham.ac.uk",
            role = c("aut", "ths", "cph"),
            comment = c(ORCID = "0000-0003-2211-233X")))
-Maintainer: Ahmad S. ALQabandi <ahmad.alqabandi@durham.ac.uk>
+Maintainer: Ahmad ALQabandi <ahmad.alqabandi@durham.ac.uk>
 Description: Fast and efficient sampling from general univariate probability
     density functions. Implements a rejection sampling approach designed to take
     advantage of modern CPU caches and minimise evaluation of the target
