@@ -12,3 +12,5 @@
 ^docs$
 ^pkgdown$
 ^cran-comments\.md$
+^R/hex\.R$
+^inst/.*\.png$
