@@ -9,7 +9,7 @@ It employs an optimized proposal distribution around the mode and Inverse Transf
 
     <a class="navbar-brand me-2" href="../index.html">stors</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -99,23 +99,23 @@ from the standard Exponential Distribution, then scaled accordingly.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Generate 10 samples from the standard Exponential Distribution</span></span></span>
 <span class="r-in"><span><span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu">srexp</span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">samples</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.5603843 0.2844683 0.4954779 2.1691440 0.1536847 0.1738814 0.6721279</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] 0.5504264 0.1415577 0.3971108</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.08721098 0.71289139 0.86819797 2.09785883 0.15156574 0.69868192</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 3.97532483 1.82903795 0.86555835 3.88570077</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Generate 10 samples using a pre-allocated vector</span></span></span>
 <span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">srexp</span><span class="op">(</span><span class="fl">10</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.59366667 1.24779486 0.97384716 0.24309197 1.03282179 1.36348987</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 0.32088562 2.05045399 0.17722475 0.02695628</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 4.62659893 2.18698872 0.65503573 1.28844958 0.01287737 0.04139821</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 0.07888465 0.57704357 0.86804670 0.19796102</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.59366667 1.24779486 0.97384716 0.24309197 1.03282179 1.36348987</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 0.32088562 2.05045399 0.17722475 0.02695628</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 4.62659893 2.18698872 0.65503573 1.28844958 0.01287737 0.04139821</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 0.07888465 0.57704357 0.86804670 0.19796102</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Generate 10 samples from a Exponential Distribution with rate = 4</span></span></span>
 <span class="r-in"><span><span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu">srexp</span><span class="op">(</span><span class="fl">10</span>, rate <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">samples</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.041349464 0.224742396 0.106423296 0.478133937 0.112295795 0.091989576</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 1.295193902 0.006852274 0.740551723 0.124286375</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.19398248 0.25860041 0.06331532 0.33801212 0.77460021 0.06748873</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 0.10611432 0.28309432 0.03746756 0.23645145</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Steps Optimized Rejection Sampling • stors</title>
+<title>Step Optimised Rejection Sampling • stors</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Steps Optimized Rejection Sampling">
-<meta name="description" content="Fast and efficient sampling from general univariate probability density functions. Implements a rejection sampling approach designed to take advantage of modern CPU caches and minimise evaluation of the the target density for most samples. Many standard densities are internally implemented in C for high performance, with general user defined densities also supported.">
-<meta property="og:description" content="Fast and efficient sampling from general univariate probability density functions. Implements a rejection sampling approach designed to take advantage of modern CPU caches and minimise evaluation of the the target density for most samples. Many standard densities are internally implemented in C for high performance, with general user defined densities also supported.">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Step Optimised Rejection Sampling">
+<meta name="description" content="Fast and efficient sampling from general univariate probability density functions. Implements a rejection sampling approach designed to take advantage of modern CPU caches and minimise evaluation of the target density for most samples. Many standard densities are internally implemented in C for high performance, with general user defined densities also supported. A paper describing the methodology will be released soon.">
+<meta property="og:description" content="Fast and efficient sampling from general univariate probability density functions. Implements a rejection sampling approach designed to take advantage of modern CPU caches and minimise evaluation of the target density for most samples. Many standard densities are internally implemented in C for high performance, with general user defined densities also supported. A paper describing the methodology will be released soon.">
 <meta property="og:image" content="https://ahmad-alqabandi.github.io/stors/logo.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="index.html">stors</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,11 +65,14 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install <strong>StORS</strong> directly from R-universe:</p>
+<p>The stable binary release can be install from CRAN:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"stors"</span><span class="op">)</span></span></code></pre></div>
+<p>The latest development binary can be installed from R-universe:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'stors'</span>, repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'https://ahmad-alqabandi.r-universe.dev'</span>, <span class="st">'https://cloud.r-project.org'</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Or from GitHub:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"ahmad-alqabandi/stors"</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -80,7 +83,7 @@
 <h3 id="sampling-from-a-built-in-normal-distribution">Sampling from a Built-in Normal Distribution<a class="anchor" aria-label="anchor" href="#sampling-from-a-built-in-normal-distribution"></a>
 </h3>
 <p>The first example demonstrates sampling from a <strong>built-in Normal distribution</strong> using a <strong>pre-optimised proposal</strong> that is constructed at package installation time for efficiency.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://ahmad-alqabandi.github.io/stors/">"stors"</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Generate 1000 samples from the standard normal distribution</span></span>
@@ -93,7 +96,7 @@
 <h3 id="re-optimizing-the-built-in-normal-proposal">Re-optimizing the Built-in Normal Proposal<a class="anchor" aria-label="anchor" href="#re-optimizing-the-built-in-normal-proposal"></a>
 </h3>
 <p>If needed, the user can re-optimize the proposal for the normal distribution. This can be useful for tasks such as sampling from a truncated normal distribution.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Re-optimize the proposal for a truncated normal distribution (e.g., between -2 and 2)</span></span>
 <span><span class="fu"><a href="reference/srnorm_optimize.html">srnorm_optimize</a></span><span class="op">(</span>xl <span class="op">=</span> <span class="op">-</span><span class="fl">2</span>, xr <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span></span>
@@ -107,7 +110,7 @@
 <h3 id="building-a-proposal-for-a-custom-distribution">Building a Proposal for a Custom Distribution<a class="anchor" aria-label="anchor" href="#building-a-proposal-for-a-custom-distribution"></a>
 </h3>
 <p>Users can build a custom proposal by passing a probability density function (PDF) to <code><a href="reference/build_proposal.html">build_proposal()</a></code>. The following example demonstrates building a proposal for a Pareto distribution.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define the Pareto PDF</span></span>
 <span><span class="va">dpareto</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">alpha</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">alpha</span> <span class="op">/</span> <span class="va">x</span><span class="op">^</span><span class="op">(</span><span class="va">alpha</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span></span>
@@ -156,8 +159,8 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Ahmad ALQabandi <br><small class="roles"> Maintainer, author </small> <a href="https://orcid.org/0009-0006-0055-3846" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-<li>Louis Aslett <br><small class="roles"> Author, thesis advisor </small> <a href="https://orcid.org/0000-0003-2211-233X" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Ahmad ALQabandi <br><small class="roles"> Maintainer, author, copyright holder </small> <a href="https://orcid.org/0009-0006-0055-3846" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Louis Aslett <br><small class="roles"> Author, thesis advisor, copyright holder </small> <a href="https://orcid.org/0000-0003-2211-233X" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 </ul>
 </div>
 
