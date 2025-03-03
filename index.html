@@ -13,6 +13,7 @@
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Steps Optimized Rejection Sampling">
 <meta name="description" content="Fast and efficient sampling from general univariate probability density functions. Implements a rejection sampling approach designed to take advantage of modern CPU caches and minimise evaluation of the the target density for most samples. Many standard densities are internally implemented in C for high performance, with general user defined densities also supported.">
 <meta property="og:description" content="Fast and efficient sampling from general univariate probability density functions. Implements a rejection sampling approach designed to take advantage of modern CPU caches and minimise evaluation of the the target density for most samples. Many standard densities are internally implemented in C for high performance, with general user defined densities also supported.">
+<meta property="og:image" content="https://ahmad-alqabandi.github.io/stors/logo.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
 </head>
@@ -55,8 +56,10 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="id_-stors-r-package-">📦 <code>{stors}</code> R package <img src="reference/figures/logo.png" align="right" height="278"><a class="anchor" aria-label="anchor" href="#id_-stors-r-package-"></a>
-</h1></div>
+<div class="page-header">
+<img src="logo.png" class="logo" alt=""><h1 id="id_-stors-r-package-">📦 <code>{stors}</code> R package <a class="anchor" aria-label="anchor" href="#id_-stors-r-package-"></a>
+</h1>
+</div>
 <p><strong>StORS</strong> (Step Optimised Rejection Sampling) is an optimised rejection sampling method designed for efficient sampling from univariate probability density functions. It constructs a proposal distribution using computationally efficient steps that adapt around the target density.</p>
 <p>Built-in distributions can have any type of unbounded tails, as <strong>Inverse Transform</strong> sampling is used when necessary. However, for user-provided distributions, if unbounded, the tails must be log-concave since <strong>Adaptive Rejection Sampling (ARS)</strong> is applied in this case.</p>
 <div class="section level2">
