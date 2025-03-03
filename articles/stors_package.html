@@ -11,6 +11,8 @@
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="stors package">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -80,7 +82,7 @@ Sampling (ARS) for the tails, specifically for the proposals created by
 the user. Fortunately, since ARS is used only for the tails, it
 eliminates the requirement for log concavity in most distributions,
 allowing us to cover a wide range of distributions that have log-concave
-tails such as normal multimodal distrebutions.</p>
+tails such as normal multimodal distributions.</p>
 <p>To use the <code>stors</code> package, we need to differentiate
 between two phases. The first phase involves building the proposal for
 the proposal distribution. The second step is caching this proposal in
@@ -90,7 +92,7 @@ Most R base sampling functions are already covered in the stors package,
 making sampling straightforward.</p>
 </div>
 <div class="section level2">
-<h2 id="sampling-from-built-in-distrubutions">Sampling from Built-in Distrubutions<a class="anchor" aria-label="anchor" href="#sampling-from-built-in-distrubutions"></a>
+<h2 id="sampling-from-built-in-distributions">Sampling from Built-in Distributions<a class="anchor" aria-label="anchor" href="#sampling-from-built-in-distributions"></a>
 </h2>
 <p>To sample from any built-in distribution, a proposal for each
 distribution is pre-optimized using 4091 steps when the package is
@@ -264,9 +266,9 @@ control over the proposal structure.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">custom_proposal_high_theta</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Proposal Summary</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; • Total steps: 1,934</span></span>
-<span><span class="co">#&gt; • Steps range: [-2.659710, 2.659710]</span></span>
-<span><span class="co">#&gt; • Sampling efficiency: 99.73%</span></span>
+<span><span class="co">#&gt; • Total steps: 2,138</span></span>
+<span><span class="co">#&gt; • Steps range: [-2.674984, 2.674984]</span></span>
+<span><span class="co">#&gt; • Sampling efficiency: 99.75%</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">custom_proposal_high_theta</span><span class="op">)</span></span></code></pre></div>
 <p><img src="stors_package_files/figure-html/unnamed-chunk-8-2.png" width="700"></p>
@@ -278,9 +280,9 @@ control over the proposal structure.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">custom_proposal_range</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Proposal Summary</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; • Total steps: 82</span></span>
-<span><span class="co">#&gt; • Steps range: [-1.026970, 1.026970]</span></span>
-<span><span class="co">#&gt; • Sampling efficiency: 86.32%</span></span>
+<span><span class="co">#&gt; • Total steps: 332</span></span>
+<span><span class="co">#&gt; • Steps range: [-1.007959, 1.007959]</span></span>
+<span><span class="co">#&gt; • Sampling efficiency: 85.92%</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">custom_proposal_range</span><span class="op">)</span></span></code></pre></div>
 <p><img src="stors_package_files/figure-html/unnamed-chunk-8-3.png" width="700"></p>
@@ -416,9 +418,9 @@ requirements of the target distribution.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">bi_proposal</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Proposal Summary</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; • Total steps: 4,099</span></span>
-<span><span class="co">#&gt; • Steps range: [-3.817446, 7.816738]</span></span>
-<span><span class="co">#&gt; • Sampling efficiency: 99.80%</span></span>
+<span><span class="co">#&gt; • Total steps: 8,195</span></span>
+<span><span class="co">#&gt; • Steps range: [-3.750816, 7.749994]</span></span>
+<span><span class="co">#&gt; • Sampling efficiency: 99.89%</span></span>
 <span></span>
 <span><span class="co"># Visualizing the custom proposal</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">bi_proposal</span><span class="op">)</span></span></code></pre></div>
@@ -520,14 +522,14 @@ user with all stored proposals.</p>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Proposals Data</span> <span style="color: #00BBBB;">──────────────────────────────────────────────────────────────</span></span></span>
 <span><span class="co">#&gt; Name                 | Size (KB)       | Date</span></span>
 <span><span class="co">#&gt; -----------------------------------------------</span></span>
-<span><span class="co">#&gt; bimodal_proposal_1   | 124.98          | 2025-03-02 20:36:12</span></span>
-<span><span class="co">#&gt; bimodal_proposal_2   | 124.98          | 2025-03-02 20:36:12</span></span>
-<span><span class="co">#&gt; bimodal_proposal_3   | 124.98          | 2025-03-02 20:36:12</span></span>
-<span><span class="co">#&gt; bimodal_proposal     | 124.98          | 2025-03-02 20:36:12</span></span>
-<span><span class="co">#&gt; bimodal              | 26.88           | 2025-03-02 20:35:17</span></span>
-<span><span class="co">#&gt; normal               | 23.05           | 2025-03-02 20:35:17</span></span>
+<span><span class="co">#&gt; bimodal_proposal_1   | 246.59          | 2025-03-03 16:53:52</span></span>
+<span><span class="co">#&gt; bimodal_proposal_2   | 246.59          | 2025-03-03 16:53:52</span></span>
+<span><span class="co">#&gt; bimodal_proposal_3   | 246.59          | 2025-03-03 16:53:52</span></span>
+<span><span class="co">#&gt; bimodal_proposal     | 246.59          | 2025-03-03 16:53:52</span></span>
+<span><span class="co">#&gt; bimodal              | 26.88           | 2025-03-03 16:52:55</span></span>
+<span><span class="co">#&gt; normal               | 23.05           | 2025-03-03 16:52:55</span></span>
 <span><span class="co">#&gt; -----------------------------------------------</span></span>
-<span><span class="co">#&gt; Total Size: 549.85</span></span></code></pre></div>
+<span><span class="co">#&gt; Total Size: 1036.29</span></span></code></pre></div>
 <p>Be aware that the saved proposal can be quite large in size,
 depending on the user’s system. Therefore, if the user wants to delete a
 proposal, the <code><a href="../reference/delete_proposal.html">delete_proposal()</a></code> function can be used by
@@ -542,13 +544,13 @@ providing the proposal’s name.</p>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Proposals Data</span> <span style="color: #00BBBB;">──────────────────────────────────────────────────────────────</span></span></span>
 <span><span class="co">#&gt; Name                 | Size (KB)       | Date</span></span>
 <span><span class="co">#&gt; -----------------------------------------------</span></span>
-<span><span class="co">#&gt; bimodal_proposal_1   | 124.98          | 2025-03-02 20:36:12</span></span>
-<span><span class="co">#&gt; bimodal_proposal_2   | 124.98          | 2025-03-02 20:36:12</span></span>
-<span><span class="co">#&gt; bimodal_proposal_3   | 124.98          | 2025-03-02 20:36:12</span></span>
-<span><span class="co">#&gt; bimodal              | 26.88           | 2025-03-02 20:35:17</span></span>
-<span><span class="co">#&gt; normal               | 23.05           | 2025-03-02 20:35:17</span></span>
+<span><span class="co">#&gt; bimodal_proposal_1   | 246.59          | 2025-03-03 16:53:52</span></span>
+<span><span class="co">#&gt; bimodal_proposal_2   | 246.59          | 2025-03-03 16:53:52</span></span>
+<span><span class="co">#&gt; bimodal_proposal_3   | 246.59          | 2025-03-03 16:53:52</span></span>
+<span><span class="co">#&gt; bimodal              | 26.88           | 2025-03-03 16:52:55</span></span>
+<span><span class="co">#&gt; normal               | 23.05           | 2025-03-03 16:52:55</span></span>
 <span><span class="co">#&gt; -----------------------------------------------</span></span>
-<span><span class="co">#&gt; Total Size: 424.87</span></span></code></pre></div>
+<span><span class="co">#&gt; Total Size: 789.70</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
