@@ -236,7 +236,7 @@ stors_env <- new.env(parent = emptyenv())
 
   builtin_proposals_files <- list.files(builtin_proposals_dir)
   existing_builtin_proposals_number <- as.numeric(sub("\\.rds$", "", builtin_proposals_files))
-  number_of_proposals <- 2 *length(built_in_proposals)
+  number_of_proposals <- 2 * length(built_in_proposals)
 
   for (i in seq_len(number_of_proposals)) {
 
@@ -246,7 +246,7 @@ stors_env <- new.env(parent = emptyenv())
       system.file(paste0("builtin_proposals/", i, ".rds"), package = pkg)
     }
 
-    if (file.exists(proposal_path)){
+    if (file.exists(proposal_path)) {
 
       proposal <- readRDS(proposal_path)
 
