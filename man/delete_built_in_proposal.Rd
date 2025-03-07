@@ -33,9 +33,9 @@ If the specified sampling function or proposal type does not exist, an error is 
 # build system, hence they are commented.
 
 # Delete a custom proposal for the srgamma function (uncomment to run)
-#delete_built_in_proposal(sampling_function = "srgamma", proposal_type = "custom")
+\dontrun{delete_built_in_proposal(sampling_function = "srgamma", proposal_type = "custom")}
 
 # Delete a scaled proposal for the srnorm function (uncomment to run)
-#delete_built_in_proposal(sampling_function = "srnorm", proposal_type = "scaled")
+\dontrun{delete_built_in_proposal(sampling_function = "srnorm", proposal_type = "scaled")}
 
 }
