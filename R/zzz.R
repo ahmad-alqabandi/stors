@@ -188,30 +188,30 @@ stors_env <- new.env(parent = emptyenv())
   if (!dir.exists(data_dir))
     dir.create(data_dir, recursive = TRUE)
 
-  if (!file.exists(file.path(data_dir, "version"))) {
-    # No versioning file so make sure directory is empty and create new version file
-    unlink(list.files(tools::R_user_dir("stors", "data"), full.names = TRUE),
-           recursive = TRUE, force = TRUE)
-    fd <- file(file.path(data_dir, "version"), open = "wt")
-    write(as.character(utils::packageVersion("stors")), file = fd)
-    close(fd)
-  } else {
-    vers <- suppressWarnings(readLines(file.path(data_dir, "version"), n = 1))
-    if (!identical(as.character(utils::packageVersion("stors")),
-                   vers)) {
-      warning("Package version updated, old proposals being archived.")
-      if (file.exists(file.path(data_dir, paste0("builtin_proposals_", vers)))) {
-        unlink(file.path(data_dir, c(paste0("builtin_proposals_", vers), paste0("user_proposals_", vers))), recursive = TRUE, force = TRUE)
-      }
-      file.rename(file.path(data_dir, "builtin_proposals"),
-                  file.path(data_dir, paste0("builtin_proposals_", vers)))
-      file.rename(file.path(data_dir, "user_proposals"),
-                  file.path(data_dir, paste0("user_proposals_", vers)))
-      fd <- file(file.path(data_dir, "version"), open = "wt")
-      write(as.character(utils::packageVersion("stors")), file = fd)
-      close(fd)
-    }
-  }
+  # if (!file.exists(file.path(data_dir, "version"))) {
+  #   # No versioning file so make sure directory is empty and create new version file
+  #   unlink(list.files(tools::R_user_dir("stors", "data"), full.names = TRUE),
+  #          recursive = TRUE, force = TRUE)
+  #   fd <- file(file.path(data_dir, "version"), open = "wt")
+  #   write(as.character(utils::packageVersion("stors")), file = fd)
+  #   close(fd)
+  # } else {
+  #   vers <- suppressWarnings(readLines(file.path(data_dir, "version"), n = 1))
+  #   if (!identical(as.character(utils::packageVersion("stors")),
+  #                  vers)) {
+  #     warning("Package version updated, old proposals being archived.")
+  #     if (file.exists(file.path(data_dir, paste0("builtin_proposals_", vers)))) {
+  #       unlink(file.path(data_dir, c(paste0("builtin_proposals_", vers), paste0("user_proposals_", vers))), recursive = TRUE, force = TRUE)
+  #     }
+  #     file.rename(file.path(data_dir, "builtin_proposals"),
+  #                 file.path(data_dir, paste0("builtin_proposals_", vers)))
+  #     file.rename(file.path(data_dir, "user_proposals"),
+  #                 file.path(data_dir, paste0("user_proposals_", vers)))
+  #     fd <- file(file.path(data_dir, "version"), open = "wt")
+  #     write(as.character(utils::packageVersion("stors")), file = fd)
+  #     close(fd)
+  #   }
+  # }
 
   builtin_proposals_dir <- file.path(data_dir, "builtin_proposals")
 
@@ -235,29 +235,24 @@ stors_env <- new.env(parent = emptyenv())
 
 
   builtin_proposals_files <- list.files(builtin_proposals_dir)
+  existing_builtin_proposals_number <- as.numeric(sub("\\.rds$", "", builtin_proposals_files))
+  number_of_proposals <- 2 *length(built_in_proposals)
 
-  if (length(builtin_proposals_files) == 0) {
+  for (i in seq_len(number_of_proposals)) {
 
-
-    for (name in names(built_in_proposals)) {
-
-      fun_name <- paste0(name, "_optimize")
-      do.call(fun_name, list(steps = 4091))
-
+    proposal_path <- if (i %in% existing_builtin_proposals_number) {
+      file.path(builtin_proposals_dir, paste0(i, ".rds"))
+    } else {
+      system.file(paste0("builtin_proposals/", i, ".rds"), package = pkg)
     }
 
-  } else {
+    if (file.exists(proposal_path)){
 
-    for (proposal_name in builtin_proposals_files) {
-
-      proposal_path <- file.path(builtin_proposals_dir, proposal_name)
       proposal <- readRDS(proposal_path)
 
-      if (is_valid_proposal(proposal))
+      if (is_valid_proposal(proposal)) {
         cache_proposal_c(proposal$cnum, proposal)
-
-
-
+      }
     }
 
   }
