@@ -9,7 +9,7 @@ It employs an optimized proposal distribution around the mode and Adaptive Rejec
 
     <a class="navbar-brand me-2" href="../index.html">stors</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -105,23 +105,23 @@ from the standard Normal distribution, then scaled and location shifted accordin
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Generate 10 samples from the standard Normal distribution</span></span></span>
 <span class="r-in"><span><span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu">srnorm</span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">samples</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  1.82162188 -1.54503316  0.66665189 -0.18628797 -1.13132568 -0.04051822</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.31578765 -0.54573070  1.19908447 -1.07421382</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  0.4243311  1.4301971 -1.0563776  0.7653815  1.2819099 -0.5776533</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  0.6286107  1.0763716 -0.5866452 -0.7403679</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Generate 10 samples using a pre-allocated vector</span></span></span>
 <span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">srnorm</span><span class="op">(</span><span class="fl">10</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.8836765  1.2722961 -0.8249442  1.4520775  0.3352823  1.1540284</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  2.4333979 -0.6606458  0.3987386 -1.0249183</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  1.0800536 -0.7451148 -0.7294962 -0.4985642  0.2222929 -0.2952098</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -1.8884170  0.0737074  0.8794445  1.0396361</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.8836765  1.2722961 -0.8249442  1.4520775  0.3352823  1.1540284</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  2.4333979 -0.6606458  0.3987386 -1.0249183</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  1.0800536 -0.7451148 -0.7294962 -0.4985642  0.2222929 -0.2952098</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -1.8884170  0.0737074  0.8794445  1.0396361</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Generate 10 samples from a Normal distribution with mean = 2 and sd = 3</span></span></span>
 <span class="r-in"><span><span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu">srnorm</span><span class="op">(</span><span class="fl">10</span>, mean <span class="op">=</span> <span class="fl">2</span>, sd <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">samples</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  2.0166136  4.7186473 -0.8259597  3.0032599  2.6041036  1.3932055</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  4.7839186  3.1892148  0.3062024  3.6714986</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  3.86374215  6.52516141 -1.09233696  2.72138269  1.24684771  1.99993077</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  6.16478822 -0.05879545  2.11829241  1.87991590</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
