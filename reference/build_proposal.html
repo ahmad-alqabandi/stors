@@ -286,6 +286,8 @@ x-axis, they can do so by specifying the proposal limits using the <code>proposa
 <span class="r-in"><span><span class="va">h_norm</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu">f_norm</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span> <span class="op">}</span></span></span>
 <span class="r-in"><span><span class="va">h_prime_norm</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span> <span class="op">-</span><span class="va">x</span> <span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Following example takes slightly too long to run on CRAN.</span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Build the proposal for the standard normal distribution</span></span></span>
 <span class="r-in"><span><span class="va">norm_proposal</span> <span class="op">=</span> <span class="fu">build_proposal</span><span class="op">(</span>lower <span class="op">=</span> <span class="op">-</span><span class="cn">Inf</span>, upper <span class="op">=</span> <span class="cn">Inf</span>, mode <span class="op">=</span> <span class="va">modes_norm</span>,</span></span>
 <span class="r-in"><span> f <span class="op">=</span> <span class="va">f_norm</span>, h <span class="op">=</span> <span class="va">h_norm</span>, h_prime <span class="op">=</span> <span class="va">h_prime_norm</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
@@ -297,90 +299,91 @@ x-axis, they can do so by specifying the proposal limits using the <code>proposa
 <span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         Steps      |       Area       |    Best Sim Time</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  -----------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---        132 ---  --- 0.007723577 ---   ---   90543.00 ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---        126 ---  --- 0.008130081 ---   ---  104113.50 ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---        120 ---  --- 0.008536585 ---   ---  103172.00 ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---        132 ---  --- 0.007723577 ---   ---   96375.00 ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---        126 ---  --- 0.008130081 ---   ---  109479.50 ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---        120 ---  --- 0.008536585 ---   ---  112139.50 ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Step:        Inf | Area: 0.003984064 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         Steps      |       Area       |    Best Sim Time</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  -----------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---        268 ---  --- 0.003784861 ---   ---   57943.00 ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---        254 ---  --- 0.003984064 ---   ---   54502.00 ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---        242 ---  --- 0.004183267 ---   ---   63929.00 ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---        268 ---  --- 0.003784861 ---   ---   63684.00 ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---        254 ---  --- 0.003984064 ---   ---   63879.50 ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---        242 ---  --- 0.004183267 ---   ---   64375.00 ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Step:        Inf | Area: 0.001972387 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         Steps      |       Area       |    Best Sim Time</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  -----------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---        538 ---  --- 0.001873767 ---   ---   34389.00 ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---        512 ---  --- 0.001972387 ---   ---   41998.00 ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---        488 ---  --- 0.002071006 ---   ---   42915.00 ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---        538 ---  --- 0.001873767 ---   ---   40200.00 ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---        512 ---  --- 0.001972387 ---   ---   44437.50 ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---        488 ---  --- 0.002071006 ---   ---   50519.50 ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Step:        Inf | Area: 0.000981354 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         Steps      |       Area       |    Best Sim Time</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  -----------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---       1078 ---  --- 0.000932287 ---   ---   29945.50 ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---       1024 ---  --- 0.000981354 ---   ---   26855.00 ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---        976 ---  --- 0.001030422 ---   ---   28488.00 ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---       1078 ---  --- 0.000932287 ---   ---   31248.00 ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---       1024 ---  --- 0.000981354 ---   ---   27196.00 ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---        976 ---  --- 0.001030422 ---   ---   30201.00 ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Step:        Inf | Area: 0.000489476 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         Steps      |       Area       |    Best Sim Time</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  -----------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---       2156 ---  --- 0.000465002 ---   ---   19646.50 ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---       2048 ---  --- 0.000489476 ---   ---   16941.50 ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---       1952 ---  --- 0.000513950 ---   ---   24310.00 ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---       2156 ---  --- 0.000465002 ---   ---   19958.00 ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---       2048 ---  --- 0.000489476 ---   ---   17778.50 ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---       1952 ---  --- 0.000513950 ---   ---   26164.50 ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Step:        Inf | Area: 0.000244439 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         Steps      |       Area       |    Best Sim Time</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  -----------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---       4312 ---  --- 0.000232217 ---   ---   17717.50 ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---       4098 ---  --- 0.000244439 ---   ---   17302.00 ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---       3902 ---  --- 0.000256661 ---   ---   15739.50 ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---       4312 ---  --- 0.000232217 ---   ---   18810.00 ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---       4098 ---  --- 0.000244439 ---   ---   17938.50 ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---       3902 ---  --- 0.000256661 ---   ---   15704.00 ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Step:        Inf | Area: 0.000122145 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         Steps      |       Area       |    Best Sim Time</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  -----------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---       8626 ---  --- 0.000116038 ---   ---   17533.00 ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---       8194 ---  --- 0.000122145 ---   ---   15278.50 ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---       7804 ---  --- 0.000128252 ---   ---   15113.00 ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---       8626 ---  --- 0.000116038 ---   ---   18359.50 ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---       8194 ---  --- 0.000122145 ---   ---   13886.50 ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---       7804 ---  --- 0.000128252 ---   ---   15684.50 ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Step:        Inf | Area: 0.000061054 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         Steps      |       Area       |    Best Sim Time</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  -----------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---      17248 ---  --- 0.000058001 ---   ---   26003.50 ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---      16386 ---  --- 0.000061054 ---   ---   24716.50 ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---      15606 ---  --- 0.000064106 ---   ---   19717.00 ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---      17248 ---  --- 0.000058001 ---   ---   28092.50 ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---      16386 ---  --- 0.000061054 ---   ---   24831.00 ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---      15606 ---  --- 0.000064106 ---   ---   20062.50 ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────────────────────────────────────────────────────────</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Performance Data:</span> <span style="color: #00BBBB;">───────────────────────────────────────────────────────────</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      Area       |     Time     |   Steps</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.0077235772 |   90543.00 |     132</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.0039840637 |   54502.00 |     254</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.0018737673 |   34389.00 |     538</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.0009813543 |   26855.00 |    1024</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.0004894763 |   16941.50 |    2048</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.0002566610 |   15739.50 |    3902</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.0001282521 |   15113.00 |    7804</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  0.0077235772 |   96375.00 |     132</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  0.0037848606 |   63684.00 |     268</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  0.0018737673 |   40200.00 |     538</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  0.0009813543 |   27196.00 |    1024</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  0.0004894763 |   17778.50 |    2048</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  0.0002566610 |   15704.00 |    3902</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  0.0001221449 |   13886.50 |    8194</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────────────────────────────────────────────────────────</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Plot the generated proposal</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">norm_proposal</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="build_proposal-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 2: proposal for a Bimodal Distribution</span></span></span>
 <span class="r-in"><span><span class="co"># This example shows how to build a proposal for sampling from a bimodal distribution,</span></span></span>
