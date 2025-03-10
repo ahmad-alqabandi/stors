@@ -412,16 +412,17 @@ cached_proposal_info <- function(cnum) {
 #'
 #' @examples
 #'
-#' # The following examples are commented, since if they are run the srgamma and
+#' # The following examples are not run, since if they are run the srgamma and
 #' # srnorm samplers will no longer work until a new grid is built for them.
 #' # This causes problems if the examples are run by CRAN checks or the website
-#' # build system, hence they are commented.
-#'
+#' # build system.
+#' \dontrun{
 #' # Delete a custom proposal for the srgamma function (uncomment to run)
-#' \dontrun{delete_built_in_proposal(sampling_function = "srgamma", proposal_type = "custom")}
+#' delete_built_in_proposal(sampling_function = "srgamma", proposal_type = "custom")
 #'
 #' # Delete a scaled proposal for the srnorm function (uncomment to run)
-#' \dontrun{delete_built_in_proposal(sampling_function = "srnorm", proposal_type = "scaled")}
+#' delete_built_in_proposal(sampling_function = "srnorm", proposal_type = "scaled")
+#' }
 #'
 #' @export
 delete_built_in_proposal <- function(sampling_function, proposal_type = "custom") {

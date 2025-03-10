@@ -183,58 +183,23 @@ stors_env <- new.env(parent = emptyenv())
 
 .onLoad <- function(lib, pkg) {
 
+  assign("user_cnum_counter", 100, envir = stors_env)
+  assign("user_session_cached_proposals_locks", data.frame(lock = character(), cnum = numeric()), envir = stors_env)
+
   data_dir <- tools::R_user_dir("stors", "data")
 
-  if (!dir.exists(data_dir))
-    dir.create(data_dir, recursive = TRUE)
-
-  # if (!file.exists(file.path(data_dir, "version"))) {
-  #   # No versioning file so make sure directory is empty and create new version file
-  #   unlink(list.files(tools::R_user_dir("stors", "data"), full.names = TRUE),
-  #          recursive = TRUE, force = TRUE)
-  #   fd <- file(file.path(data_dir, "version"), open = "wt")
-  #   write(as.character(utils::packageVersion("stors")), file = fd)
-  #   close(fd)
-  # } else {
-  #   vers <- suppressWarnings(readLines(file.path(data_dir, "version"), n = 1))
-  #   if (!identical(as.character(utils::packageVersion("stors")),
-  #                  vers)) {
-  #     warning("Package version updated, old proposals being archived.")
-  #     if (file.exists(file.path(data_dir, paste0("builtin_proposals_", vers)))) {
-  #       unlink(file.path(data_dir, c(paste0("builtin_proposals_", vers), paste0("user_proposals_", vers))), recursive = TRUE, force = TRUE)
-  #     }
-  #     file.rename(file.path(data_dir, "builtin_proposals"),
-  #                 file.path(data_dir, paste0("builtin_proposals_", vers)))
-  #     file.rename(file.path(data_dir, "user_proposals"),
-  #                 file.path(data_dir, paste0("user_proposals_", vers)))
-  #     fd <- file(file.path(data_dir, "version"), open = "wt")
-  #     write(as.character(utils::packageVersion("stors")), file = fd)
-  #     close(fd)
-  #   }
-  # }
-
   builtin_proposals_dir <- file.path(data_dir, "builtin_proposals")
+  assign("builtin_proposals_dir", builtin_proposals_dir, envir = stors_env)
 
   user_proposals_dir <- file.path(data_dir, "user_proposals")
-
-
-  if (!dir.exists(builtin_proposals_dir))
-    dir.create(builtin_proposals_dir, recursive = TRUE)
-
-
-  if (!dir.exists(user_proposals_dir))
-    dir.create(user_proposals_dir, recursive = TRUE)
-
-  user_cnum_counter <- 100
-  user_session_cached_proposals_locks <- data.frame(lock = character(), cnum = numeric())
-
-  assign("builtin_proposals_dir", builtin_proposals_dir, envir = stors_env)
   assign("user_proposals_dir", user_proposals_dir, envir = stors_env)
-  assign("user_cnum_counter", user_cnum_counter, envir = stors_env)
-  assign("user_session_cached_proposals_locks", user_session_cached_proposals_locks, envir = stors_env)
 
+  if (dir.exists(builtin_proposals_dir)) {
+    builtin_proposals_files <- list.files(builtin_proposals_dir)
+  } else {
+    builtin_proposals_files <- character(0)
+  }
 
-  builtin_proposals_files <- list.files(builtin_proposals_dir)
   existing_builtin_proposals_number <- as.numeric(sub("\\.rds$", "", builtin_proposals_files))
   number_of_proposals <- 2 * length(built_in_proposals)
 
@@ -256,7 +221,6 @@ stors_env <- new.env(parent = emptyenv())
     }
 
   }
-
 }
 
 .onUnload <- function(...) {
