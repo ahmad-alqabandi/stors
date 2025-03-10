@@ -381,6 +381,9 @@ free_cache_cnum_c <- function(c_num) {
 
 #' @noRd
 save_builtin_proposal <- function(c_num, proposal) {
+  if (!dir.exists(stors_env$builtin_proposals_dir))
+    dir.create(stors_env$builtin_proposals_dir, recursive = TRUE)
+
   proposals_file_path <- file.path(stors_env$builtin_proposals_dir, paste0(c_num, ".rds"))
   saveRDS(proposal, proposals_file_path)
 }

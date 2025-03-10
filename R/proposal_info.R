@@ -321,6 +321,9 @@ save_proposal <- function(proposal, proposal_name) {
                      "i" = "Only proposals created using {.fn build_proposal} can be used."))
   }
 
+  if (!dir.exists(stors_env$user_proposals_dir))
+    dir.create(stors_env$user_proposals_dir, recursive = TRUE)
+
   proposals_file_path <- file.path(stors_env$user_proposals_dir,
                                    paste0(proposal_name, ".rds"))
   saveRDS(proposal, proposals_file_path)
