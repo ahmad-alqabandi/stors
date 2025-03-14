@@ -1,7 +1,7 @@
 Package: stors
 Type: Package
 Title: Step Optimised Rejection Sampling
-Version: 1.0.1
+Version: 1.0.2
 Authors@R: c(
     person("Ahmad", "ALQabandi", email = "ahmad.alqabandi@durham.ac.uk",
            role = c("cre", "aut", "cph"),
