@@ -3,11 +3,17 @@
 \name{srnorm}
 \alias{srnorm}
 \alias{srnorm_custom}
+\alias{tabl_srnorm_custom}
+\alias{stors_srnorm_custom}
 \title{Sampling from Normal Distribution}
 \usage{
 srnorm(n = 1, mean = 0, sd = 1, x = NULL)
 
 srnorm_custom(n = 1, x = NULL)
+
+tabl_srnorm_custom(x = NULL)
+
+stors_srnorm_custom(x = NULL)
 }
 \arguments{
 \item{n}{Integer, length 1. Number of samples to draw.}

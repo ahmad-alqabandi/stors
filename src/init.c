@@ -10,6 +10,12 @@
 #include "grid_utils.h"
 #include "srbeta.h"
 #include "err.h"
+<<<<<<< Updated upstream
+=======
+#include "uniform_rngs.h"
+#include "bm_tabl.h"
+#include "bm_stors.h"
+>>>>>>> Stashed changes
 
 
 static const R_CallMethodDef callMethods[]  = {
@@ -33,6 +39,8 @@ static const R_CallMethodDef callMethods[]  = {
 
   {"srnorm_custom", (DL_FUNC) &srnorm_custom, 1},
   {"srnorm_custom_inplace", (DL_FUNC) &srnorm_custom_inplace, 1},
+  {"tabl_srnorm_custom_inplace", (DL_FUNC) &tabl_srnorm_custom_inplace, 1},
+  {"stors_srnorm_custom_inplace", (DL_FUNC) &stors_srnorm_custom_inplace, 1},
 
   {"srnorm_sym_custom", (DL_FUNC) &srnorm_sym_custom, 1},
   {"srnorm_sym_custom_inplace", (DL_FUNC) &srnorm_sym_custom_inplace, 1},

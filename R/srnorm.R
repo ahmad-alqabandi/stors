@@ -67,8 +67,25 @@ srnorm <- function(n = 1, mean = 0, sd = 1, x = NULL) {
 #'
 #' @export
 srnorm_custom <- function(n = 1, x = NULL) {
-  .Call(C_srnorm_custom_check, n, x)
+  .Call(C_srnorm_custom_check,n, x)
 }
+
+#' Sampling from Custom Normal Distribution TABL
+#' @rdname srnorm
+#'
+#' @export
+tabl_srnorm_custom <- function(x = NULL) {
+  .Call(C_tabl_srnorm_custom_inplace, x)
+}
+
+#' Sampling from Custom Normal Distribution TABL
+#' @rdname srnorm
+#'
+#' @export
+stors_srnorm_custom <- function(x = NULL) {
+  .Call(C_stors_srnorm_custom_inplace, x)
+}
+
 
 
 #' Optimizing Normal Distribution proposal
