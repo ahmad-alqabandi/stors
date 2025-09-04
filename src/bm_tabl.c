@@ -42,14 +42,6 @@ SEXP tabl_srnorm_custom_inplace(SEXP Rresults){
   {
 
 
-    // if(u1 > 0.5){
-    //   u1 = 1-u1;
-    //   flip = -1;
-    // }else{
-    //   flip = 1;
-    // }
-
-    /* Use the top bit for the sign, rescale the remainder back to (0,1)   */
     if (u1 < 0.5) {                    /* left half → negative sign          */
     flip = -1;
       u1 = 2.0 * u1;                /* uniform on (0,1) again             */
@@ -57,28 +49,6 @@ SEXP tabl_srnorm_custom_inplace(SEXP Rresults){
     flip = +1;
       u1 = 2.0 * u1 - 1.0;          /*   (shifts interval [0.5,1) → (0,1) */
     }
-//
-//     if (u1 < g->sampling_probabilities[0])
-//     {
-//
-//       sample = x[0] + (log( g->lt_properties[0] + u1 * g->lt_properties[1]) - g->lt_properties[2]) * g->lt_properties[3];
-//       h_upper = g->lt_properties[4] * (sample - x[0]) + g->lt_properties[2];
-//       u = u_rng();
-//
-//       if (u < F(sample) / exp(h_upper))
-//       {
-//         results[i] = sample;
-//         i++;
-//       }
-//
-//       u1 = u_rng();
-//
-//
-//
-//     }else
-//
-//
-
 
       if(u1 > g->sampling_probabilities[1]){
 
